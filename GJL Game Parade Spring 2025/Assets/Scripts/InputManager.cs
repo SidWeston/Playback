@@ -15,6 +15,7 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public InputKey crouchKey = new InputKey();
     public InputKey sprintKey = new InputKey();
     public InputKey jumpKey = new InputKey();
+    public InputKey ghostKey = new InputKey();
 
     private void Awake()
     {
@@ -95,6 +96,20 @@ public class InputManager : MonoBehaviour, IPlayerActions
         {
             sprintKey.downCounter = 0;
             sprintKey.InvokeKeyPress(false);
+        }
+    }
+
+    public void OnToggleGhost(InputAction.CallbackContext context)
+    {
+        if(context.ReadValue<float>() > 0 &&  ghostKey.downCounter == 0)
+        {
+            ghostKey.downCounter++;
+            ghostKey.InvokeKeyPress(true);
+        }
+        else if(context.ReadValue<float>() <= 0)
+        {
+            ghostKey.downCounter = 0;
+            ghostKey.InvokeKeyPress(false);
         }
     }
 }

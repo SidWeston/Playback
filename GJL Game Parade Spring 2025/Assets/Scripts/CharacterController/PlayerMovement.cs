@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem.Layouts;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
 
     //ground check and gravity
     private bool grounded;
-    [SerializeField] private LayerMask whatIsGround;
+    [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheckLocation;
 
     private Vector3 velocity;
@@ -37,26 +36,23 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        grounded = Physics.CheckSphere(groundCheckLocation.position, 0.15f, groundLayer);
         //apply gravity
-        velocity.y += gravity;
-        if (grounded)
+        velocity.y += gravity * Time.deltaTime;
+        if (grounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
-        characterController.Move(velocity);
 
         //move player
-        Vector3 movement = transform.right * moveVector.x + transform.forward * moveVector.y;
-        characterController.Move(movement * moveSpeed * Time.deltaTime);
-    }
-
-    private void FixedUpdate()
-    {
-        grounded = Physics.CheckSphere(groundCheckLocation.position, 0.15f, whatIsGround);
+        //movement direction based on inputs
+        Vector3 movementInput = transform.right * moveVector.x + transform.forward * moveVector.y;
+        //add gravity to it
+        Vector3 totalMovement = movementInput * moveSpeed + Vector3.up * velocity.y;
+        characterController.Move(totalMovement * Time.deltaTime);
     }
 
     //input functions
-
     private void OnMove(Vector2 input)
     {
         moveVector = input;
@@ -64,7 +60,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnJump(bool input)
     {
-        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        if(input && grounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
     }
 
     private void OnSprint(bool input)
@@ -72,16 +71,18 @@ public class PlayerMovement : MonoBehaviour
         if(input)
         {
             moveSpeed = sprintSpeed;
+            sprinting = true;
         }
         else
         {
             moveSpeed = walkSpeed;
+            sprinting = false;
         }
     }
 
     private void OnCrouch(bool input)
     {
-
+        crouching = input;
     }
 
     //ghost recording
@@ -91,7 +92,10 @@ public class PlayerMovement : MonoBehaviour
         {
             position = transform.position,
             rotation = transform.rotation,
+            movementInput = moveVector,
             isCrouching = crouching,
+            isSprinting = sprinting,
+            isJumping = grounded,
             timeStamp = Time.time
         };
     }

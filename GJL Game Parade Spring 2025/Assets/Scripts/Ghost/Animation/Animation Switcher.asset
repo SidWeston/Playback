@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80aed9fe0504d4840b151afc62a7fe59, type: 3}
+  m_Name: Animation Switcher
+  m_EditorClassIdentifier: 
+  walkSet: {fileID: 11400000, guid: e63788225115c754b97e9fab26c08feb, type: 2}
+  sprintSet: {fileID: 11400000, guid: 07e409d94c7c5f24ea70af8977ad9ab2, type: 2}
+  crouchSet: {fileID: 11400000, guid: 3a3acc2f1f4fad94ebda207d38765640, type: 2}
+  idle: {fileID: -2576967968662016515, guid: 56fd86b76fc74d24d83522069f5deb9b, type: 3}
+  crouchIdle: {fileID: 3094330708855449807, guid: aa30e50360fde394fb96e9e6c0ba8e18, type: 3}
+  jump: {fileID: 8973767263969007744, guid: 2035f8d45874b4e47a2c15ea2fa026fb, type: 3}
+  falling: {fileID: 0}
