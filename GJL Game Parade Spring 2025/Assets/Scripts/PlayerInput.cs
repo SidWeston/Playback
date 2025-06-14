@@ -82,9 +82,18 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ToggleGhost"",
+                    ""name"": ""RecordGhost"",
                     ""type"": ""Button"",
                     ""id"": ""60f4fd24-434e-46e9-94b0-408b935224be"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleGhost"",
+                    ""type"": ""Button"",
+                    ""id"": ""b8004e30-28c0-471c-81ee-e1d73c9d5024"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -231,6 +240,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
+                    ""action"": ""RecordGhost"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""990a4efa-34d2-4d33-9e5f-f3a7ff50f991"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
                     ""action"": ""ToggleGhost"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -248,6 +268,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_RecordGhost = m_Player.FindAction("RecordGhost", throwIfNotFound: true);
         m_Player_ToggleGhost = m_Player.FindAction("ToggleGhost", throwIfNotFound: true);
     }
 
@@ -321,6 +342,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_RecordGhost;
     private readonly InputAction m_Player_ToggleGhost;
     public struct PlayerActions
     {
@@ -332,6 +354,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @RecordGhost => m_Wrapper.m_Player_RecordGhost;
         public InputAction @ToggleGhost => m_Wrapper.m_Player_ToggleGhost;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -360,6 +383,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @RecordGhost.started += instance.OnRecordGhost;
+            @RecordGhost.performed += instance.OnRecordGhost;
+            @RecordGhost.canceled += instance.OnRecordGhost;
             @ToggleGhost.started += instance.OnToggleGhost;
             @ToggleGhost.performed += instance.OnToggleGhost;
             @ToggleGhost.canceled += instance.OnToggleGhost;
@@ -385,6 +411,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @RecordGhost.started -= instance.OnRecordGhost;
+            @RecordGhost.performed -= instance.OnRecordGhost;
+            @RecordGhost.canceled -= instance.OnRecordGhost;
             @ToggleGhost.started -= instance.OnToggleGhost;
             @ToggleGhost.performed -= instance.OnToggleGhost;
             @ToggleGhost.canceled -= instance.OnToggleGhost;
@@ -413,6 +442,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnSprint(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnRecordGhost(InputAction.CallbackContext context);
         void OnToggleGhost(InputAction.CallbackContext context);
     }
 }

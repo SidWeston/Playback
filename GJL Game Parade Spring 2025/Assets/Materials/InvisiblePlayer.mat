@@ -7,25 +7,24 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ghost
-  m_Shader: {fileID: 4800000, guid: 8a970d62549d99d4eab51bffa33b0ee9, type: 3}
+  m_Name: InvisiblePlayer
+  m_Shader: {fileID: 4800000, guid: 0dde7f0097aeb2541aea684ca0ad0e3c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
-  - _EMISSION_ON
-  - _GLITCH_ON
+  - _FADE_BY_CAM_DISTANCE_NEAR_FADE
+  - _FADE_BY_CAM_DISTANCE_ON
   - _GREYSCALESTAGE_BEFORELIGHTING
-  - _HOLOGRAM_ON
-  - _HUE_SHIFT_ON
   - _LIGHTMODEL_TOON
   - _MATCAPBLENDMODE_MULTIPLY
   - _OUTLINETYPE_NONE
+  - _RECEIVE_SHADOWS_ON
   - _REFLECTIONS_NONE
-  - _RIMLIGHTINGSTAGE_BEFORELIGHTINGLAST
+  - _RIMLIGHTINGSTAGE_BEFORELIGHTING
   - _SHADINGMODEL_BASIC
   - _SPECULARMODEL_NONE
-  - _SUBSURFACE_SCATTERING_ON
   - _TEXTUREBLENDINGMODE_RGB
   - _USE_WIND_VERTICAL_MASK
   m_InvalidKeywords:
@@ -102,7 +101,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 4bd33e1e21997ce40943100eae6b272c, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FadeTex:
@@ -197,7 +196,7 @@ Material:
     - _AlbedoVertexColorOn: 0
     - _AlphaClip: 0
     - _AlphaCutoffOn: 0
-    - _AlphaCutoffValue: 0.211
+    - _AlphaCutoffValue: 1
     - _AlphaRoundOn: 0
     - _AlphaToMask: 0
     - _AnisoShininess: 0.85
@@ -215,7 +214,7 @@ Material:
     - _Brightness: 0
     - _BrightnessLM: 0
     - _BumpScale: 1
-    - _CastShadowsOn: 0
+    - _CastShadowsOn: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _ColorMask: 15
@@ -235,7 +234,7 @@ Material:
     - _Cutoff: 0.5
     - _DepthColoringOn: 0
     - _DepthGlowColorIntensity: 25
-    - _DepthGlowDist: 0.01
+    - _DepthGlowDist: 0.2
     - _DepthGlowGlobalIntensity: 2
     - _DepthGlowPower: 25
     - _DetailAlbedoMapScale: 1
@@ -247,22 +246,22 @@ Material:
     - _DitherScale: 10
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EmissionEnabled: 1
-    - _EmissionSelfGlow: 3
+    - _EmissionEnabled: 0
+    - _EmissionSelfGlow: 1
     - _EnvironmentReflections: 1
     - _FaceDownCutoff: 0.25
     - _FadeAmount: 0
     - _FadeBurnOn: 0
     - _FadeBurnWidth: 0.01
-    - _FadeByCamDistanceOn: 0
+    - _FadeByCamDistanceOn: 1
     - _FadeOn: 0
-    - _FadePower: 0.28
+    - _FadePower: 1
     - _FadeTransition: 0.2
     - _FogOn: 0
-    - _GeneralAlpha: 0.6
-    - _Glitch: 1
-    - _GlitchAmount: 0.1
-    - _GlitchSpeed: 0.5
+    - _GeneralAlpha: 1
+    - _Glitch: 0
+    - _GlitchAmount: 0.5
+    - _GlitchSpeed: 2.5
     - _GlitchTiling: 5
     - _GlitchWorldSpace: 1
     - _GlossMapOn: 0
@@ -277,7 +276,7 @@ Material:
     - _HandDrawn: 0
     - _HandDrawnAmount: 10
     - _HandDrawnSpeed: 5
-    - _HardnessFakeGI: 1
+    - _HardnessFakeGI: 0.75
     - _HeightGradientOn: 0
     - _HeightGradientPositionSpace: 0
     - _HighlightCutoff: 0.5
@@ -287,7 +286,7 @@ Material:
     - _Hit: 0
     - _HitBlend: 1
     - _HitGlow: 5
-    - _Hologram: 1
+    - _Hologram: 0
     - _HologramAccentAlpha: 0.5
     - _HologramAccentFrequency: 2
     - _HologramAccentSpeed: 1
@@ -297,13 +296,13 @@ Material:
     - _HologramLineCenter: 0.5
     - _HologramLineSmoothness: 2
     - _HologramLineSpacing: 2
-    - _HologramScrollSpeed: 1
-    - _HueBrightness: 1.42
+    - _HologramScrollSpeed: 2
+    - _HueBrightness: 1
     - _HueBrightnessLM: 1
-    - _HueSaturation: 2.78
+    - _HueSaturation: 1
     - _HueSaturationLM: 1
-    - _HueShift: 43
-    - _HueShiftEnabled: 1
+    - _HueShift: 0
+    - _HueShiftEnabled: 0
     - _HueShiftLM: 0
     - _InflateBlend: 1
     - _IntersectionFadeFactor: 1
@@ -318,14 +317,14 @@ Material:
     - _MaxDistanceToFade: 100
     - _MaxGradientHeight: 0.75
     - _MaxInflate: 0.2
-    - _MaxRim: 0.803
+    - _MaxRim: 1
     - _Metallic: 0
     - _MetallicMapOn: 0
-    - _MinDistanceToFade: 0
+    - _MinDistanceToFade: -1.8
     - _MinGradientHeight: 0
     - _MinInflate: 0
-    - _MinRim: 0.997
-    - _NearFade: 0
+    - _MinRim: 0
+    - _NearFade: 1
     - _NormalInfluence: 0.5
     - _NormalMapEnabled: 0
     - _NormalStrength: 1
@@ -335,18 +334,18 @@ Material:
     - _Pixelate: 0
     - _PixelateSize: 32
     - _Posterize: 0
-    - _PosterizeGamma: 2
-    - _PosterizeNumColors: 52
+    - _PosterizeGamma: 0.75
+    - _PosterizeNumColors: 8
     - _QueueOffset: 0
     - _RecalculateNormals: 0
     - _ReceiveShadows: 1
-    - _ReceiveShadowsOn: 0
+    - _ReceiveShadowsOn: 1
     - _Reflections: 0
     - _ReflectionsAtten: 0.5
     - _RenderPreset: 2
     - _RimAttenuation: 1
     - _RimLighting: 0
-    - _RimLightingStage: 1
+    - _RimLightingStage: 0
     - _SSSAtten: 1
     - _SSSFrontAtten: 0.3
     - _SSSFrontPower: 3
@@ -373,13 +372,13 @@ Material:
     - _StochasticSampling: 0
     - _StochasticScale: 3.464
     - _StochasticSkew: 0.57735026
-    - _SubsurfaceScattering: 1
+    - _SubsurfaceScattering: 0
     - _Surface: 0
     - _TextureBlending: 0
     - _TextureBlendingMode: 0
     - _TextureBlendingSource: 0
     - _TimingSeed: 0
-    - _ToonCutoff: 0.415
+    - _ToonCutoff: 0.5
     - _ToonFactor: 0
     - _ToonSmoothness: 0.5
     - _TopNormalStrength: 1
@@ -414,9 +413,9 @@ Material:
     - _AOColor: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _CustomAmbientColor: {r: 0.40744036, g: 0.78200066, b: 0.7924528, a: 0.4745098}
-    - _DepthGlowColor: {r: 0.29803923, g: 0.82745105, b: 0.9058824, a: 1}
-    - _EmissionColor: {r: 0.07186719, g: 0.6509953, b: 0.8018868, a: 1}
+    - _CustomAmbientColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
+    - _DepthGlowColor: {r: 1, g: 0.9869999, b: 0.6, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FadeBurnColor: {r: 1, g: 1, b: 0, a: 1}
     - _GlitchOffset: {r: -0.5, g: 0, b: 0, a: 0}
     - _GradientHeightColor01: {r: 0.2, g: 0.2, b: 0.2, a: 1}
@@ -425,9 +424,9 @@ Material:
     - _HighlightOffset: {r: 0, g: 0, b: 0, a: 0}
     - _HighlightsColor: {r: 2, g: 2, b: 2, a: 1}
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HologramColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HologramLineDirection: {r: 0.5, g: 0.5, b: 0.5, a: 0}
-    - _RimColor: {r: 0.29236382, g: 0.832705, b: 0.8490566, a: 1}
+    - _HologramColor: {r: 1.25, g: 2.8, b: 6.8, a: 1}
+    - _HologramLineDirection: {r: 0, g: 1, b: 0, a: 0}
+    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimOffset: {r: 0, g: 0, b: 0, a: 0}
     - _SSSColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShakeMaxDisplacement: {r: 0.1, g: 0.1, b: 0.1, a: 0}
@@ -436,7 +435,7 @@ Material:
     - _VertexDistortionNoiseSpeed: {r: 4, g: 4, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &7094043398942249585
+--- !u!114 &1965765451680045320
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

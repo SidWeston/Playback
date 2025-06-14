@@ -60,9 +60,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleGhost",
+                    "name": "RecordGhost",
                     "type": "Button",
                     "id": "60f4fd24-434e-46e9-94b0-408b935224be",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleGhost",
+                    "type": "Button",
+                    "id": "b8004e30-28c0-471c-81ee-e1d73c9d5024",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -206,6 +215,17 @@
                     "name": "",
                     "id": "5b22b06f-0446-4c6f-9779-df5ba39ef891",
                     "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RecordGhost",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "990a4efa-34d2-4d33-9e5f-f3a7ff50f991",
+                    "path": "<Keyboard>/g",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

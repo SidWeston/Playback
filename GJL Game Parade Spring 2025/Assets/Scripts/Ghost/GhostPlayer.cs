@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
+using System.Transactions;
 using UnityEngine;
 
 public class GhostPlayer : MonoBehaviour
@@ -9,108 +10,179 @@ public class GhostPlayer : MonoBehaviour
 
     private List<GhostFrame> recording = new List<GhostFrame>();
 
-    private bool shouldRecord = true;
+    private bool isRecording = false;
 
-    [SerializeField] private float ghostDelay = 10.0f;
+    [SerializeField] private float frameInterval = 0.1f;
+    [SerializeField] private float recordDuration = 5f;
 
     [SerializeField] private GhostAnimationController animationController;
     [SerializeField] private BoxCollider ghostCollider;
     [SerializeField] private LayerMask playerLayer;
 
+    [SerializeField] private GameObject head, body;
+    [SerializeField] private Material ghostMat;
+
+    private int currentFrameIndex = 0;
+    private float frameTimer = 0f;
+    private bool isPlaying = false;
+    private bool active = false;
+
+    private bool overlappingPlayer = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        StartCoroutine(RecordFrame());
-
-        InputManager.instance.ghostKey.keyPress += ToggleCollision;
+        InputManager.instance.ghostKey.keyPress += ToggleGhost;
+        InputManager.instance.recordKey.keyPress += StartRecording;
+        ResetGlitch(); //ensure glitch effect isnt set to high by default
+        active = false; //assume ghost starts turned off
     }
 
     // Update is called once per frame
     void Update()
     {
-        float ghostTime = Time.time - ghostDelay;
+        if (!isPlaying || recording.Count < 2) return;
 
-        if (recording == null || recording.Count < 2) return;
+        frameTimer += Time.deltaTime;
 
-        //find the two frames around the current ghost time
-        GhostFrame a = default;
-        GhostFrame b = default;
-        bool found = false;
-
-        for(int i = 0; i < recording.Count - 1; i++)
+        while(frameTimer > frameInterval)
         {
-            if (recording[i].timeStamp <= ghostTime && recording[i + 1].timeStamp >= ghostTime)
+            frameTimer -= frameInterval;
+            currentFrameIndex++;
+            if(currentFrameIndex >= recording.Count - 1)
             {
-                a = recording[i];
-                b = recording[i + 1];
-                found = true;
-                break;
+                currentFrameIndex = 0;
+                ghostMat.SetFloat("_GlitchAmount", 5);
+                Invoke("ResetGlitch", 0.2f);
+                if (CheckForPlayerOverlap())
+                {
+                    overlappingPlayer = true;
+                    Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
+                }
             }
         }
 
-        if (!found) return;
+        if (overlappingPlayer && !!CheckForPlayerOverlap())
+        {
+            overlappingPlayer = false;
+            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
+        }
 
-        //play animations
+        GhostFrame a = recording[currentFrameIndex];
+        GhostFrame b = recording[currentFrameIndex + 1];
+        float t = frameTimer / frameInterval;
+
+        Vector3 position = Vector3.Lerp(a.position, b.position, t);
+        Quaternion rotation = Quaternion.Slerp(a.rotation, b.rotation, t);
+
+        transform.position = position;
+        transform.rotation = rotation;
+
         animationController.PlayMovementAnimation(a.movementInput);
-
         animationController.SwitchAnimSet(a.isCrouching, a.isSprinting);
 
-        if(a.isCrouching)
-        {
-            ghostCollider.size = new Vector3(ghostCollider.size.x, 1, ghostCollider.size.z);
-            ghostCollider.center = new Vector3(0, -0.25f, 0);
-        }
-        else
-        {
-            ghostCollider.size = new Vector3(ghostCollider.size.x, 2, ghostCollider.size.z);
-            ghostCollider.center = Vector3.zero;
-        }
-
-        //check if player is stood on top of the ghost, and if so clamp y position to stop the ghost flying up and pushing the player
-        if(Physics.CheckSphere(transform.position + Vector3.up, 0.5f, playerLayer))
-        {
-            a.position.y = transform.position.y;
-            b.position.y = transform.position.y;
-        }
-
-        //move to next point smoothly
-        float t = Mathf.InverseLerp(a.timeStamp, b.timeStamp, ghostTime);
-        transform.position = Vector3.Lerp(a.position, b.position, t);
-        transform.rotation = Quaternion.Slerp(a.rotation, b.rotation, t);
+        ghostCollider.size = new Vector3(ghostCollider.size.x, a.isCrouching ? 1 : 2, ghostCollider.size.z);
+        ghostCollider.center = a.isCrouching ? new Vector3(0, -0.25f, 0) : Vector3.zero;
     }
 
-    public void StartRecording()
+    private void ResetGlitch()
     {
+        ghostMat.SetFloat("_GlitchAmount", 0.1f);
+    }
 
+    public void StopRecording()
+    {
+        StopCoroutine(RecordFrame());
+    }
+
+    private void UpdateOverlapState()
+    {
+        bool shouldIgnore = CheckForPlayerOverlap();
+
+        if (shouldIgnore && !overlappingPlayer)
+        {
+            overlappingPlayer = true;
+            Physics.IgnoreCollision(ghostCollider, target.GetComponent<CharacterController>(), true);
+        }
+        else if (!shouldIgnore && overlappingPlayer)
+        {
+            overlappingPlayer = false;
+            Physics.IgnoreCollision(ghostCollider, target.GetComponent<CharacterController>(), false);
+        }
+    }
+
+    public bool CheckForPlayerOverlap()
+    {
+        Collider[] hits = Physics.OverlapBox(ghostCollider.bounds.center, ghostCollider.bounds.extents,
+            ghostCollider.transform.rotation, playerLayer);
+        if(hits.Length > 0)
+        {
+            return false;
+        }
+        return true;
     }
 
     public IEnumerator RecordFrame()
     {
-        while(shouldRecord)
-        {
-            recording.Add(target.RecordFrame());
+        isRecording = true;
+        if(active) ToggleGhost(true);
+        List<GhostFrame> newFrames = new List<GhostFrame>();
+        float timer = 0f;
 
-            float minTime = Time.time - ghostDelay - 1f;
-            while(recording.Count > 0 && recording[0].timeStamp < minTime)
-            { 
-                recording.RemoveAt(0);
-            }
-            yield return new WaitForSeconds(0.1f);
+        while (timer < recordDuration)
+        {
+            newFrames.Add(target.RecordFrame());
+            yield return new WaitForSeconds(frameInterval);
+            timer += frameInterval;
         }
+
+        if (!active) ToggleGhost(true);
+        recording = newFrames;
+        currentFrameIndex = 0;
+        ghostMat.SetFloat("_GlitchAmount", 5);
+        Invoke("ResetGlitch", 0.2f);
+        if (CheckForPlayerOverlap())
+        {
+            overlappingPlayer = true;
+            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
+        }
+        frameTimer = 0;
+        transform.position = recording[0].position;
+        transform.rotation = recording[0].rotation;
+        isPlaying = true;
+        isRecording = false;
     }
 
-    private void ToggleCollision(bool input)
+    private void ToggleGhost(bool input)
     {
         if (input)
         {
-            if(ghostCollider.enabled)
+            if (recording.Count > 2)
             {
-                ghostCollider.enabled = false;
+                isPlaying = !isPlaying;
+                currentFrameIndex = 0;
             }
-            else
-            {
-                ghostCollider.enabled = true;
-            }
+            else isPlaying = false;
+            transform.position = Vector3.zero;
+            head.SetActive(!head.activeSelf);
+            body.SetActive(!body.activeSelf);
+            active = !active;
+            //need to wait a frame to wait for physics updates
+            StartCoroutine(DisableGhostAfterFrame());
+        }
+    }
+
+    private IEnumerator DisableGhostAfterFrame()
+    {
+        yield return new WaitForFixedUpdate();
+        ghostCollider.enabled = !ghostCollider.enabled;
+    }
+
+    private void StartRecording(bool input)
+    {
+        if(input && !isRecording)
+        {
+            StartCoroutine(RecordFrame());
         }
     }
 }

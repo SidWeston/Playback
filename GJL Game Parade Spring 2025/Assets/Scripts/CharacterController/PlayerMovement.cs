@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -11,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpHeight;
 
     //ground check and gravity
-    private bool grounded;
+    public bool grounded;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheckLocation;
 
@@ -21,6 +22,10 @@ public class PlayerMovement : MonoBehaviour
     //input variables
     private Vector2 moveVector;
     private bool sprinting, crouching;
+
+    //events for animations
+    public event Action<bool> landedEvent;
+    public event Action<bool> jumpEvent;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
@@ -36,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        grounded = Physics.CheckSphere(groundCheckLocation.position, 0.15f, groundLayer);
+        GroundCheck();
         //apply gravity
         velocity.y += gravity * Time.deltaTime;
         if (grounded && velocity.y < 0)
@@ -52,6 +57,16 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(totalMovement * Time.deltaTime);
     }
 
+    private void GroundCheck()
+    {
+        bool checkGround = Physics.CheckSphere(groundCheckLocation.position, 0.15f, groundLayer);
+        if(checkGround && grounded != checkGround)
+        {
+            landedEvent?.Invoke(true);
+        }
+        grounded = checkGround;
+    }
+
     //input functions
     private void OnMove(Vector2 input)
     {
@@ -63,6 +78,7 @@ public class PlayerMovement : MonoBehaviour
         if(input && grounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumpEvent?.Invoke(true);
         }
     }
 
