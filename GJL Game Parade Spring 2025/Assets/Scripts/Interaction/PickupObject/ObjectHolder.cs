@@ -2,30 +2,42 @@ using UnityEngine;
 
 public class ObjectHolder : MonoBehaviour
 {
-
-    public Transform holdTransform;
+    public Transform playerCamera;
     public PickupObject currentObject;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    [SerializeField] private Transform holdPosition;
+    [SerializeField] private float dropThreshold = 1f;
+
+    private void Update()
     {
-        
+        if(currentObject != null)
+        {
+            if(Vector3.Distance(holdPosition.position, currentObject.transform.position) > dropThreshold)
+            {
+                DropObject();
+            }
+        }
     }
 
     public void DropObject()
     {
+        if (currentObject.gameObject.TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = true;
+        }
         currentObject.transform.parent = null;
+        currentObject = null;
     }
 
     public void PickupObject(PickupObject obj)
     {
         currentObject = obj;
-        currentObject.transform.parent = holdTransform;
+        if (currentObject.gameObject.TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = false;
+        }
+        currentObject.transform.parent = playerCamera;
+        holdPosition.localPosition = currentObject.transform.localPosition;
     }
 }

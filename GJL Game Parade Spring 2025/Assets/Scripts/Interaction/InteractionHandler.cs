@@ -17,12 +17,15 @@ public class InteractionHandler : MonoBehaviour
 
     private void OnInteract(bool input)
     {
-        RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, range, interactableLayers))
+        if(input)
         {
-            if(hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+            RaycastHit hit;
+            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, range, interactableLayers))
             {
-                interactable.Interact(gameObject);
+                if (hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+                {
+                    interactable.Interact(gameObject);
+                }
             }
         }
     }
