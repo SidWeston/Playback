@@ -28,6 +28,7 @@ public class GhostPlayer : MonoBehaviour
     private bool active = false;
 
     private bool overlappingPlayer = false;
+    private bool earlyStop = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -125,11 +126,12 @@ public class GhostPlayer : MonoBehaviour
     public IEnumerator RecordFrame()
     {
         isRecording = true;
+        earlyStop = false;
         if(active) ToggleGhost(true);
         List<GhostFrame> newFrames = new List<GhostFrame>();
         float timer = 0f;
 
-        while (timer < recordDuration)
+        while (timer < recordDuration && !earlyStop)
         {
             newFrames.Add(target.RecordFrame());
             yield return new WaitForSeconds(frameInterval);
@@ -180,9 +182,17 @@ public class GhostPlayer : MonoBehaviour
 
     private void StartRecording(bool input)
     {
-        if(input && !isRecording)
+        if(input)
         {
-            StartCoroutine(RecordFrame());
+            if(!isRecording) //start recording
+            {
+                StartCoroutine(RecordFrame());
+            }
+            else if(isRecording) //end recording early
+            {
+                earlyStop = true;
+            }
+
         }
     }
 }
