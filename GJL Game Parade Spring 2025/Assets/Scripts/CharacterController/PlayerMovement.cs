@@ -5,11 +5,14 @@ public class PlayerMovement : MonoBehaviour
 {
     //Components
     [SerializeField] private CharacterController characterController;
+    [SerializeField] private Camera playerCamera;
 
     //settings
     private float moveSpeed;
     [SerializeField] private float walkSpeed, sprintSpeed, crouchSpeed;
     [SerializeField] private float jumpHeight;
+
+    [SerializeField] private Vector3 stoodCamPos, crouchedCamPos;
 
     //ground check and gravity
     public bool grounded;
@@ -98,7 +101,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCrouch(bool input)
     {
-        crouching = input;
+        if(input)
+        {
+            crouching = true;
+            playerCamera.transform.localPosition = crouchedCamPos;
+        }
+        else
+        {
+            crouching = false;
+            playerCamera.transform.localPosition = stoodCamPos;
+        }
     }
 
     //ghost recording
