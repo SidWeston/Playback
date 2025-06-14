@@ -19,6 +19,7 @@ public class EnergyBall : MonoBehaviour
             Destroy(gameObject);
         }
         Invoke("EnableTrigger", 0.25f);
+        Destroy(gameObject, 10f);
     }
 
     // Update is called once per frame
@@ -56,6 +57,10 @@ public class EnergyBall : MonoBehaviour
         {
             other.gameObject.TryGetComponent(out EnergyReceiver obj);
             obj.PowerOn();
+            Destroy(gameObject);
+        }
+        else
+        {
             Destroy(gameObject);
         }
     }

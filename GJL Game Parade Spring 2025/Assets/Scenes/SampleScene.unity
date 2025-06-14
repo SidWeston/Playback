@@ -1154,7 +1154,7 @@ GameObject:
   - component: {fileID: 1101535051}
   - component: {fileID: 1101535050}
   - component: {fileID: 1101535055}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: PickupCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1270,9 +1270,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101535049}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Mass: 5
+  m_Drag: 1
+  m_AngularDrag: 0.5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1592,7 +1592,7 @@ MonoBehaviour:
   range: 15
   interactableLayers:
     serializedVersion: 2
-    m_Bits: 768
+    m_Bits: 2816
 --- !u!54 &1855419158
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2362,8 +2362,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_Size: {x: 1, y: 0.2, z: 1}
+  m_Center: {x: 0, y: 0.2, z: 0}
 --- !u!114 &919132149332356864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2379,7 +2379,7 @@ MonoBehaviour:
   activatableObject: {fileID: 1037074551}
   activatableLayers:
     serializedVersion: 2
-    m_Bits: 384
+    m_Bits: 2432
   overlappedObjects: []
   buttonTransform: {fileID: 7899099928361123311}
   upPos: {x: 0, y: 0.1, z: 0}
