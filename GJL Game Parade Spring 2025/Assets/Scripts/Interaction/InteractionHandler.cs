@@ -22,7 +22,7 @@ public class InteractionHandler : MonoBehaviour
         {
             if(hit.collider.gameObject.TryGetComponent(out Interactable interactable))
             {
-                interactable.Interact();
+                interactable.Interact(gameObject);
             }
         }
     }

@@ -4846,7 +4846,7 @@ MonoBehaviour:
     m_Bits: 384
   activateLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   velocity: 12
   redirects: 0
   maxRedirects: 4

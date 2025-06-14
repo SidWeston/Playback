@@ -54,8 +54,8 @@ public class EnergyBall : MonoBehaviour
         }
         else if((activateLayers.value & (1 << other.gameObject.layer)) != 0)
         {
-            other.gameObject.TryGetComponent(out ActivatableObject obj);
-            obj.Activate();
+            other.gameObject.TryGetComponent(out EnergyReceiver obj);
+            obj.PowerOn();
             Destroy(gameObject);
         }
     }
