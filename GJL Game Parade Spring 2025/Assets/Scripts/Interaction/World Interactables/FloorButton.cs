@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class FloorButton : MonoBehaviour
 {
-    [SerializeField] private ActivatableObject activatableObject;
+    [SerializeField] protected ActivatableObject activatableObject;
 
-    [SerializeField] private LayerMask activatableLayers;
+    [SerializeField] protected LayerMask activatableLayers;
 
-    [SerializeField] private List<GameObject> overlappedObjects = new List<GameObject>();
+    [SerializeField] protected List<GameObject> overlappedObjects = new List<GameObject>();
 
-    private bool buttonDown = false;
+    protected bool buttonDown = false;
+    public bool active = false;
 
-    [SerializeField] private Transform buttonTransform;
-    [SerializeField] private Vector3 upPos, downPos;
-    private float pressTime = 0.25f;
-    private float t;
+    [SerializeField] protected Transform buttonTransform;
+    [SerializeField] protected Vector3 upPos, downPos;
+    protected float pressTime = 0.25f;
+    protected float t;
 
     private void Update()
     {
@@ -38,17 +39,18 @@ public class FloorButton : MonoBehaviour
 
     }
 
-    public void OnTriggerEnter(Collider other)
+    public virtual void OnTriggerEnter(Collider other)
     {
         if((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
-            overlappedObjects.Add(other.gameObject);
-            activatableObject.Activate();
             if (!buttonDown) buttonDown = true;
+            active = true;
+            overlappedObjects.Add(other.gameObject);
+            activatableObject.Activate(gameObject);
         }
     }
 
-    public void OnTriggerExit(Collider other)
+    public virtual void OnTriggerExit(Collider other)
     {
         if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
@@ -63,6 +65,7 @@ public class FloorButton : MonoBehaviour
             {
                 activatableObject.Deactivate();
                 if (buttonDown) buttonDown = false;
+                active = false;
             }
         }
     }

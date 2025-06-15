@@ -22,7 +22,7 @@ public class EnergyReceiver : MonoBehaviour
     {
         if(!powered)
         {
-            poweredObj.Activate();
+            poweredObj.Activate(gameObject);
             powered = true;
         }
     }

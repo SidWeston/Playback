@@ -155,7 +155,7 @@ public class GhostPlayer : MonoBehaviour
         isRecording = false;
     }
 
-    private void ToggleGhost(bool input)
+    public void ToggleGhost(bool input)
     {
         if (input)
         {
@@ -165,16 +165,18 @@ public class GhostPlayer : MonoBehaviour
                 currentFrameIndex = 0;
             }
             else isPlaying = false;
-            transform.position = Vector3.zero;
+            transform.position = new Vector3(-100, -100, -100); //ensure the ghost is out of sight
             head.SetActive(!head.activeSelf);
             body.SetActive(!body.activeSelf);
             active = !active;
             //need to wait a frame to wait for physics updates
-            StartCoroutine(DisableGhostAfterFrame());
+            StartCoroutine(EnableColliderAfterFrame());
+
+            if (!active && recording.Count > 0) recording.Clear();
         }
     }
 
-    private IEnumerator DisableGhostAfterFrame()
+    private IEnumerator EnableColliderAfterFrame()
     {
         yield return new WaitForFixedUpdate();
         ghostCollider.enabled = !ghostCollider.enabled;

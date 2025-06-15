@@ -1,14 +1,19 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class Door : ActivatableObject
+//door with multiple activations required
+public class MultiDoor : ActivatableObject
 {
+    public List<FloorButton> buttons = new List<FloorButton>();
+
     public Vector3 closedPos;
     public Vector3 openPos;
 
     public float openTime = 1f;
     private float t;
 
-    private bool open = false; 
+    private bool open = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -19,16 +24,16 @@ public class Door : ActivatableObject
     // Update is called once per frame
     void Update()
     {
-        if(open)
+        if (open)
         {
-            if(t < openTime)
+            if (t < openTime)
             {
                 t += Time.deltaTime;
             }
         }
         else
         {
-            if(t > 0)
+            if (t > 0)
             {
                 t -= Time.deltaTime;
             }
@@ -39,10 +44,14 @@ public class Door : ActivatableObject
 
     public override void Activate(GameObject activator)
     {
-        if(!open)
+        foreach (FloorButton button in buttons)
         {
-            open = true;
+            if (!button.active)
+            {
+                return;
+            }
         }
+        open = true;
     }
 
     public override void Deactivate()
