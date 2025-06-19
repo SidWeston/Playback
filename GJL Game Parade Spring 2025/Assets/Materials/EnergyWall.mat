@@ -27,14 +27,17 @@ Material:
   m_ValidKeywords:
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
   - _EMISSION_ON
+  - _FOG_ON
   - _GLITCH_ON
   - _GREYSCALESTAGE_BEFORELIGHTING
+  - _HIGHLIGHTS_ON
   - _HOLOGRAM_ON
   - _LIGHTMODEL_TOON
   - _MATCAPBLENDMODE_MULTIPLY
   - _OUTLINETYPE_NONE
   - _REFLECTIONS_NONE
   - _RIMLIGHTINGSTAGE_AFTERLIGHTING
+  - _RIM_LIGHTING_ON
   - _SHADINGMODEL_BASIC
   - _SPECULARMODEL_NONE
   - _TEXTUREBLENDINGMODE_RGB
@@ -203,7 +206,7 @@ Material:
     - _AOMapEnabled: 0
     - _AOMapStrength: 1
     - _AddPrecomputedVelocity: 0
-    - _AdvancedConfigurationEnabled: 0
+    - _AdvancedConfigurationEnabled: 1
     - _AffectedByLightmaps: 0
     - _AlbedoVertexColorMode: 1
     - _AlbedoVertexColorOn: 0
@@ -241,7 +244,7 @@ Material:
     - _ContrastBrightnessOn: 0
     - _ContrastLM: 1
     - _Cull: 2
-    - _CullingMode: 2
+    - _CullingMode: 0
     - _CustomAmbientLightOn: 0
     - _CustomShadowColorOn: 0
     - _Cutoff: 0.5
@@ -260,7 +263,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EmissionEnabled: 1
-    - _EmissionSelfGlow: 5
+    - _EmissionSelfGlow: 10
     - _EnvironmentReflections: 1
     - _FaceDownCutoff: 0.25
     - _FadeAmount: 0
@@ -270,7 +273,7 @@ Material:
     - _FadeOn: 0
     - _FadePower: 1
     - _FadeTransition: 0.2
-    - _FogOn: 0
+    - _FogOn: 1
     - _GeneralAlpha: 1
     - _Glitch: 1
     - _GlitchAmount: 0
@@ -283,8 +286,8 @@ Material:
     - _GlossyReflections: 0
     - _GreyScaleStage: 0
     - _Greyscale: 0
-    - _GreyscaleBlend: 1
-    - _GreyscaleLuminosity: 0
+    - _GreyscaleBlend: 0.5
+    - _GreyscaleLuminosity: -1
     - _HalfLambertWrap: 1
     - _HandDrawn: 0
     - _HandDrawnAmount: 10
@@ -292,9 +295,9 @@ Material:
     - _HardnessFakeGI: 0.75
     - _HeightGradientOn: 0
     - _HeightGradientPositionSpace: 0
-    - _HighlightCutoff: 0.5
-    - _HighlightSmoothness: 0.5
-    - _Highlights: 0
+    - _HighlightCutoff: 0
+    - _HighlightSmoothness: 0.225
+    - _Highlights: 1
     - _HighlightsStrength: 1
     - _Hit: 0
     - _HitBlend: 1
@@ -304,7 +307,7 @@ Material:
     - _HologramAccentFrequency: 3
     - _HologramAccentSpeed: 1
     - _HologramAlpha: 0.058
-    - _HologramBaseAlpha: 0
+    - _HologramBaseAlpha: 0.5
     - _HologramFrequency: 30
     - _HologramLineCenter: 0.5
     - _HologramLineSmoothness: 0.42
@@ -336,7 +339,7 @@ Material:
     - _MinDistanceToFade: 0
     - _MinGradientHeight: 0
     - _MinInflate: 0
-    - _MinRim: 0.383
+    - _MinRim: 0.955
     - _NearFade: 0
     - _NormalInfluence: 0.5
     - _NormalMapEnabled: 0
@@ -357,7 +360,7 @@ Material:
     - _ReflectionsAtten: 0.5
     - _RenderPreset: 2
     - _RimAttenuation: 1
-    - _RimLighting: 0
+    - _RimLighting: 1
     - _RimLightingStage: 2
     - _SSSAtten: 1
     - _SSSFrontAtten: 0.3
@@ -428,18 +431,18 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _CustomAmbientColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
     - _DepthGlowColor: {r: 1, g: 0.9869999, b: 0.6, a: 1}
-    - _EmissionColor: {r: 1, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0, g: 0.9233861, b: 1, a: 1}
     - _FadeBurnColor: {r: 1, g: 1, b: 0, a: 1}
     - _GlitchOffset: {r: -0.5, g: 0, b: 0, a: 0}
     - _GradientHeightColor01: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _GradientHeightColor02: {r: 1, g: 1, b: 1, a: 1}
     - _GreyscaleTintColor: {r: 1, g: 1, b: 1, a: 1}
     - _HighlightOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _HighlightsColor: {r: 2, g: 2, b: 2, a: 1}
+    - _HighlightsColor: {r: 3.5648696, g: 0, b: 0, a: 1}
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HologramColor: {r: 6.800001, g: 1.3865272, b: 1.2816756, a: 1}
+    - _HologramColor: {r: 1.2816758, g: 4.9905334, b: 6.8000026, a: 1}
     - _HologramLineDirection: {r: 0, g: 1, b: 0, a: 0}
-    - _RimColor: {r: 0, g: 0.83739424, b: 1, a: 1}
+    - _RimColor: {r: 1, g: 0, b: 0, a: 1}
     - _RimOffset: {r: -0.67, g: 0, b: 0, a: 0}
     - _SSSColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShakeMaxDisplacement: {r: 0.1, g: 0.1, b: 0.1, a: 0}

@@ -2907,7 +2907,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   frameInterval: 0.1
-  recordDuration: 5
+  recordDuration: 12
   animationController: {fileID: 5808585837080059873}
   ghostCollider: {fileID: 7343467662140470803}
   playerLayer:

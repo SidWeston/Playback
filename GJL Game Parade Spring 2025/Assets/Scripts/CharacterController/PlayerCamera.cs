@@ -18,6 +18,10 @@ public class PlayerCamera : MonoBehaviour
     void Start()
     {
         InputManager.instance.lookEvent += OnLook;
+        if(Settings.instance != null)
+        {
+            lookSensitivity = Settings.instance.mouseSensitivity;
+        }
     }
 
     // Update is called once per frame

@@ -233,7 +233,7 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DistortAmount: 0.3
-    - _DistortStrength: 2
+    - _DistortStrength: 1
     - _DistortTexXSpeed: 2
     - _DistortTexYSpeed: 2
     - _DitherOn: 0

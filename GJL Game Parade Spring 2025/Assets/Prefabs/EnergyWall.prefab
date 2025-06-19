@@ -103,6 +103,8 @@ MonoBehaviour:
   ghostLayer:
     serializedVersion: 2
     m_Bits: 256
+  explodeVFXPrefab: {fileID: 191726, guid: 3477ee01f804e8845939c1fede24260f, type: 3}
+  vfxDuration: 1.5
 --- !u!65 &4693063892734464388
 BoxCollider:
   m_ObjectHideFlags: 0

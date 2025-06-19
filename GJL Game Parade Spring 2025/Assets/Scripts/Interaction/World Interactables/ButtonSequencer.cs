@@ -32,6 +32,10 @@ public class ButtonSequencer : ActivatableObject
                 started = false;
                 current = 0;
                 timer = 0;
+                foreach (LightIndicator indicator in indicators)
+                {
+                    indicator.Deactivate();
+                }
             }
         }
     }
@@ -45,6 +49,7 @@ public class ButtonSequencer : ActivatableObject
                 if (!started) started = true;
                 indicators[current].Activate(gameObject);
                 current++;
+                timer = 0;
                 if (current >= buttons.Count)
                 {
                     CompletePuzzle();   

@@ -5,6 +5,9 @@ public class EnergyWall : MonoBehaviour
 
     [SerializeField] private LayerMask ghostLayer;
 
+    [SerializeField] private GameObject explodeVFXPrefab;
+    [SerializeField] private float vfxDuration = 1.5f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -23,6 +26,8 @@ public class EnergyWall : MonoBehaviour
         {
             if(other.gameObject.TryGetComponent(out GhostPlayer ghost))
             {
+                GameObject vfx = Instantiate(explodeVFXPrefab, ghost.transform.position, ghost.transform.rotation);
+                Destroy(vfx, vfxDuration);
                 ghost.ToggleGhost(true);
                 if(gameObject.TryGetComponent(out Renderer renderer))
                 {

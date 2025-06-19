@@ -8,6 +8,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public static InputManager instance;
     private PlayerInput input;
 
+    public bool inputEnabled = true;
+
     public event Action<Vector2> moveEvent;
     public event Action<Vector2> lookEvent;
 
@@ -36,16 +38,22 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnMovement(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         moveEvent?.Invoke(context.ReadValue<Vector2>());
     }
 
     public void OnLook(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         lookEvent?.Invoke(context.ReadValue<Vector2>());
     }
 
     public void OnInteract(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.ReadValue<float>() > 0 && interactKey.downCounter == 0)
         {
             interactKey.downCounter++;
@@ -60,6 +68,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.ReadValue<float>() > 0 && jumpKey.downCounter == 0)
         {
             jumpKey.downCounter++;
@@ -74,6 +84,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnCrouch(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.ReadValue<float>() > 0 && crouchKey.downCounter == 0)
         {
             crouchKey.downCounter++;
@@ -88,6 +100,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnSprint(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.ReadValue<float>() > 0 && sprintKey.downCounter == 0)
         {
             sprintKey.downCounter++;
@@ -102,6 +116,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnToggleGhost(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.ReadValue<float>() > 0 && ghostKey.downCounter == 0)
         {
             ghostKey.downCounter++;
@@ -116,6 +132,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnRecordGhost(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.ReadValue<float>() > 0 && recordKey.downCounter == 0)
         {
             recordKey.downCounter++;

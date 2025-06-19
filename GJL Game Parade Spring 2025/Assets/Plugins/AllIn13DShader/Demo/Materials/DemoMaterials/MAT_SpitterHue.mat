@@ -9,8 +9,9 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: MAT_SpitterHue
   m_Shader: {fileID: 4800000, guid: 0dde7f0097aeb2541aea684ca0ad0e3c, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ALBEDOVERTEXCOLORMODE_REPLACE
   - _ALPHA_CUTOFF_ON
   - _AOMAP_ON
   - _CAST_SHADOWS_ON
@@ -18,7 +19,6 @@ Material:
   - _FADE_BURN_ON
   - _FADE_ON
   - _GREYSCALESTAGE_BEFORELIGHTING
-  - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
   - _HIGHLIGHTS_ON
   - _HUE_SHIFT_ON
   - _LIGHTMODEL_FAKEGI
@@ -34,17 +34,20 @@ Material:
   - _SPECULARMODEL_CLASSIC
   - _SUBSURFACE_SCATTERING_ON
   - _TEXTUREBLENDINGMODE_RGB
-  - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
-  - _TRIPLANARNORMALSPACE_WORLD
   - _USE_WIND_VERTICAL_MASK
   m_InvalidKeywords:
+  - _ALBEDOVERTEXCOLORMODE_REPLACE
   - _GLITCHWORLDSPACE_ON
+  - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
+  - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
+  - _TRIPLANARNORMALSPACE_WORLD
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 2000
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -272,9 +275,9 @@ Material:
     - _HologramScrollSpeed: 2
     - _HueBrightness: 1
     - _HueBrightnessLM: 1
-    - _HueSaturation: 2.2487226
+    - _HueSaturation: 0.0022832751
     - _HueSaturationLM: 1
-    - _HueShift: 1.9916582
+    - _HueShift: 359.86017
     - _HueShiftEnabled: 1
     - _HueShiftLM: 0
     - _InflateBlend: 1
@@ -402,3 +405,4 @@ Material:
     - _ShakeSpeed: {r: 41, g: 49, b: 45, a: 0}
     - _VertexDistortionNoiseSpeed: {r: 4, g: 4, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

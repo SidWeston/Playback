@@ -4,7 +4,7 @@ public class EnergyReceiver : MonoBehaviour
 {
     public ActivatableObject poweredObj;
 
-    bool powered = false;
+    public bool powered = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
