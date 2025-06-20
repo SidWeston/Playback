@@ -11,6 +11,8 @@ public class PlayerCamera : MonoBehaviour
 
     private float yRotation;
 
+    private bool camEnabled = true;
+
     //input
     private Vector2 lookVector;
 
@@ -18,16 +20,20 @@ public class PlayerCamera : MonoBehaviour
     void Start()
     {
         InputManager.instance.lookEvent += OnLook;
-        if(Settings.instance != null)
-        {
-            lookSensitivity = Settings.instance.mouseSensitivity;
-        }
+        InputManager.instance.pauseKey.keyPress += OnPause;
+
+        GameUI.instance.backButton.onClick.AddListener(HideCursor);
+        GameUI.instance.backToMenuButton.onClick.AddListener(ShowCursor);
+
+        HideCursor();
     }
 
     // Update is called once per frame
     void Update()
     {
-        lookVector *= lookSensitivity * Time.deltaTime;
+        if (!camEnabled) return;
+
+        lookVector *= Settings.instance != null ? (Settings.instance.mouseSensitivity * 2) * Time.deltaTime : 100 * Time.deltaTime;
         yRotation -= lookVector.y;
         yRotation = Mathf.Clamp(yRotation, -90, 90);
         playerCamera.transform.localRotation = Quaternion.Euler(yRotation, 0f, 0f);
@@ -37,5 +43,29 @@ public class PlayerCamera : MonoBehaviour
     private void OnLook(Vector2 input)
     {
         lookVector = input;
+    }
+
+    private void OnPause(bool input)
+    {
+        if(input)
+        {
+            ShowCursor();
+        }
+    }
+
+    private void ShowCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        camEnabled = false;
+    }
+
+    private void HideCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        camEnabled = true;
     }
 }

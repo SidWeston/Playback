@@ -8,10 +8,14 @@ public class ProximityTrigger : MonoBehaviour
 
     [SerializeField] private LayerMask activatableLayers;
 
+    //powerlight
+    [SerializeField] private Renderer wallLight;
+    [SerializeField] private Material lightOff, lightOn;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        wallLight.material = lightOff;
     }
 
     // Update is called once per frame
@@ -25,6 +29,7 @@ public class ProximityTrigger : MonoBehaviour
         if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
             obj.Activate(gameObject);
+            wallLight.material = lightOn;
         }
     }
 
@@ -35,6 +40,7 @@ public class ProximityTrigger : MonoBehaviour
         if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
             obj.Deactivate();
+            wallLight.material = lightOff;
         }
     }
 }

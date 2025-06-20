@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class UpdateText : MonoBehaviour
 {
-    public TMPro.TextMeshProUGUI text;
+    public TextMeshProUGUI text;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

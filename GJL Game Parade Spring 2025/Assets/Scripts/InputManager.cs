@@ -19,6 +19,7 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public InputKey jumpKey = new InputKey();
     public InputKey recordKey = new InputKey();
     public InputKey ghostKey = new InputKey();
+    public InputKey pauseKey = new InputKey();
 
     private void Awake()
     {
@@ -145,8 +146,28 @@ public class InputManager : MonoBehaviour, IPlayerActions
             recordKey.InvokeKeyPress(false);
         }
     }
+
+    public void OnPause(InputAction.CallbackContext context)
+    {
+        if (context.ReadValue<float>() > 0 && pauseKey.downCounter == 0)
+        {
+            pauseKey.downCounter++;
+            pauseKey.InvokeKeyPress(true);
+        }
+        else if (context.ReadValue<float>() <= 0)
+        {
+            pauseKey.downCounter = 0;
+            pauseKey.InvokeKeyPress(false);
+        }
+    }
 }
 
+
+//to anyone reading this - 
+//I made this custom class for inputs because when a button is pressed, Unity's input system records an input twice when it presses.
+//im fairly sure this is because it has two events for a button press: "started" and "performed" (and some for when its released, but those havent caused a problem)
+//setting the input system up properly with these actions will solve it will almost definitely solve this problem,
+//but I cant be bothered to do that, and this works just as well for my purposes, even if its likely a bit wasteful. 
 public class InputKey
 {
     public event Action<bool> keyPress;

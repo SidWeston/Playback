@@ -24,6 +24,7 @@ public class GhostPlayer : MonoBehaviour
 
     private int currentFrameIndex = 0;
     private float frameTimer = 0f;
+    private float duration = 0f, fullDuration = 0f;
     private bool isPlaying = false;
     private bool active = false;
 
@@ -45,6 +46,9 @@ public class GhostPlayer : MonoBehaviour
         if (!isPlaying || recording.Count < 2) return;
 
         frameTimer += Time.deltaTime;
+        duration -= Time.deltaTime;
+
+        GameUI.instance.SetRecordTime(duration);
 
         while(frameTimer > frameInterval)
         {
@@ -55,6 +59,8 @@ public class GhostPlayer : MonoBehaviour
                 currentFrameIndex = 0;
                 ghostMat.SetFloat("_GlitchAmount", 5);
                 Invoke("ResetGlitch", 0.2f);
+                duration = fullDuration;
+                GameUI.instance.SetRecordTime(duration);
                 if (CheckForPlayerOverlap())
                 {
                     overlappingPlayer = true;
@@ -131,12 +137,17 @@ public class GhostPlayer : MonoBehaviour
         List<GhostFrame> newFrames = new List<GhostFrame>();
         float timer = 0f;
 
+        GameUI.instance.SetRecordSymbol();
+
         while (timer < recordDuration && !earlyStop)
         {
             newFrames.Add(target.RecordFrame());
             yield return new WaitForSeconds(frameInterval);
             timer += frameInterval;
+            GameUI.instance.SetRecordTime(timer);
         }
+        fullDuration = timer;
+        duration = timer;
 
         if (!active) ToggleGhost(true);
         recording = newFrames;
@@ -148,6 +159,7 @@ public class GhostPlayer : MonoBehaviour
             overlappingPlayer = true;
             Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
         }
+        GameUI.instance.SetPlaySymbol();
         frameTimer = 0;
         transform.position = recording[0].position;
         transform.rotation = recording[0].rotation;

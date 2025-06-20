@@ -42,6 +42,7 @@ public class ButtonSequencer : ActivatableObject
 
     public override void Activate(GameObject activator)
     {
+        if (complete) return;
         if(activator.TryGetComponent(out FloorButton button))
         {
             if (buttons[current] == button)

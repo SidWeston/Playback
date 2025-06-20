@@ -18,6 +18,19 @@ public class FloorButton : MonoBehaviour
     protected float pressTime = 0.25f;
     protected float t;
 
+    //line renderers
+    [SerializeField] protected LineRenderer powerline;
+    [SerializeField] protected Material lineOff, lineOn;
+    //powerlight
+    [SerializeField] protected Renderer wallLight;
+    [SerializeField] protected Material lightOff, lightOn;
+
+    private void Start()
+    {
+        if(powerline)   powerline.material = lineOff; 
+        if(wallLight)  wallLight.material = lightOff;
+    }
+
     private void Update()
     {
         if(buttonDown)
@@ -47,6 +60,8 @@ public class FloorButton : MonoBehaviour
             active = true;
             overlappedObjects.Add(other.gameObject);
             activatableObject.Activate(gameObject);
+            if(powerline)   powerline.material = lineOn;
+            if(wallLight)   wallLight.material = lightOn;
         }
     }
 
@@ -66,6 +81,8 @@ public class FloorButton : MonoBehaviour
                 activatableObject.Deactivate();
                 if (buttonDown) buttonDown = false;
                 active = false;
+                if(powerline)  powerline.material = lineOff;
+                if(wallLight)   wallLight.material = lightOff;
             }
         }
     }

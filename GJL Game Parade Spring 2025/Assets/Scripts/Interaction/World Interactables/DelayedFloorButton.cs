@@ -6,6 +6,12 @@ public class DelayedFloorButton : FloorButton
     [SerializeField] private float releaseTime = 3f;
     private float r;
 
+    private void Start()
+    {
+        if(powerline) powerline.material = lineOff;
+        if(wallLight) wallLight.material = lightOff;
+    }
+
     private void Update()
     {
         if (buttonDown)
@@ -29,6 +35,8 @@ public class DelayedFloorButton : FloorButton
                 {
                     activatableObject.Deactivate();
                     active = false;
+                    if(powerline) powerline.material = lineOff;
+                    if(wallLight) wallLight.material = lightOff;
                 }
             }
         }

@@ -12,7 +12,11 @@ public class Settings : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if(!instance)
+        if(Settings.instance && Settings.instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else if(!instance)
         {
             instance = this;
         }
