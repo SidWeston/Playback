@@ -12,6 +12,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private GameObject gameUI;
 
     [SerializeField] private GameObject eventSystem;
+    private GameObject events;
 
     [SerializeField] private RawImage actionSymbol;
 
@@ -35,7 +36,10 @@ public class GameUI : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
-        Instantiate(eventSystem, transform);
+        if(!events)
+        {
+            events = Instantiate(eventSystem, transform);
+        }
 
         if(SceneManager.GetActiveScene().buildIndex == 0)
         {

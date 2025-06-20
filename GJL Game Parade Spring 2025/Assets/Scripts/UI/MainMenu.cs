@@ -8,11 +8,14 @@ public class MainMenu : MonoBehaviour
     public GameObject mainMenu;
     public GameObject settingsMenu;
     public GameObject controlsMenu;
+    public GameObject levelSelect;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     // Update is called once per frame
@@ -48,6 +51,18 @@ public class MainMenu : MonoBehaviour
     {
         mainMenu.SetActive(true);
         controlsMenu.SetActive(false);
+    }
+
+    public void LevelSelectButton()
+    {
+        mainMenu.SetActive(false);
+        levelSelect.SetActive(true);
+    }
+
+    public void LevelSelectBack()
+    {
+        mainMenu.SetActive(true);
+        levelSelect.SetActive(false);
     }
 
     public void ExitButton()

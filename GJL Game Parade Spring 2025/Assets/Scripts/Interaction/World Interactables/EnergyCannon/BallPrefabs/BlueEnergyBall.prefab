@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7608601961623962620}
   - component: {fileID: 733973712738859148}
   - component: {fileID: 2772114173829664823}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: BlueEnergyBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4861,7 +4861,7 @@ GameObject:
   - component: {fileID: 866802600306149632}
   - component: {fileID: 9007305545256904947}
   - component: {fileID: 55384437737070795}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9661,7 +9661,7 @@ GameObject:
   - component: {fileID: 791929872060670727}
   - component: {fileID: 7046782210599234679}
   - component: {fileID: 3374428484099769429}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: TrailLinger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14372,7 +14372,7 @@ GameObject:
   - component: {fileID: 797771203180085420}
   - component: {fileID: 5470323670744125985}
   - component: {fileID: 6346554410198648466}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19207,7 +19207,7 @@ GameObject:
   - component: {fileID: 4579775226702975224}
   - component: {fileID: 3290941017277437960}
   - component: {fileID: 962606481861216317}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Point light
   m_TagString: Untagged
   m_Icon: {fileID: 0}

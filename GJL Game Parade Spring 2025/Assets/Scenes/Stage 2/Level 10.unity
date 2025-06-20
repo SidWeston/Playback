@@ -13135,7 +13135,7 @@ MonoBehaviour:
   - {fileID: 31474457}
   current: 0
   complete: 0
-  resetTimer: 10
+  resetTimer: 7
 --- !u!4 &597186168
 Transform:
   m_ObjectHideFlags: 0

@@ -31,6 +31,9 @@ public class GhostPlayer : MonoBehaviour
     private bool overlappingPlayer = false;
     private bool earlyStop = false;
 
+    private float recordDelay = 0.2f;
+    private bool canRecord = true;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -196,10 +199,12 @@ public class GhostPlayer : MonoBehaviour
 
     private void StartRecording(bool input)
     {
-        if(input)
+        if(input && canRecord)
         {
             if(!isRecording) //start recording
             {
+                canRecord = false;
+                Invoke("ResetCanRecord", recordDelay);
                 StartCoroutine(RecordFrame());
             }
             else if(isRecording) //end recording early
@@ -208,6 +213,11 @@ public class GhostPlayer : MonoBehaviour
             }
 
         }
+    }
+
+    private void ResetCanRecord()
+    {
+        canRecord = true;
     }
 }
 

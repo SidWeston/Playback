@@ -33,7 +33,7 @@ public class PlayerCamera : MonoBehaviour
     {
         if (!camEnabled) return;
 
-        lookVector *= Settings.instance != null ? (Settings.instance.mouseSensitivity * 2) * Time.deltaTime : 100 * Time.deltaTime;
+        lookVector *= Settings.instance != null ? (Settings.instance.mouseSensitivity * 3) * Time.deltaTime : 100 * Time.deltaTime;
         yRotation -= lookVector.y;
         yRotation = Mathf.Clamp(yRotation, -90, 90);
         playerCamera.transform.localRotation = Quaternion.Euler(yRotation, 0f, 0f);
@@ -49,7 +49,14 @@ public class PlayerCamera : MonoBehaviour
     {
         if(input)
         {
-            ShowCursor();
+            if(Cursor.lockState == CursorLockMode.Locked)
+            {
+                ShowCursor();
+            }
+            else
+            {
+                HideCursor();
+            }
         }
     }
 
