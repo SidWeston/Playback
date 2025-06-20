@@ -9,40 +9,40 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 58b2ca2e9b6ef144793fad85314d6465
   - enabled: 1
-    path: Assets/Scenes/Stage 1/Level 1.unity
+    path: Assets/Scenes/Levels/Level 1.unity
     guid: 51ca5b86eab876c4d9986f122b1c56ea
   - enabled: 1
-    path: Assets/Scenes/Stage 1/Level 2.unity
+    path: Assets/Scenes/Levels/Level 2.unity
     guid: 24798fbc8b54c0e4f9f7684519302231
   - enabled: 1
-    path: Assets/Scenes/Stage 1/Level 3.unity
+    path: Assets/Scenes/Levels/Level 3.unity
     guid: cb8011602352a554fac6e1beb3dc0074
   - enabled: 1
-    path: Assets/Scenes/Stage 1/Level 4.unity
+    path: Assets/Scenes/Levels/Level 4.unity
     guid: f89c78ca6ddde1d4a86226a0e6e511d0
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 5.unity
+    path: Assets/Scenes/Levels/Level 5.unity
     guid: e6497f3fa6bc54247825bbc5c1acba9e
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 6.unity
+    path: Assets/Scenes/Levels/Level 6.unity
     guid: 33a52b3f147dccf45a7ea19b0b6829c6
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 7.unity
+    path: Assets/Scenes/Levels/Level 7.unity
     guid: b0ad31bb7cac03746b0d0f33749e0e6f
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 8.unity
+    path: Assets/Scenes/Levels/Level 8.unity
     guid: 34828ddb762e28f4ab22bd2ff0e75926
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 9.unity
+    path: Assets/Scenes/Levels/Level 9.unity
     guid: 444372f33e198a842a4ba621cce64473
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 10.unity
+    path: Assets/Scenes/Levels/Level 10.unity
     guid: f8073b230a6cac14380193e70254bddc
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 11.unity
+    path: Assets/Scenes/Levels/Level 11.unity
     guid: 638d5666fab3bb247bf7eb7f8464bd42
   - enabled: 1
-    path: Assets/Scenes/Stage 2/Level 12.unity
+    path: Assets/Scenes/Levels/Level 12.unity
     guid: 8eabfc09d5c84374ebe53df62fe9d389
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

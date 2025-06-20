@@ -82,6 +82,11 @@ public class GhostPlayer : MonoBehaviour
         GhostFrame b = recording[currentFrameIndex + 1];
         float t = frameTimer / frameInterval;
 
+        if (a.movementInput != Vector2.zero || b.movementInput != Vector2.zero)
+        {
+            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
+        }
+
         Vector3 position = Vector3.Lerp(a.position, b.position, t);
         Quaternion rotation = Quaternion.Slerp(a.rotation, b.rotation, t);
 
