@@ -63,7 +63,10 @@ public class PlayerMovement : MonoBehaviour
         Vector3 totalMovement = movementInput * moveSpeed + Vector3.up * velocity.y;
         characterController.Move(totalMovement * Time.deltaTime);
 
-        if (transform.position.y < -15f) transform.position = startPosition; velocity.y = 0;
+        if (transform.position.y < -15f)
+        {
+            transform.position = startPosition; velocity.y = 0;
+        }
     }
 
     private void GroundCheck()
