@@ -16,8 +16,11 @@ public class Door : ActivatableObject
     void Start()
     {
         closedPos = transform.position;
-        audioSource = GetComponent<AudioSource>();
-        Settings.instance.effectsVolumeChange += SetAudioVolume;
+        if(TryGetComponent(out AudioSource source))
+        {
+            audioSource = source;
+            Settings.instance.effectsVolumeChange += SetAudioVolume;
+        }
     }
 
     // Update is called once per frame
