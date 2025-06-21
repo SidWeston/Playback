@@ -11184,6 +11184,83 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7581248193663576721, guid: 4b8563c86fd85884197fff2d5c046a12, type: 3}
   m_PrefabInstance: {fileID: 567829518}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &579075092
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3483380508131238766, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_Name
+      value: Signboard
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -8.767999
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.9535904
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 26.994205
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.00000058114523
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_text
+      value: 'It''s Not Just About Pressing Buttons. It''s Abouut Pressing The Right
+        Buttons. '
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_fontSize
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 7815358409445180145, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.012
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1933922494531082360, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+  m_SourcePrefab: {fileID: 100100000, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
 --- !u!1001 &579560474
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42956,3 +43033,4 @@ SceneRoots:
   - {fileID: 1827349272}
   - {fileID: 113857695}
   - {fileID: 1101358853}
+  - {fileID: 579075092}

@@ -15857,6 +15857,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7581248193663576721, guid: 4b8563c86fd85884197fff2d5c046a12, type: 3}
   m_PrefabInstance: {fileID: 377952565}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &379330311
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3483380508131238766, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_Name
+      value: Signboard
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.193
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 29.86
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.70710677
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_text
+      value: Boxes Aren't Just For Buttons.
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_fontSize
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 22
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1933922494531082360, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+  m_SourcePrefab: {fileID: 100100000, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
 --- !u!1001 &379709833
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -91256,7 +91328,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5044145897290718419, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.1
+      value: 15.057
       objectReference: {fileID: 0}
     - target: {fileID: 5044145897290718419, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
       propertyPath: m_LocalPosition.y
@@ -91264,7 +91336,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5044145897290718419, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.991
+      value: 11.065
       objectReference: {fileID: 0}
     - target: {fileID: 5044145897290718419, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
       propertyPath: m_LocalRotation.w
@@ -91470,3 +91542,4 @@ SceneRoots:
   - {fileID: 77743109}
   - {fileID: 1230889288}
   - {fileID: 123485378}
+  - {fileID: 379330311}

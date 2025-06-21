@@ -22,6 +22,8 @@ public class GameUI : MonoBehaviour
     public Button backButton;
     public Button backToMenuButton;
 
+    [SerializeField] private AudioSource musicSource;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -48,6 +50,7 @@ public class GameUI : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;
         InputManager.instance.pauseKey.keyPress += OnPause;
+        Settings.instance.musicVolumeChange += SetMusicVolume;
 
         SetPauseSymbol();
     }
@@ -67,6 +70,8 @@ public class GameUI : MonoBehaviour
             instance.canvas.gameObject.SetActive(true);
             settingsMenu.SetActive(false);
             gameUI.SetActive(true);
+            musicSource.gameObject.SetActive(true);
+            musicSource.Play();
         }
         CancelRecordTime();
         SetPauseSymbol();
@@ -138,5 +143,10 @@ public class GameUI : MonoBehaviour
     public void RestartLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void SetMusicVolume(float volume)
+    {
+        musicSource.volume = volume;
     }
 }

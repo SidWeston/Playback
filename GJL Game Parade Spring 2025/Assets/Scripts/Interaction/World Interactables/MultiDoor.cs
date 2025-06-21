@@ -15,10 +15,14 @@ public class MultiDoor : ActivatableObject
 
     private bool open = false;
 
+    [SerializeField] private AudioSource audioSource;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         closedPos = transform.position;
+        audioSource = GetComponent<AudioSource>();
+        Settings.instance.effectsVolumeChange += SetAudioVolume;
     }
 
     // Update is called once per frame
@@ -51,6 +55,7 @@ public class MultiDoor : ActivatableObject
                 return;
             }
         }
+        if(!open) audioSource.Play();
         open = true;
     }
 
@@ -59,6 +64,12 @@ public class MultiDoor : ActivatableObject
         if(open)
         {
             open = false;
+            audioSource.Play();
         }
+    }
+
+    private void SetAudioVolume(float volume)
+    {
+        audioSource.volume = volume;
     }
 }

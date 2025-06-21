@@ -20,6 +20,6 @@ public class UpdateText : MonoBehaviour
 
     public void UpdateTextFromFloat(float newText)
     {
-        text.text = newText.ToString();
+        text.text = (Mathf.Floor(newText * 10) / 10).ToString();
     }
 }

@@ -34,6 +34,8 @@ public class GhostPlayer : MonoBehaviour
     private float recordDelay = 0.2f;
     private bool canRecord = true;
 
+    private AudioSource audioSource;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -41,6 +43,9 @@ public class GhostPlayer : MonoBehaviour
         InputManager.instance.recordKey.keyPress += StartRecording;
         ResetGlitch(); //ensure glitch effect isnt set to high by default
         active = false; //assume ghost starts turned off
+
+        audioSource = GetComponent<AudioSource>();
+        Settings.instance.effectsVolumeChange += SetAudioVolume;
     }
 
     // Update is called once per frame
@@ -62,6 +67,7 @@ public class GhostPlayer : MonoBehaviour
                 currentFrameIndex = 0;
                 ghostMat.SetFloat("_GlitchAmount", 5);
                 Invoke("ResetGlitch", 0.2f);
+                audioSource.Play();
                 duration = fullDuration;
                 GameUI.instance.SetRecordTime(duration);
                 if (CheckForPlayerOverlap())
@@ -82,9 +88,14 @@ public class GhostPlayer : MonoBehaviour
         GhostFrame b = recording[currentFrameIndex + 1];
         float t = frameTimer / frameInterval;
 
+        //its messy having this many ignore collision checks, but I dont have much time and it fixes the big bugs
         if (a.movementInput != Vector2.zero || b.movementInput != Vector2.zero)
         {
             Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
+        }
+        else if(a.movementInput == Vector2.zero && b.movementInput == Vector2.zero)
+        {
+            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
         }
 
         Vector3 position = Vector3.Lerp(a.position, b.position, t);
@@ -108,22 +119,6 @@ public class GhostPlayer : MonoBehaviour
     public void StopRecording()
     {
         StopCoroutine(RecordFrame());
-    }
-
-    private void UpdateOverlapState()
-    {
-        bool shouldIgnore = CheckForPlayerOverlap();
-
-        if (shouldIgnore && !overlappingPlayer)
-        {
-            overlappingPlayer = true;
-            Physics.IgnoreCollision(ghostCollider, target.GetComponent<CharacterController>(), true);
-        }
-        else if (!shouldIgnore && overlappingPlayer)
-        {
-            overlappingPlayer = false;
-            Physics.IgnoreCollision(ghostCollider, target.GetComponent<CharacterController>(), false);
-        }
     }
 
     public bool CheckForPlayerOverlap()
@@ -162,6 +157,7 @@ public class GhostPlayer : MonoBehaviour
         currentFrameIndex = 0;
         ghostMat.SetFloat("_GlitchAmount", 5);
         Invoke("ResetGlitch", 0.2f);
+        audioSource.Play();
         if (CheckForPlayerOverlap())
         {
             overlappingPlayer = true;
@@ -189,6 +185,11 @@ public class GhostPlayer : MonoBehaviour
             head.SetActive(!head.activeSelf);
             body.SetActive(!body.activeSelf);
             active = !active;
+            if (!active)
+            {
+                GameUI.instance.SetPauseSymbol();
+                GameUI.instance.CancelRecordTime();
+            }
             //need to wait a frame to wait for physics updates
             StartCoroutine(EnableColliderAfterFrame());
 
@@ -223,6 +224,11 @@ public class GhostPlayer : MonoBehaviour
     private void ResetCanRecord()
     {
         canRecord = true;
+    }
+
+    private void SetAudioVolume(float volume)
+    {
+        audioSource.volume = volume;
     }
 }
 

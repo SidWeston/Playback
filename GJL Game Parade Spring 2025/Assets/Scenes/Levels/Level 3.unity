@@ -18125,6 +18125,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7581248193663576721, guid: 4b8563c86fd85884197fff2d5c046a12, type: 3}
   m_PrefabInstance: {fileID: 2065982743}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2073196312
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3483380508131238766, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_Name
+      value: Signboard
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.42201
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.6622345
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.345718
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135644202576486870, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_text
+      value: Every Button Needs A Buddy.
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_fontSize
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064995502905909560, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 22
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1933922494531082360, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+  m_SourcePrefab: {fileID: 100100000, guid: 54a553c9f64d670429a295dfcbdb09c3, type: 3}
 --- !u!1001 &2094215416
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18447,3 +18519,4 @@ SceneRoots:
   - {fileID: 1272363482}
   - {fileID: 517180773}
   - {fileID: 1844065478}
+  - {fileID: 2073196312}

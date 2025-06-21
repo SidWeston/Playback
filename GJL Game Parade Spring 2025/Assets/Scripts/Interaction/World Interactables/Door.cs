@@ -8,12 +8,16 @@ public class Door : ActivatableObject
     public float openTime = 1f;
     private float t;
 
-    private bool open = false; 
+    private bool open = false;
+
+    [SerializeField] private AudioSource audioSource;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         closedPos = transform.position;
+        audioSource = GetComponent<AudioSource>();
+        Settings.instance.effectsVolumeChange += SetAudioVolume;
     }
 
     // Update is called once per frame
@@ -42,6 +46,7 @@ public class Door : ActivatableObject
         if(!open)
         {
             open = true;
+            audioSource.Play();
         }
     }
 
@@ -50,6 +55,12 @@ public class Door : ActivatableObject
         if(open)
         {
             open = false;
+            audioSource.Play();
         }
+    }
+
+    private void SetAudioVolume(float volume)
+    {
+        audioSource.volume = volume;
     }
 }
