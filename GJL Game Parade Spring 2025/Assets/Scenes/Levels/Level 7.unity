@@ -6016,6 +6016,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5841660057041180106, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
+      propertyPath: openPos.x
+      value: 11.197
+      objectReference: {fileID: 0}
+    - target: {fileID: 5841660057041180106, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
+      propertyPath: openPos.y
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5841660057041180106, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
+      propertyPath: openPos.z
+      value: 58.376
+      objectReference: {fileID: 0}
     - target: {fileID: 5964945382237343085, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.197
@@ -41642,11 +41654,62 @@ PrefabInstance:
       propertyPath: m_Name
       value: Floor Button (2)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2367624842761358286, guid: 0b28120d5f4b38945a617c99d16356ef, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5485851776918814451, guid: 0b28120d5f4b38945a617c99d16356ef, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 999937704}
   m_SourcePrefab: {fileID: 100100000, guid: 0b28120d5f4b38945a617c99d16356ef, type: 3}
+--- !u!1 &999937700 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5485851776918814451, guid: 0b28120d5f4b38945a617c99d16356ef, type: 3}
+  m_PrefabInstance: {fileID: 999937699}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &999937701 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7047612433359955804, guid: 0b28120d5f4b38945a617c99d16356ef, type: 3}
+  m_PrefabInstance: {fileID: 999937699}
+  m_PrefabAsset: {fileID: 0}
+--- !u!120 &999937702 stripped
+LineRenderer:
+  m_CorrespondingSourceObject: {fileID: 1219632754308309596, guid: 0b28120d5f4b38945a617c99d16356ef, type: 3}
+  m_PrefabInstance: {fileID: 999937699}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &999937703 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2069518669782700301, guid: 0b28120d5f4b38945a617c99d16356ef, type: 3}
+  m_PrefabInstance: {fileID: 999937699}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &999937704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 999937700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b3996aed70d7c4d9bea9a1afc3c08f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activatableObject: {fileID: 5448928600437460107}
+  activatableLayers:
+    serializedVersion: 2
+    m_Bits: 2432
+  overlappedObjects: []
+  active: 0
+  buttonTransform: {fileID: 999937703}
+  upPos: {x: 0, y: 0.1, z: 0}
+  downPos: {x: 0, y: 0, z: 0}
+  powerline: {fileID: 999937702}
+  lineOff: {fileID: 2100000, guid: 2c21f88320e56fd4e9cf9bbc9d9bacfe, type: 2}
+  lineOn: {fileID: 2100000, guid: 5b1ed618a127b21469d618a055df478f, type: 2}
+  wallLight: {fileID: 999937701}
+  lightOff: {fileID: 2100000, guid: 50488fe1788ddd94bac492d235403888, type: 2}
+  lightOn: {fileID: 2100000, guid: 4c364c13655f06c44b2d39b7776d0eb8, type: 2}
 --- !u!1001 &1002805036
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -50216,6 +50279,7 @@ MonoBehaviour:
   closedPos: {x: 0, y: 0, z: 0}
   openPos: {x: 3.416, y: 3.5, z: 19.844}
   openTime: 1
+  audioSource: {fileID: 0}
 --- !u!1001 &1226424656
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -50410,6 +50474,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5841660057041180106, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
+      propertyPath: openPos.x
+      value: -1.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 5841660057041180106, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
+      propertyPath: openPos.y
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5841660057041180106, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
+      propertyPath: openPos.z
+      value: 58.376
+      objectReference: {fileID: 0}
     - target: {fileID: 5964945382237343085, guid: a86cd73c0d7dd724481228f639e37c54, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.12
@@ -54373,6 +54449,7 @@ MonoBehaviour:
   closedPos: {x: 0, y: 0, z: 0}
   openPos: {x: 0.5159998, y: 3.5, z: 19.844}
   openTime: 1
+  audioSource: {fileID: 0}
 --- !u!1001 &1329211016
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -73959,6 +74036,7 @@ MonoBehaviour:
   closedPos: {x: 0, y: 0, z: 0}
   openPos: {x: 23.502, y: 3.5, z: 41.824}
   openTime: 1
+  audioSource: {fileID: 0}
 --- !u!1001 &1796803172
 PrefabInstance:
   m_ObjectHideFlags: 0

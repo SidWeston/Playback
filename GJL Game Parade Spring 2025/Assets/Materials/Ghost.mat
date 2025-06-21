@@ -261,7 +261,7 @@ Material:
     - _FogOn: 0
     - _GeneralAlpha: 0.6
     - _Glitch: 1
-    - _GlitchAmount: 5
+    - _GlitchAmount: 0.1
     - _GlitchSpeed: 0.5
     - _GlitchTiling: 5
     - _GlitchWorldSpace: 1

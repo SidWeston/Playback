@@ -13207,7 +13207,7 @@ MonoBehaviour:
   - {fileID: 31474457}
   current: 0
   complete: 0
-  resetTimer: 7
+  resetTimer: 5
 --- !u!4 &597186168
 Transform:
   m_ObjectHideFlags: 0
@@ -19408,6 +19408,7 @@ MonoBehaviour:
   closedPos: {x: 0, y: 0, z: 0}
   openPos: {x: -2.766003, y: 3.5, z: 49.977}
   openTime: 1
+  audioSource: {fileID: 0}
 --- !u!1001 &852079111
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35218,6 +35219,7 @@ MonoBehaviour:
   closedPos: {x: 0, y: 0, z: 0}
   openPos: {x: -2.766, y: 3.5, z: 22.018}
   openTime: 1
+  audioSource: {fileID: 0}
 --- !u!1001 &1495676053
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -24,14 +24,20 @@ public class GameUI : MonoBehaviour
 
     [SerializeField] private AudioSource musicSource;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private PlayerCamera playerCam;
+
+    private void Awake()
     {
-        if(GameUI.instance && GameUI.instance != this)
+        if (GameUI.instance && GameUI.instance != this)
         {
             Destroy(gameObject);
         }
-        else if(!GameUI.instance)
+    }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        if(!GameUI.instance)
         {
             instance = this;
         }
@@ -73,6 +79,15 @@ public class GameUI : MonoBehaviour
             musicSource.gameObject.SetActive(true);
             musicSource.Play();
         }
+
+        //moved disabling the camera for the pause menu in here because for some reason if you play a level,
+        //go back to menu and then go into another level it stops working. i think its something to do with
+        //the event system but I can't figure it out right now, and I want to get this sumbitted on time for the jam.
+        if(!playerCam && scene.buildIndex != 0)
+        {
+            playerCam = GameObject.FindGameObjectWithTag("Camera").GetComponent<PlayerCamera>();
+        }
+
         CancelRecordTime();
         SetPauseSymbol();
     }
@@ -102,12 +117,20 @@ public class GameUI : MonoBehaviour
     {
         settingsMenu.SetActive(true);
         gameUI.SetActive(false);
+
+        playerCam.camDisabled = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void ClosePauseMenu()
     {
         settingsMenu.SetActive(false);
         gameUI.SetActive(true);
+
+        playerCam.camDisabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void SetRecordSymbol()

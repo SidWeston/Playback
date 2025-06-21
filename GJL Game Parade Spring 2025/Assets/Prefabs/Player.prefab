@@ -1505,7 +1505,7 @@ GameObject:
   - component: {fileID: 6238128522052719806}
   m_Layer: 7
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: Camera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1644,6 +1644,7 @@ MonoBehaviour:
   playerCamera: {fileID: 3925250576420355490}
   playerTransform: {fileID: 5044145897290718419}
   lookSensitivity: 200
+  camDisabled: 0
 --- !u!1 &3764150393396055352
 GameObject:
   m_ObjectHideFlags: 0
