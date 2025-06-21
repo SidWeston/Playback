@@ -106,10 +106,6 @@ public class GameUI : MonoBehaviour
             {
                 OpenPauseMenu();
             }
-            else
-            {
-                ClosePauseMenu();
-            } 
         }
     }
 
