@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     public event Action<bool> landedEvent;
     public event Action<bool> jumpEvent;
 
+    private Vector3 startPosition;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
@@ -39,6 +41,8 @@ public class PlayerMovement : MonoBehaviour
         InputManager.instance.sprintKey.keyPress += OnSprint;
 
         moveSpeed = walkSpeed; //assume player always starts off walking
+
+        startPosition = transform.position;
     }
 
     // Update is called once per frame
@@ -58,6 +62,8 @@ public class PlayerMovement : MonoBehaviour
         //add gravity to it
         Vector3 totalMovement = movementInput * moveSpeed + Vector3.up * velocity.y;
         characterController.Move(totalMovement * Time.deltaTime);
+
+        if (transform.position.y < -15f) transform.position = startPosition; velocity.y = 0;
     }
 
     private void GroundCheck()
