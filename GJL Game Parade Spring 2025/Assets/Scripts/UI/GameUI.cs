@@ -161,6 +161,7 @@ public class GameUI : MonoBehaviour
 
     public void RestartLevel()
     {
+        ClosePauseMenu();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

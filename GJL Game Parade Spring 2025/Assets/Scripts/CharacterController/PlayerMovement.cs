@@ -71,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void GroundCheck()
     {
-        bool checkGround = Physics.CheckSphere(groundCheckLocation.position, 0.15f, groundLayer);
+        bool checkGround = Physics.CheckSphere(groundCheckLocation.position, 0.3f, groundLayer);
         if(checkGround && grounded != checkGround)
         {
             landedEvent?.Invoke(true);
