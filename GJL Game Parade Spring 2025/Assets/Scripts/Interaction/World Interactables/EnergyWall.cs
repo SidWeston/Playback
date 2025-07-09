@@ -34,8 +34,8 @@ public class EnergyWall : MonoBehaviour
                     renderer.material.SetFloat("_GlitchAmount", 0.5f);
                     Invoke("ResetGlitch", 0.5f);
                 }
-                GameUI.instance.SetPauseSymbol();
-                GameUI.instance.CancelRecordTime();
+                GameUI.instance.UpdateGhostUIState(ghost.GetIndex(), RecordState.Pause);
+                GameUI.instance.UpdateGhostUITime(ghost.GetIndex(), 0);
             }
         }
     }

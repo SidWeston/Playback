@@ -107,6 +107,33 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Rewind"",
+                    ""type"": ""Button"",
+                    ""id"": ""4d9d47bb-45f1-4099-994a-dd3830592f70"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SelectOne"",
+                    ""type"": ""Button"",
+                    ""id"": ""74b0ea79-b136-4215-864d-0dfffaffc362"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SelectTwo"",
+                    ""type"": ""Button"",
+                    ""id"": ""9768d335-2d0a-47ec-8dd5-c52e410324f1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -274,6 +301,39 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Pause"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""abe8b89e-2fc0-45e2-b1d1-5de7aa1b5a08"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rewind"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7b0129e0-6bf6-44b6-8d45-96ff1d617852"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectOne"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""db5b2dba-407f-4729-b1cf-c9e4cfe90503"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectTwo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -291,6 +351,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_RecordGhost = m_Player.FindAction("RecordGhost", throwIfNotFound: true);
         m_Player_ToggleGhost = m_Player.FindAction("ToggleGhost", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
+        m_Player_Rewind = m_Player.FindAction("Rewind", throwIfNotFound: true);
+        m_Player_SelectOne = m_Player.FindAction("SelectOne", throwIfNotFound: true);
+        m_Player_SelectTwo = m_Player.FindAction("SelectTwo", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -366,6 +429,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_RecordGhost;
     private readonly InputAction m_Player_ToggleGhost;
     private readonly InputAction m_Player_Pause;
+    private readonly InputAction m_Player_Rewind;
+    private readonly InputAction m_Player_SelectOne;
+    private readonly InputAction m_Player_SelectTwo;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -379,6 +445,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @RecordGhost => m_Wrapper.m_Player_RecordGhost;
         public InputAction @ToggleGhost => m_Wrapper.m_Player_ToggleGhost;
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
+        public InputAction @Rewind => m_Wrapper.m_Player_Rewind;
+        public InputAction @SelectOne => m_Wrapper.m_Player_SelectOne;
+        public InputAction @SelectTwo => m_Wrapper.m_Player_SelectTwo;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -415,6 +484,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
+            @Rewind.started += instance.OnRewind;
+            @Rewind.performed += instance.OnRewind;
+            @Rewind.canceled += instance.OnRewind;
+            @SelectOne.started += instance.OnSelectOne;
+            @SelectOne.performed += instance.OnSelectOne;
+            @SelectOne.canceled += instance.OnSelectOne;
+            @SelectTwo.started += instance.OnSelectTwo;
+            @SelectTwo.performed += instance.OnSelectTwo;
+            @SelectTwo.canceled += instance.OnSelectTwo;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -446,6 +524,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
+            @Rewind.started -= instance.OnRewind;
+            @Rewind.performed -= instance.OnRewind;
+            @Rewind.canceled -= instance.OnRewind;
+            @SelectOne.started -= instance.OnSelectOne;
+            @SelectOne.performed -= instance.OnSelectOne;
+            @SelectOne.canceled -= instance.OnSelectOne;
+            @SelectTwo.started -= instance.OnSelectTwo;
+            @SelectTwo.performed -= instance.OnSelectTwo;
+            @SelectTwo.canceled -= instance.OnSelectTwo;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -474,5 +561,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnRecordGhost(InputAction.CallbackContext context);
         void OnToggleGhost(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
+        void OnRewind(InputAction.CallbackContext context);
+        void OnSelectOne(InputAction.CallbackContext context);
+        void OnSelectTwo(InputAction.CallbackContext context);
     }
 }

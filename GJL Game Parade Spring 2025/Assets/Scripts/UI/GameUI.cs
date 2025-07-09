@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -14,10 +15,9 @@ public class GameUI : MonoBehaviour
     [SerializeField] private GameObject eventSystem;
     private GameObject events;
 
-    [SerializeField] private RawImage actionSymbol;
-
     [SerializeField] private Texture2D recordSymbol, pauseSymbol, playSymbol;
-    public TextMeshProUGUI recordTime;
+
+    public List<GhostUI> ghostUIs = new List<GhostUI>();
 
     public Button backButton;
     public Button backToMenuButton;
@@ -25,6 +25,11 @@ public class GameUI : MonoBehaviour
     [SerializeField] private AudioSource musicSource;
 
     private PlayerCamera playerCam;
+
+    [SerializeField] private bool testScene = false;
+
+    [SerializeField] private RawImage emptySymbolPrefab;
+    [SerializeField] private TextMeshProUGUI emptyTextPrefab;
 
     private void Awake()
     {
@@ -58,7 +63,18 @@ public class GameUI : MonoBehaviour
         InputManager.instance.pauseKey.keyPress += OnPause;
         Settings.instance.musicVolumeChange += SetMusicVolume;
 
-        SetPauseSymbol();
+        //currentActionSymbol = actionSymbolA;
+
+        if(testScene)
+        {
+            SetupGhostUI();
+        }
+
+        for(int i = 0; i < ghostUIs.Count; i++)
+        {
+            UpdateGhostUIState(i, RecordState.Pause);
+            UpdateGhostUITime(i, 0);
+        }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -88,8 +104,11 @@ public class GameUI : MonoBehaviour
             playerCam = GameObject.FindGameObjectWithTag("Camera").GetComponent<PlayerCamera>();
         }
 
-        CancelRecordTime();
-        SetPauseSymbol();
+        for (int i = 0; i < ghostUIs.Count; i++)
+        {
+            UpdateGhostUIState(i, RecordState.Pause);
+            UpdateGhostUITime(i, 0);
+        }
     }
 
     // Update is called once per frame
@@ -114,7 +133,7 @@ public class GameUI : MonoBehaviour
         settingsMenu.SetActive(true);
         gameUI.SetActive(false);
 
-        playerCam.camDisabled = true;
+        playerCam.camEnabled = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -124,34 +143,96 @@ public class GameUI : MonoBehaviour
         settingsMenu.SetActive(false);
         gameUI.SetActive(true);
 
-        playerCam.camDisabled = true;
+        playerCam.camEnabled = true;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    public void SetRecordSymbol()
+    public void UpdateGhostUIState(int index, RecordState state)
     {
-        actionSymbol.texture = recordSymbol;
+        GhostUI ui = ghostUIs[index];
+
+        switch (state)
+        {
+            case RecordState.Pause:
+                {
+                    ui.stateIcon.texture = pauseSymbol;
+                    break;
+                }
+            case RecordState.Recording:
+                {
+                    ui.stateIcon.texture = recordSymbol;
+                    break;
+                }
+            case RecordState.Play:
+                {
+                    ui.stateIcon.texture = playSymbol;
+                    break;
+                }
+        }
     }
 
-    public void SetPauseSymbol()
+    public void UpdateGhostUITime(int index, float time)
     {
-        actionSymbol.texture = pauseSymbol;
+        GhostUI ui = ghostUIs[index];
+        //adjust time to 2 decimal places
+        float adjustedTime = (Mathf.Floor(time * 10) / 10);
+        ui.timerText.text = adjustedTime.ToString();
     }
 
-    public void SetPlaySymbol()
+    public void SetGhostUIActive(int index)
     {
-        actionSymbol.texture = playSymbol;
+        for(int i = 0; i < ghostUIs.Count; i++)
+        {
+            if(index == i)
+            {
+                ghostUIs[i].stateIcon.material.SetFloat("_GhostBlend", 0);
+                ghostUIs[i].stateIcon.material.SetFloat("_OutlineAlpha", 1);
+                ghostUIs[i].stateIcon.material.SetFloat("_OutlinePixelWidth", 1f);
+                ghostUIs[i].stateIcon.material.SetFloat("_ShineGlow", 0.2f);
+            }
+            else
+            {
+                ghostUIs[i].stateIcon.material.SetFloat("_GhostBlend", 1);
+                ghostUIs[i].stateIcon.material.SetFloat("_OutlineAlpha", 0);
+                ghostUIs[i].stateIcon.material.SetFloat("_OutlinePixelWidth", 0);
+                ghostUIs[i].stateIcon.material.SetFloat("_ShineGlow", 0);
+            }
+        }
     }
 
-    public void SetRecordTime(float time)
+    public void SetupGhostUI()
     {
-        recordTime.text = (Mathf.Floor(time * 10) / 10).ToString();
-    }
+        //find all ghosts
+        GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+        foreach (GameObject ghost in ghosts)
+        {
+            ghostUIs.Add(ghost.GetComponent<GhostUI>());
+        }
 
-    public void CancelRecordTime()
-    {
-        recordTime.text = "N/A";
+        if (ghostUIs.Count == 0) return;
+
+        float offset = 0;
+
+        if(ghostUIs.Count > 1)
+        {
+            offset = 200 - (400 * (ghostUIs.Count - 1));
+        }
+
+        for(int i = 0; i < ghostUIs.Count; i++)
+        {
+            ghostUIs[i].stateIcon = Instantiate(emptySymbolPrefab, canvas.transform);
+            ghostUIs[i].stateIcon.rectTransform.localScale = new Vector3(2, 2, 1);
+            ghostUIs[i].stateIcon.rectTransform.localPosition = new Vector2(offset, -210);
+            ghostUIs[i].stateIcon.material = new Material(ghostUIs[i].stateIcon.material);
+
+
+            ghostUIs[i].timerText = Instantiate(emptyTextPrefab, canvas.transform);
+            ghostUIs[i].timerText.rectTransform.localScale = new Vector3(2, 2, 1);
+            ghostUIs[i].timerText.rectTransform.localPosition = new Vector3(offset, -360, 0);
+
+            offset += 400;
+        }
     }
 
     public void ReturnToMainMenu()
@@ -169,4 +250,11 @@ public class GameUI : MonoBehaviour
     {
         musicSource.volume = volume;
     }
+}
+
+public enum RecordState
+{ 
+    Pause,
+    Recording,
+    Play
 }

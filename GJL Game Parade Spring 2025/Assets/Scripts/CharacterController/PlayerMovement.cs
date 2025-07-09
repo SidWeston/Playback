@@ -32,6 +32,8 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 startPosition;
 
+    public bool movementEnabled = true;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
@@ -48,6 +50,8 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (!movementEnabled) return;
+
         GroundCheck();
         //apply gravity
         velocity.y += gravity * Time.deltaTime;
@@ -137,7 +141,19 @@ public class PlayerMovement : MonoBehaviour
             isCrouching = crouching,
             isSprinting = sprinting,
             isJumping = grounded,
+        };
+    }
+
+    //player rewind recording
+    public PlayerFrame RecordPlayerFrame()
+    {
+        return new PlayerFrame
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            isCrouching = crouching,
             timeStamp = Time.time
         };
     }
+
 }

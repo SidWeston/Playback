@@ -2867,6 +2867,7 @@ GameObject:
   - component: {fileID: 8075170827125153337}
   - component: {fileID: 2220249242083156996}
   - component: {fileID: 7889235734572317722}
+  - component: {fileID: 4165520606073552891}
   - component: {fileID: 7343467662140470803}
   - component: {fileID: 6995063589282702737}
   - component: {fileID: 6089891201788918747}
@@ -2930,6 +2931,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnLocation: {fileID: 571984444370616503}
+--- !u!114 &4165520606073552891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9040133445007071190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5d0e0e4d6fc0b84b927a2d811c3996f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  index: 0
+  stateIcon: {fileID: 0}
+  timerText: {fileID: 0}
+  linkedGhost: {fileID: 0}
 --- !u!65 &7343467662140470803
 BoxCollider:
   m_ObjectHideFlags: 0

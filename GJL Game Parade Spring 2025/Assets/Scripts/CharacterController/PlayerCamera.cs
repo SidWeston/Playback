@@ -11,7 +11,7 @@ public class PlayerCamera : MonoBehaviour
 
     private float yRotation;
 
-    public bool camDisabled = false;
+    public bool camEnabled = true;
 
     //input
     private Vector2 lookVector;
@@ -22,8 +22,11 @@ public class PlayerCamera : MonoBehaviour
         InputManager.instance.lookEvent += OnLook;
         //InputManager.instance.pauseKey.keyPress += OnPause; //stops working if you go back and forth through the scenes, so its disabled and moved.
 
-        GameUI.instance.backButton.onClick.AddListener(HideCursor);
-        GameUI.instance.backToMenuButton.onClick.AddListener(ShowCursor);
+        if(GameUI.instance)
+        {
+            GameUI.instance.backButton.onClick.AddListener(HideCursor);
+            GameUI.instance.backToMenuButton.onClick.AddListener(ShowCursor);
+        }
 
         if (Cursor.lockState == CursorLockMode.None)
         {
@@ -34,7 +37,7 @@ public class PlayerCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (camDisabled) return;
+        if (!camEnabled) return;
 
         lookVector *= Settings.instance != null ? (Settings.instance.mouseSensitivity * 3) * Time.deltaTime : 100 * Time.deltaTime;
         yRotation -= lookVector.y;
@@ -68,7 +71,7 @@ public class PlayerCamera : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        camDisabled = true;
+        camEnabled = false;
     }
 
     private void HideCursor()
@@ -76,6 +79,6 @@ public class PlayerCamera : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        camDisabled = false;
+        camEnabled = true;
     }
 }

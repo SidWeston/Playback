@@ -20,6 +20,9 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public InputKey recordKey = new InputKey();
     public InputKey ghostKey = new InputKey();
     public InputKey pauseKey = new InputKey();
+    public InputKey rewindKey = new InputKey();
+    public InputKey selectOne = new InputKey();
+    public InputKey selectTwo = new InputKey();
 
     private void Awake()
     {
@@ -158,6 +161,48 @@ public class InputManager : MonoBehaviour, IPlayerActions
         {
             pauseKey.downCounter = 0;
             pauseKey.InvokeKeyPress(false);
+        }
+    }
+
+    public void OnRewind(InputAction.CallbackContext context)
+    {
+        if (context.ReadValue<float>() > 0 && rewindKey.downCounter == 0)
+        {
+            rewindKey.downCounter++;
+            rewindKey.InvokeKeyPress(true);
+        }
+        else if (context.ReadValue<float>() <= 0)
+        {
+            rewindKey.downCounter = 0;
+            rewindKey.InvokeKeyPress(false);
+        }
+    }
+
+    public void OnSelectOne(InputAction.CallbackContext context)
+    {
+        if (context.ReadValue<float>() > 0 && selectOne.downCounter == 0)
+        {
+            selectOne.downCounter++;
+            selectOne.InvokeKeyPress(true);
+        }
+        else if (context.ReadValue<float>() <= 0)
+        {
+            selectOne.downCounter = 0;
+            selectOne.InvokeKeyPress(false);
+        }
+    }
+
+    public void OnSelectTwo(InputAction.CallbackContext context)
+    {
+        if (context.ReadValue<float>() > 0 && selectTwo.downCounter == 0)
+        {
+            selectTwo.downCounter++;
+            selectTwo.InvokeKeyPress(true);
+        }
+        else if (context.ReadValue<float>() <= 0)
+        {
+            selectTwo.downCounter = 0;
+            selectTwo.InvokeKeyPress(false);
         }
     }
 }

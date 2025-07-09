@@ -35,7 +35,7 @@ Material:
   - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
   - _TRIPLANARNORMALSPACE_WORLD
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
   stringTagMap: {}
@@ -261,7 +261,7 @@ Material:
     - _FogOn: 0
     - _GeneralAlpha: 0.6
     - _Glitch: 1
-    - _GlitchAmount: 0.1
+    - _GlitchAmount: 5
     - _GlitchSpeed: 0.5
     - _GlitchTiling: 5
     - _GlitchWorldSpace: 1

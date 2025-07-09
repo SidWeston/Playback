@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Transactions;
 using UnityEngine;
 
 public class GhostPlayer : MonoBehaviour
@@ -22,6 +20,8 @@ public class GhostPlayer : MonoBehaviour
     [SerializeField] private GameObject head, body;
     [SerializeField] private Material ghostMat;
 
+    [SerializeField] private GhostUI ghostUI;
+
     private int currentFrameIndex = 0;
     private float frameTimer = 0f;
     private float duration = 0f, fullDuration = 0f;
@@ -39,10 +39,12 @@ public class GhostPlayer : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        InputManager.instance.ghostKey.keyPress += ToggleGhost;
-        InputManager.instance.recordKey.keyPress += StartRecording;
+        //InputManager.instance.ghostKey.keyPress += ToggleGhost;
+        //InputManager.instance.recordKey.keyPress += StartRecording;
         ResetGlitch(); //ensure glitch effect isnt set to high by default
         active = false; //assume ghost starts turned off
+
+        ghostUI = GetComponent<GhostUI>();
 
         audioSource = GetComponent<AudioSource>();
         Settings.instance.effectsVolumeChange += SetAudioVolume;
@@ -56,7 +58,7 @@ public class GhostPlayer : MonoBehaviour
         frameTimer += Time.deltaTime;
         duration -= Time.deltaTime;
 
-        GameUI.instance.SetRecordTime(duration);
+        GameUI.instance.UpdateGhostUITime(ghostUI.index, duration);
 
         while(frameTimer > frameInterval)
         {
@@ -65,11 +67,12 @@ public class GhostPlayer : MonoBehaviour
             if(currentFrameIndex >= recording.Count - 1)
             {
                 currentFrameIndex = 0;
-                ghostMat.SetFloat("_GlitchAmount", 5);
+                body.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
+                head.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
                 Invoke("ResetGlitch", 0.2f);
                 audioSource.Play();
                 duration = fullDuration;
-                GameUI.instance.SetRecordTime(duration);
+                //GameUI.instance.UpdateGhostUITime(ghostUI.index, duration);
                 if (CheckForPlayerOverlap())
                 {
                     overlappingPlayer = true;
@@ -113,7 +116,8 @@ public class GhostPlayer : MonoBehaviour
 
     private void ResetGlitch()
     {
-        ghostMat.SetFloat("_GlitchAmount", 0.1f);
+        body.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 0.1f);
+        head.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 0.1f);
     }
 
     public void StopRecording()
@@ -140,14 +144,14 @@ public class GhostPlayer : MonoBehaviour
         List<GhostFrame> newFrames = new List<GhostFrame>();
         float timer = 0f;
 
-        GameUI.instance.SetRecordSymbol();
+        GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Recording);
 
         while (timer < recordDuration && !earlyStop)
         {
             newFrames.Add(target.RecordFrame());
             yield return new WaitForSeconds(frameInterval);
             timer += frameInterval;
-            GameUI.instance.SetRecordTime(timer);
+            GameUI.instance.UpdateGhostUITime(ghostUI.index, timer);
         }
         fullDuration = timer;
         duration = timer;
@@ -155,7 +159,8 @@ public class GhostPlayer : MonoBehaviour
         if (!active) ToggleGhost(true);
         recording = newFrames;
         currentFrameIndex = 0;
-        ghostMat.SetFloat("_GlitchAmount", 5);
+        body.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
+        head.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
         Invoke("ResetGlitch", 0.2f);
         audioSource.Play();
         if (CheckForPlayerOverlap())
@@ -163,7 +168,7 @@ public class GhostPlayer : MonoBehaviour
             overlappingPlayer = true;
             Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
         }
-        GameUI.instance.SetPlaySymbol();
+        GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Play);
         frameTimer = 0;
         transform.position = recording[0].position;
         transform.rotation = recording[0].rotation;
@@ -187,8 +192,8 @@ public class GhostPlayer : MonoBehaviour
             active = !active;
             if (!active)
             {
-                GameUI.instance.SetPauseSymbol();
-                GameUI.instance.CancelRecordTime();
+                GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Pause);
+                GameUI.instance.UpdateGhostUITime(ghostUI.index, 0);
             }
             //need to wait a frame to wait for physics updates
             StartCoroutine(EnableColliderAfterFrame());
@@ -203,7 +208,7 @@ public class GhostPlayer : MonoBehaviour
         ghostCollider.enabled = !ghostCollider.enabled;
     }
 
-    private void StartRecording(bool input)
+    public void StartRecording(bool input)
     {
         if(input && canRecord)
         {
@@ -219,6 +224,11 @@ public class GhostPlayer : MonoBehaviour
             }
 
         }
+    }
+
+    public int GetIndex()
+    {
+        return ghostUI.index;
     }
 
     private void ResetCanRecord()
@@ -240,5 +250,4 @@ public struct GhostFrame
     public bool isCrouching;
     public bool isSprinting;
     public bool isJumping;
-    public float timeStamp;
 }
