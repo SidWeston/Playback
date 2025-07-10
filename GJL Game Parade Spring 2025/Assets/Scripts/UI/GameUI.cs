@@ -104,6 +104,9 @@ public class GameUI : MonoBehaviour
             playerCam = GameObject.FindGameObjectWithTag("Camera").GetComponent<PlayerCamera>();
         }
 
+        //need to ensure ghost ui is properly destroyed when changing from a previous level, or this will layer on top
+        SetupGhostUI();
+
         for (int i = 0; i < ghostUIs.Count; i++)
         {
             UpdateGhostUIState(i, RecordState.Pause);
@@ -232,6 +235,16 @@ public class GameUI : MonoBehaviour
             ghostUIs[i].timerText.rectTransform.localPosition = new Vector3(offset, -360, 0);
 
             offset += 400;
+        }
+    }
+
+    public void DestroyGhostUI()
+    {
+        for(int i = 0; i < ghostUIs.Count; i++)
+        {
+            Destroy(ghostUIs[i].stateIcon.gameObject);
+            Destroy(ghostUIs[i].timerText.gameObject);
+            ghostUIs.Remove(ghostUIs[i]);
         }
     }
 

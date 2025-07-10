@@ -8,7 +8,7 @@ public class GhostPlayer : MonoBehaviour
 
     private List<GhostFrame> recording = new List<GhostFrame>();
 
-    private bool isRecording = false;
+    public bool isRecording = false;
 
     [SerializeField] private float frameInterval = 0.1f;
     [SerializeField] private float recordDuration = 5f;

@@ -55,6 +55,8 @@ public class Cryopod : MonoBehaviour
 
     private void LoadNextLevel()
     {
+        //make sure old ghost UI is destroyed
+        GameUI.instance.DestroyGhostUI();
         SceneManager.LoadScene(nextLevelIndex);
     }
 

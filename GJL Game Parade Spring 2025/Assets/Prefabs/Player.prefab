@@ -1644,7 +1644,7 @@ MonoBehaviour:
   playerCamera: {fileID: 3925250576420355490}
   playerTransform: {fileID: 5044145897290718419}
   lookSensitivity: 200
-  camDisabled: 0
+  camEnabled: 1
 --- !u!1 &3764150393396055352
 GameObject:
   m_ObjectHideFlags: 0
@@ -2959,7 +2959,9 @@ GameObject:
   - component: {fileID: 5974653435150049071}
   - component: {fileID: 4653575705279436589}
   - component: {fileID: 4874481943290677820}
+  - component: {fileID: 5906679367376822722}
   - component: {fileID: 3712309354710438930}
+  - component: {fileID: 6092844924510624725}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -3036,6 +3038,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2368
   groundCheckLocation: {fileID: 3551708824775240405}
+  movementEnabled: 1
 --- !u!114 &5974653435150049071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3082,6 +3085,25 @@ MonoBehaviour:
   currentObject: {fileID: 0}
   holdPosition: {fileID: 7309815635431496739}
   dropThreshold: 1
+--- !u!114 &5906679367376822722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8662953265429487248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9168ec601cc074f47a533aa3a39f0f8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movement: {fileID: 5971502459326427157}
+  playerCamera: {fileID: 6238128522052719806}
+  ghostController: {fileID: 6092844924510624725}
+  shouldRecord: 1
+  isRewinding: 0
+  rewindTime: 10
+  rewindDuration: 1
 --- !u!54 &3712309354710438930
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3109,6 +3131,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6092844924510624725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8662953265429487248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b401129628e59ea449502086728c7d4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ghosts: []
 --- !u!1 &8678372641530580153
 GameObject:
   m_ObjectHideFlags: 0

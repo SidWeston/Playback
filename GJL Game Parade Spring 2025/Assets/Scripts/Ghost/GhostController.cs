@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GhostController : MonoBehaviour
 {
     private GhostPlayer currentGhost;
-    public GhostPlayer ghostA, ghostB;
+    public List<GhostPlayer> ghosts;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -13,8 +14,11 @@ public class GhostController : MonoBehaviour
         InputManager.instance.selectOne.keyPress += SelectGhostA;
         InputManager.instance.selectTwo.keyPress += SelectGhostB;
 
-        //ghostA = GameObject.FindGameObjectWithTag("Ghost A").GetComponent<GhostPlayer>();
-        //ghostB = GameObject.FindGameObjectWithTag("Ghost B").GetComponent<GhostPlayer>();
+        if (ghosts.Count == 1)
+        {
+            currentGhost = ghosts[0];
+            GameUI.instance.SetGhostUIActive(0);
+        }
     }
 
     // Update is called once per frame
@@ -25,18 +29,18 @@ public class GhostController : MonoBehaviour
 
     private void SelectGhostA(bool input)
     {
-        if(input && ghostA != null)
+        if(input && ghosts[0] != null)
         {
-            currentGhost = ghostA;
+            currentGhost = ghosts[0];
             GameUI.instance.SetGhostUIActive(0);
         }
     }
 
     private void SelectGhostB(bool input)
     {
-        if (input && ghostB != null)
+        if (input && ghosts[1] != null)
         {
-            currentGhost = ghostB;
+            currentGhost = ghosts[1];
             GameUI.instance.SetGhostUIActive(1);
         }
     }
@@ -55,5 +59,17 @@ public class GhostController : MonoBehaviour
         {
             currentGhost.StartRecording(true);
         }
+    }
+
+    public void StopRecording()
+    {
+        currentGhost.StartRecording(true);
+        currentGhost.ToggleGhost(true);
+    }
+
+    public bool IsRecording()
+    {
+        if (currentGhost.isRecording) return true;
+        return false;
     }
 }

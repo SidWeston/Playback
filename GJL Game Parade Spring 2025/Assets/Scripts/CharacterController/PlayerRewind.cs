@@ -6,6 +6,7 @@ public class PlayerRewind : MonoBehaviour
 {
     public PlayerMovement movement;
     public PlayerCamera playerCamera;
+    public GhostController ghostController;
     public List<PlayerFrame> recording = new List<PlayerFrame>();
 
     public bool shouldRecord = true;
@@ -95,9 +96,12 @@ public class PlayerRewind : MonoBehaviour
             movement.movementEnabled = false;
             playerCamera.camEnabled = false;
 
+            if(ghostController.IsRecording())
+            {
+                ghostController.StopRecording();
+            }
+
             StartCoroutine(RewindSmoothLerp());
-            //also disable movement and camera inputs
-            //if recording for a ghost, cancel recording
         }
     }
 

@@ -2873,7 +2873,7 @@ GameObject:
   - component: {fileID: 6089891201788918747}
   m_Layer: 8
   m_Name: Ghost
-  m_TagString: Untagged
+  m_TagString: Ghost
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2918,6 +2918,7 @@ MonoBehaviour:
   head: {fileID: 3192516904129123997}
   body: {fileID: 8160859224214552357}
   ghostMat: {fileID: 2100000, guid: 31810d401580865488e513236e1046d8, type: 2}
+  ghostUI: {fileID: 4165520606073552891}
 --- !u!114 &7889235734572317722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2946,7 +2947,6 @@ MonoBehaviour:
   index: 0
   stateIcon: {fileID: 0}
   timerText: {fileID: 0}
-  linkedGhost: {fileID: 0}
 --- !u!65 &7343467662140470803
 BoxCollider:
   m_ObjectHideFlags: 0
