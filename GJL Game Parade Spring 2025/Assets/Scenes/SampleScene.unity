@@ -526,6 +526,10 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 1230115888}
+    - target: {fileID: 2220249242083156996, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
+      propertyPath: obstacleLayers.m_Bits
+      value: 8256
+      objectReference: {fileID: 0}
     - target: {fileID: 8075170827125153337, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.62801
@@ -959,7 +963,7 @@ GameObject:
   - component: {fileID: 307285665}
   - component: {fileID: 307285664}
   - component: {fileID: 307285663}
-  m_Layer: 6
+  m_Layer: 13
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4863,6 +4867,10 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 1230115888}
+    - target: {fileID: 2220249242083156996, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
+      propertyPath: obstacleLayers.m_Bits
+      value: 8256
+      objectReference: {fileID: 0}
     - target: {fileID: 4165520606073552891, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
       propertyPath: index
       value: 1

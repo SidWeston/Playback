@@ -16,6 +16,7 @@ public class GhostPlayer : MonoBehaviour
     [SerializeField] private GhostAnimationController animationController;
     [SerializeField] private BoxCollider ghostCollider;
     [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private LayerMask obstacleLayers;
 
     [SerializeField] private GameObject head, body;
     [SerializeField] private Material ghostMat;
@@ -28,7 +29,7 @@ public class GhostPlayer : MonoBehaviour
     private bool isPlaying = false;
     private bool active = false;
 
-    private bool overlappingPlayer = false;
+    private bool collisionsDisabled = false;
     private bool earlyStop = false;
 
     private float recordDelay = 0.2f;
@@ -67,24 +68,10 @@ public class GhostPlayer : MonoBehaviour
             if(currentFrameIndex >= recording.Count - 1)
             {
                 currentFrameIndex = 0;
-                body.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
-                head.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
-                Invoke("ResetGlitch", 0.2f);
+                PerformGlitchEffect();
                 audioSource.Play();
-                duration = fullDuration;
-                //GameUI.instance.UpdateGhostUITime(ghostUI.index, duration);
-                if (CheckForPlayerOverlap())
-                {
-                    overlappingPlayer = true;
-                    Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
-                }
+                duration = fullDuration;               
             }
-        }
-
-        if (overlappingPlayer && !!CheckForPlayerOverlap())
-        {
-            overlappingPlayer = false;
-            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
         }
 
         GhostFrame a = recording[currentFrameIndex];
@@ -92,14 +79,17 @@ public class GhostPlayer : MonoBehaviour
         float t = frameTimer / frameInterval;
 
         //its messy having this many ignore collision checks, but I dont have much time and it fixes the big bugs
-        if (a.movementInput != Vector2.zero || b.movementInput != Vector2.zero)
-        {
-            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
-        }
-        else if(a.movementInput == Vector2.zero && b.movementInput == Vector2.zero)
-        {
-            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
-        }
+        //if (a.movementInput != Vector2.zero || b.movementInput != Vector2.zero)
+        //{
+        //    Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
+        //}
+        //else if(a.movementInput == Vector2.zero && b.movementInput == Vector2.zero)
+        //{
+        //    Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
+        //}
+
+
+
 
         Vector3 position = Vector3.Lerp(a.position, b.position, t);
         Quaternion rotation = Quaternion.Slerp(a.rotation, b.rotation, t);
@@ -112,6 +102,18 @@ public class GhostPlayer : MonoBehaviour
 
         ghostCollider.size = new Vector3(ghostCollider.size.x, a.isCrouching ? 1 : 2, ghostCollider.size.z);
         ghostCollider.center = a.isCrouching ? new Vector3(0, -0.25f, 0) : Vector3.zero;
+    }
+
+    private void FixedUpdate()
+    {
+        CheckForPlayerWallCollision();
+    }
+
+    private void PerformGlitchEffect()
+    {
+        body.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
+        head.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
+        Invoke("ResetGlitch", 0.2f);
     }
 
     private void ResetGlitch()
@@ -134,6 +136,31 @@ public class GhostPlayer : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    public void CheckForPlayerWallCollision()
+    {
+        Vector3 toPlayer = target.transform.position - transform.position;
+        Ray rayToPlayer = new Ray(transform.position, toPlayer);
+        if(!collisionsDisabled)
+        {
+            if (Physics.Raycast(rayToPlayer, out RaycastHit playerHit, 1.5f, playerLayer))
+            {
+                Debug.Log("hit player");
+                Ray rayThroughPlayer = new Ray(target.transform.position, toPlayer);
+                if (Physics.Raycast(rayThroughPlayer, out RaycastHit wallHit, 1.5f, obstacleLayers))
+                {
+                    Debug.Log("disabling collider");
+                    collisionsDisabled = true;
+                    Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
+                }
+            }
+        }
+        else if(collisionsDisabled && Vector3.Distance(transform.position, target.transform.position) > 1.25f)
+        {
+            collisionsDisabled = false;
+            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
+        }
     }
 
     public IEnumerator RecordFrame()
@@ -159,15 +186,10 @@ public class GhostPlayer : MonoBehaviour
         if (!active) ToggleGhost(true);
         recording = newFrames;
         currentFrameIndex = 0;
-        body.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
-        head.GetComponent<Renderer>().material.SetFloat("_GlitchAmount", 5);
-        Invoke("ResetGlitch", 0.2f);
+        PerformGlitchEffect();
         audioSource.Play();
-        if (CheckForPlayerOverlap())
-        {
-            overlappingPlayer = true;
-            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
-        }
+
+
         GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Play);
         frameTimer = 0;
         transform.position = recording[0].position;
