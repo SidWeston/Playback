@@ -13,18 +13,13 @@ public class GhostController : MonoBehaviour
         InputManager.instance.recordKey.keyPress += StartRecording;
         InputManager.instance.selectOne.keyPress += SelectGhostA;
         InputManager.instance.selectTwo.keyPress += SelectGhostB;
+        InputManager.instance.interactKey.keyPress += OnInteract;
 
         if (ghosts.Count == 1)
         {
             currentGhost = ghosts[0];
             GameUI.instance.SetGhostUIActive(0);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     private void SelectGhostA(bool input)
@@ -71,5 +66,21 @@ public class GhostController : MonoBehaviour
     {
         if (currentGhost.isRecording) return true;
         return false;
+    }
+
+    private void RecordEvent(GhostEvent.EventType type)
+    {
+        currentGhost.RecordEvent(type);
+    }
+
+    private void OnInteract(bool input)
+    { 
+        if(input)
+        {
+            if(currentGhost.isRecording)
+            {
+                RecordEvent(GhostEvent.EventType.Interact);
+            }
+        }
     }
 }

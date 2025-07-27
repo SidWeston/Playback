@@ -49,7 +49,7 @@ public class Door : ActivatableObject
         if(!open)
         {
             open = true;
-            audioSource.Play();
+            if(audioSource) audioSource.Play();
         }
     }
 
@@ -58,7 +58,7 @@ public class Door : ActivatableObject
         if(open)
         {
             open = false;
-            audioSource.Play();
+            if(audioSource) audioSource.Play();
         }
     }
 

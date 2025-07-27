@@ -75,7 +75,7 @@ public class PlayerRewind : MonoBehaviour
     {
         while(shouldRecord)
         {
-            recording.Add(movement.RecordPlayerFrame());
+            recording.Add(movement.RecordRewindFrame());
 
             float cutoff = Time.time - rewindTime;
             while(recording.Count > 0 && recording[0].timeStamp < cutoff)

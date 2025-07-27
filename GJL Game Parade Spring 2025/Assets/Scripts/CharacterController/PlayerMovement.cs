@@ -25,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
     //input variables
     private Vector2 moveVector;
     private bool sprinting, crouching;
+    private bool interacting = false;
 
     //events for animations
     public event Action<bool> landedEvent;
@@ -41,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
         InputManager.instance.jumpKey.keyPress += OnJump;
         InputManager.instance.crouchKey.keyPress += OnCrouch;
         InputManager.instance.sprintKey.keyPress += OnSprint;
+        InputManager.instance.interactKey.keyPress += OnInteract;
 
         moveSpeed = walkSpeed; //assume player always starts off walking
 
@@ -130,22 +132,31 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void OnInteract(bool input)
+    {
+        interacting = input;
+    }
+
+    //2 seperate frame recording structs, probably messy but who cares
+
     //ghost recording
     public GhostFrame RecordFrame()
     {
         return new GhostFrame
         {
             position = transform.position,
+            cameraForward = playerCamera.transform.forward,
             rotation = transform.rotation,
             movementInput = moveVector,
             isCrouching = crouching,
             isSprinting = sprinting,
             isJumping = grounded,
+            isInteracting = interacting
         };
     }
 
     //player rewind recording
-    public PlayerFrame RecordPlayerFrame()
+    public PlayerFrame RecordRewindFrame()
     {
         return new PlayerFrame
         {

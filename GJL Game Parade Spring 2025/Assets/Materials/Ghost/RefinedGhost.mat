@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ghost
+  m_Name: RefinedGhost
   m_Shader: {fileID: 4800000, guid: 8a970d62549d99d4eab51bffa33b0ee9, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -25,7 +25,6 @@ Material:
   - _RIMLIGHTINGSTAGE_BEFORELIGHTINGLAST
   - _SHADINGMODEL_BASIC
   - _SPECULARMODEL_NONE
-  - _SUBSURFACE_SCATTERING_ON
   - _TEXTUREBLENDINGMODE_RGB
   - _USE_WIND_VERTICAL_MASK
   m_InvalidKeywords:
@@ -261,7 +260,7 @@ Material:
     - _FogOn: 0
     - _GeneralAlpha: 0.6
     - _Glitch: 1
-    - _GlitchAmount: 5
+    - _GlitchAmount: 0.05
     - _GlitchSpeed: 0.5
     - _GlitchTiling: 5
     - _GlitchWorldSpace: 1
@@ -373,7 +372,7 @@ Material:
     - _StochasticSampling: 0
     - _StochasticScale: 3.464
     - _StochasticSkew: 0.57735026
-    - _SubsurfaceScattering: 1
+    - _SubsurfaceScattering: 0
     - _Surface: 0
     - _TextureBlending: 0
     - _TextureBlendingMode: 0
@@ -426,7 +425,7 @@ Material:
     - _HighlightsColor: {r: 2, g: 2, b: 2, a: 1}
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HologramLineDirection: {r: 0.5, g: 0.5, b: 0.5, a: 0}
+    - _HologramLineDirection: {r: 0, g: 0.5, b: 0, a: 0}
     - _RimColor: {r: 0.29236382, g: 0.832705, b: 0.8490566, a: 1}
     - _RimOffset: {r: 0, g: 0, b: 0, a: 0}
     - _SSSColor: {r: 1, g: 1, b: 1, a: 1}

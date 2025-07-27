@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Windows;
 
 public class GhostPlayer : MonoBehaviour
 {
     [SerializeField] private PlayerMovement target;
 
     private List<GhostFrame> recording = new List<GhostFrame>();
+    private List<GhostEvent> eventLog = new List<GhostEvent>();
 
     public bool isRecording = false;
 
@@ -24,8 +26,11 @@ public class GhostPlayer : MonoBehaviour
     [SerializeField] private GhostUI ghostUI;
 
     private int currentFrameIndex = 0;
+    private int currentEventIndex = 0;
     private float frameTimer = 0f;
     private float duration = 0f, fullDuration = 0f;
+    private float recordingStartTime = 0f;
+    private float playbackStartTime = 0f;
     private bool isPlaying = false;
     private bool active = false;
 
@@ -36,12 +41,11 @@ public class GhostPlayer : MonoBehaviour
     private bool canRecord = true;
 
     private AudioSource audioSource;
+    [SerializeField] private LayerMask interactableLayers;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        //InputManager.instance.ghostKey.keyPress += ToggleGhost;
-        //InputManager.instance.recordKey.keyPress += StartRecording;
         ResetGlitch(); //ensure glitch effect isnt set to high by default
         active = false; //assume ghost starts turned off
 
@@ -68,28 +72,18 @@ public class GhostPlayer : MonoBehaviour
             if(currentFrameIndex >= recording.Count - 1)
             {
                 currentFrameIndex = 0;
+                currentEventIndex = 0;
+                playbackStartTime = Time.time;
                 PerformGlitchEffect();
                 audioSource.Play();
                 duration = fullDuration;               
             }
         }
 
+        //get 2 frames to interpolate between
         GhostFrame a = recording[currentFrameIndex];
         GhostFrame b = recording[currentFrameIndex + 1];
         float t = frameTimer / frameInterval;
-
-        //its messy having this many ignore collision checks, but I dont have much time and it fixes the big bugs
-        //if (a.movementInput != Vector2.zero || b.movementInput != Vector2.zero)
-        //{
-        //    Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
-        //}
-        //else if(a.movementInput == Vector2.zero && b.movementInput == Vector2.zero)
-        //{
-        //    Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
-        //}
-
-
-
 
         Vector3 position = Vector3.Lerp(a.position, b.position, t);
         Quaternion rotation = Quaternion.Slerp(a.rotation, b.rotation, t);
@@ -97,11 +91,19 @@ public class GhostPlayer : MonoBehaviour
         transform.position = position;
         transform.rotation = rotation;
 
+        float playbackTime = Time.time - playbackStartTime;
+
+        while(currentEventIndex < eventLog.Count && eventLog[currentEventIndex].time <= playbackTime)
+        {
+            TriggerEvent(eventLog[currentEventIndex]);
+            currentEventIndex++;
+        }
+
         animationController.PlayMovementAnimation(a.movementInput);
         animationController.SwitchAnimSet(a.isCrouching, a.isSprinting);
 
         ghostCollider.size = new Vector3(ghostCollider.size.x, a.isCrouching ? 1 : 2, ghostCollider.size.z);
-        ghostCollider.center = a.isCrouching ? new Vector3(0, -0.25f, 0) : Vector3.zero;
+        ghostCollider.center = a.isCrouching ? new Vector3(0, -0.25f, 0) : Vector3.zero; //recenter the collider if crouching to ensure accuracy
     }
 
     private void FixedUpdate()
@@ -146,11 +148,9 @@ public class GhostPlayer : MonoBehaviour
         {
             if (Physics.Raycast(rayToPlayer, out RaycastHit playerHit, 1.5f, playerLayer))
             {
-                Debug.Log("hit player");
                 Ray rayThroughPlayer = new Ray(target.transform.position, toPlayer);
                 if (Physics.Raycast(rayThroughPlayer, out RaycastHit wallHit, 1.5f, obstacleLayers))
                 {
-                    Debug.Log("disabling collider");
                     collisionsDisabled = true;
                     Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
                 }
@@ -170,6 +170,7 @@ public class GhostPlayer : MonoBehaviour
         if(active) ToggleGhost(true);
         List<GhostFrame> newFrames = new List<GhostFrame>();
         float timer = 0f;
+        recordingStartTime = Time.time;
 
         GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Recording);
 
@@ -189,13 +190,63 @@ public class GhostPlayer : MonoBehaviour
         PerformGlitchEffect();
         audioSource.Play();
 
-
         GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Play);
+
+        //setup to play the first frame of the recording
         frameTimer = 0;
         transform.position = recording[0].position;
         transform.rotation = recording[0].rotation;
         isPlaying = true;
         isRecording = false;
+        playbackStartTime = Time.time;
+        currentEventIndex = 0;
+    }
+
+    public void RecordEvent(GhostEvent.EventType type)
+    {
+        eventLog.Add(new GhostEvent
+        {
+            time = Time.time - recordingStartTime,
+            type = type
+        });
+    }
+
+    private void TriggerEvent(GhostEvent ghostEvent)
+    {
+        switch (ghostEvent.type)
+        {
+            case GhostEvent.EventType.Interact:
+                {
+                    TryInteract();
+                    break;
+                }
+            case GhostEvent.EventType.Rewind:
+                {
+                    break;
+                }
+            case GhostEvent.EventType.UseAnchor:
+                {
+                    break;
+                }
+        }
+    }
+
+    private void TryInteract()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, recording[currentFrameIndex].cameraForward, out hit, 5.0f, interactableLayers))
+        {
+            Debug.Log("interacted with " + hit.collider.gameObject);
+            if (hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+            {
+                interactable.Interact(gameObject);
+            }
+        }
+    }
+
+    public void ClearEventLog()
+    {
+        eventLog.Clear();
     }
 
     public void ToggleGhost(bool input)
@@ -208,7 +259,7 @@ public class GhostPlayer : MonoBehaviour
                 currentFrameIndex = 0;
             }
             else isPlaying = false;
-            transform.position = new Vector3(-100, -100, -100); //ensure the ghost is out of sight
+            transform.position = new Vector3(-100, -100, -100); //ensure the ghost is out of sight, as we cant disable it and record at the same time
             head.SetActive(!head.activeSelf);
             body.SetActive(!body.activeSelf);
             active = !active;
@@ -267,9 +318,24 @@ public class GhostPlayer : MonoBehaviour
 public struct GhostFrame
 {
     public Vector3 position;
+    public Vector3 cameraForward;
     public Quaternion rotation;
     public Vector2 movementInput;
     public bool isCrouching;
     public bool isSprinting;
     public bool isJumping;
+    public bool isInteracting;
+}
+
+public struct GhostEvent
+{
+    public float time;
+    public EventType type;
+
+    public enum EventType
+    {
+        Interact,
+        Rewind,
+        UseAnchor
+    }
 }
