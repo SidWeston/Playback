@@ -250,7 +250,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EmissionEnabled: 1
-    - _EmissionSelfGlow: 6
+    - _EmissionSelfGlow: 2
     - _EnvironmentReflections: 1
     - _FaceDownCutoff: 0.25
     - _FadeAmount: 0

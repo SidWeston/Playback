@@ -3373,6 +3373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469451740b01dd0419dec4cc3df70213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 1101535055}
 --- !u!4 &1101535054
 Transform:
   m_ObjectHideFlags: 0
@@ -3382,7 +3383,7 @@ Transform:
   m_GameObject: {fileID: 1101535049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.44, y: 0.92, z: 4.96}
+  m_LocalPosition: {x: -2.44, y: 1.054, z: 4.96}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3396,9 +3397,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101535049}
   serializedVersion: 4
-  m_Mass: 5
-  m_Drag: 1
-  m_AngularDrag: 0.5
+  m_Mass: 6
+  m_Drag: 0.6
+  m_AngularDrag: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3412,9 +3413,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!1 &1115862677
 GameObject:
   m_ObjectHideFlags: 0
@@ -3819,6 +3820,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4874481943290677820, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
+      propertyPath: holdForce
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 4874481943290677820, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
+      propertyPath: dampingMulti
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4874481943290677820, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
+      propertyPath: forceMultiplier
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4874481943290677820, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
+      propertyPath: maxHoldDistance
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5044145897290718419, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.579073
@@ -3879,6 +3896,10 @@ PrefabInstance:
       propertyPath: 'ghosts.Array.data[1]'
       value: 
       objectReference: {fileID: 1250346027}
+    - target: {fileID: 7309815635431496739, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8662953265429487248, guid: 4ecdea721d3920a44a215d2a8f52d002, type: 3}
       propertyPath: m_Name
       value: Player

@@ -77,7 +77,7 @@ public class GhostController : MonoBehaviour
     { 
         if(input)
         {
-            if(currentGhost.isRecording)
+            if(currentGhost && currentGhost.isRecording)
             {
                 RecordEvent(GhostEvent.EventType.Interact);
             }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PickupObject : MonoBehaviour, Interactable
 {
-
+    public Rigidbody rb;
     private Vector3 startPosition;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -24,14 +24,8 @@ public class PickupObject : MonoBehaviour, Interactable
     {
         if(interactor.TryGetComponent(out ObjectHolder holder))
         {
-            if(holder.currentObject == this)
+            if(!holder.currentObject)
             {
-                //drop it
-                holder.DropObject();
-            }
-            else
-            {
-                //pick it up
                 holder.PickupObject(this);
             }
         }

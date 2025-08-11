@@ -150,8 +150,7 @@ public class PlayerMovement : MonoBehaviour
             movementInput = moveVector,
             isCrouching = crouching,
             isSprinting = sprinting,
-            isJumping = grounded,
-            isInteracting = interacting
+            isJumping = grounded
         };
     }
 

@@ -198,6 +198,7 @@ public class GhostPlayer : MonoBehaviour
         transform.rotation = recording[0].rotation;
         isPlaying = true;
         isRecording = false;
+        //event stuff
         playbackStartTime = Time.time;
         currentEventIndex = 0;
     }
@@ -213,21 +214,14 @@ public class GhostPlayer : MonoBehaviour
 
     private void TriggerEvent(GhostEvent ghostEvent)
     {
+        //easily add more ghostEvents if needed, for now just interaction
         switch (ghostEvent.type)
         {
             case GhostEvent.EventType.Interact:
                 {
                     TryInteract();
                     break;
-                }
-            case GhostEvent.EventType.Rewind:
-                {
-                    break;
-                }
-            case GhostEvent.EventType.UseAnchor:
-                {
-                    break;
-                }
+                }   
         }
     }
 
@@ -324,7 +318,6 @@ public struct GhostFrame
     public bool isCrouching;
     public bool isSprinting;
     public bool isJumping;
-    public bool isInteracting;
 }
 
 public struct GhostEvent
@@ -334,8 +327,6 @@ public struct GhostEvent
 
     public enum EventType
     {
-        Interact,
-        Rewind,
-        UseAnchor
+        Interact
     }
 }
