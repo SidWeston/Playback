@@ -24,7 +24,7 @@ public class PickupObject : MonoBehaviour, Interactable
     {
         if(interactor.TryGetComponent(out ObjectHolder holder))
         {
-            if(!holder.currentObject)
+            if(!holder.largeObject && !holder.smallObject)
             {
                 holder.PickupObject(this);
             }

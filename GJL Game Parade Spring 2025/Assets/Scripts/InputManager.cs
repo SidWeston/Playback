@@ -23,6 +23,7 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public InputKey rewindKey = new InputKey();
     public InputKey selectOne = new InputKey();
     public InputKey selectTwo = new InputKey();
+    public InputKey dropKey = new InputKey();
 
     private void Awake()
     {
@@ -203,6 +204,20 @@ public class InputManager : MonoBehaviour, IPlayerActions
         {
             selectTwo.downCounter = 0;
             selectTwo.InvokeKeyPress(false);
+        }
+    }
+
+    public void OnDrop(InputAction.CallbackContext context)
+    {
+        if(context.ReadValue<float>() > 0 && dropKey.downCounter == 0)
+        {
+            dropKey.downCounter++;
+            dropKey.InvokeKeyPress(true);
+        }
+        else if(context.ReadValue<float>() <= 0)
+        {
+            dropKey.downCounter = 0;
+            dropKey.InvokeKeyPress(false);
         }
     }
 }

@@ -3,9 +3,11 @@ using UnityEngine;
 public class ObjectHolder : MonoBehaviour
 {
     public Transform playerCamera;
-    public PickupObject currentObject;
+    public PickupObject largeObject;
+    public SmallPickupObject smallObject;
 
-    [SerializeField] private Transform holdPosition;
+    [SerializeField] private Transform largeHoldPos;
+    [SerializeField] private Transform smallHoldPos;
 
     [SerializeField] private float holdForce = 50f;
     [SerializeField] private float forceMultiplier = 100f;
@@ -22,15 +24,15 @@ public class ObjectHolder : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(currentObject != null)
+        if(largeObject != null)
         {
-            Vector3 toHoldPoint = holdPosition.position - currentObject.transform.position;
+            Vector3 toHoldPoint = largeHoldPos.position - largeObject.transform.position;
             float scaledForce = holdForce + (toHoldPoint.magnitude * forceMultiplier);
 
-            currentObject.rb.AddForce(toHoldPoint * scaledForce);
+            largeObject.rb.AddForce(toHoldPoint * scaledForce);
             //smooth the force over time, for stability
             float scaledDamp = toHoldPoint.magnitude * dampingMulti;
-            currentObject.rb.angularVelocity *= scaledDamp;
+            largeObject.rb.angularVelocity *= scaledDamp;
 
             if(toHoldPoint.magnitude > maxHoldDistance)
             {
@@ -41,33 +43,65 @@ public class ObjectHolder : MonoBehaviour
 
     public void DropObject()
     {
-        if (currentObject.gameObject.TryGetComponent(out Rigidbody rb))
+        if (largeObject.gameObject.TryGetComponent(out Rigidbody rb))
         {
             rb.useGravity = true;
         }
         //back down so it falls properly
-        currentObject.rb.linearDamping = previousDrag;
-        currentObject.transform.parent = null;
-        currentObject = null;
+        largeObject.rb.linearDamping = previousDrag;
+        largeObject.transform.parent = null;
+        largeObject = null;
 
-        InputManager.instance.interactKey.keyPress -= OnDrop;
+        InputManager.instance.interactKey.keyPress -= OnDropLarge;
     }
 
     public void PickupObject(PickupObject obj)
     {
-        currentObject = obj;
+        largeObject = obj;
         //helps with stability
-        previousDrag = currentObject.rb.linearDamping;
-        currentObject.rb.linearDamping = 5f;
+        previousDrag = largeObject.rb.linearDamping;
+        largeObject.rb.linearDamping = 5f;
 
-        InputManager.instance.interactKey.keyPress += OnDrop;
+        InputManager.instance.interactKey.keyPress += OnDropLarge;
     }
 
-    private void OnDrop(bool input)
+    public void PickupSmallObject(SmallPickupObject obj)
     {
-        if(input && currentObject)
+        smallObject = obj;
+        smallObject.transform.position = smallHoldPos.position;
+        smallObject.transform.parent = smallHoldPos;
+        smallObject.transform.localRotation = Quaternion.identity;
+
+        smallObject.rb.isKinematic = true;
+
+        InputManager.instance.dropKey.keyPress += OnDropSmall;
+    }
+
+    public void DropSmallObject()
+    {
+        smallObject.transform.parent = null;
+        smallObject.transform.position = transform.position;
+
+        smallObject.rb.isKinematic = false;
+
+        smallObject = null;
+
+        InputManager.instance.dropKey.keyPress -= OnDropSmall;
+    }
+
+    private void OnDropLarge(bool input)
+    {
+        if(input && largeObject)
         {
             DropObject();
+        }
+    }
+
+    private void OnDropSmall(bool input)
+    {
+        if(input && smallObject)
+        {
+            DropSmallObject();
         }
     }
 }

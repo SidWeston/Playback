@@ -134,6 +134,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Drop"",
+                    ""type"": ""Button"",
+                    ""id"": ""3396d96c-672f-412d-9a53-38fec01e580d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -334,6 +343,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""SelectTwo"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d68dfdb8-3736-4113-9af2-a3d622a0d2c9"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Drop"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -354,6 +374,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_Rewind = m_Player.FindAction("Rewind", throwIfNotFound: true);
         m_Player_SelectOne = m_Player.FindAction("SelectOne", throwIfNotFound: true);
         m_Player_SelectTwo = m_Player.FindAction("SelectTwo", throwIfNotFound: true);
+        m_Player_Drop = m_Player.FindAction("Drop", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -432,6 +453,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Rewind;
     private readonly InputAction m_Player_SelectOne;
     private readonly InputAction m_Player_SelectTwo;
+    private readonly InputAction m_Player_Drop;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -448,6 +470,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Rewind => m_Wrapper.m_Player_Rewind;
         public InputAction @SelectOne => m_Wrapper.m_Player_SelectOne;
         public InputAction @SelectTwo => m_Wrapper.m_Player_SelectTwo;
+        public InputAction @Drop => m_Wrapper.m_Player_Drop;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -493,6 +516,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @SelectTwo.started += instance.OnSelectTwo;
             @SelectTwo.performed += instance.OnSelectTwo;
             @SelectTwo.canceled += instance.OnSelectTwo;
+            @Drop.started += instance.OnDrop;
+            @Drop.performed += instance.OnDrop;
+            @Drop.canceled += instance.OnDrop;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -533,6 +559,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @SelectTwo.started -= instance.OnSelectTwo;
             @SelectTwo.performed -= instance.OnSelectTwo;
             @SelectTwo.canceled -= instance.OnSelectTwo;
+            @Drop.started -= instance.OnDrop;
+            @Drop.performed -= instance.OnDrop;
+            @Drop.canceled -= instance.OnDrop;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -564,5 +593,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnRewind(InputAction.CallbackContext context);
         void OnSelectOne(InputAction.CallbackContext context);
         void OnSelectTwo(InputAction.CallbackContext context);
+        void OnDrop(InputAction.CallbackContext context);
     }
 }
