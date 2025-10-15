@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FloorButton : MonoBehaviour
+public class FloorButton : ButtonBase
 {
     [SerializeField] protected ActivatableObject activatableObject;
 
@@ -10,19 +10,11 @@ public class FloorButton : MonoBehaviour
     [SerializeField] protected List<GameObject> overlappedObjects = new List<GameObject>();
 
     protected bool buttonDown = false;
-    public bool active = false;
 
     [SerializeField] protected Transform buttonTransform;
     [SerializeField] protected Vector3 upPos, downPos;
     protected float pressTime = 0.25f;
     protected float t;
-
-    //line renderers
-    [SerializeField] protected LineRenderer powerline;
-    [SerializeField] protected Material lineOff, lineOn;
-    //powerlight
-    [SerializeField] protected Renderer wallLight;
-    [SerializeField] protected Material lightOff, lightOn;
 
     private void Start()
     {

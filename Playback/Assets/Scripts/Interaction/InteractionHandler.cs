@@ -18,7 +18,7 @@ public class InteractionHandler : MonoBehaviour
     private void OnInteract(bool input)
     {
         if(input)
-        {
+        {            
             RaycastHit hit;
             if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, range, interactableLayers))
             {

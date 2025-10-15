@@ -34,6 +34,9 @@ public class GhostPlayer : MonoBehaviour
     private bool isPlaying = false;
     private bool active = false;
 
+    private bool playerOverlapping = false;
+    private Collider[] overlapBuffer = new Collider[4];
+
     private bool collisionsDisabled = false;
     private bool earlyStop = false;
 
@@ -69,6 +72,7 @@ public class GhostPlayer : MonoBehaviour
         {
             frameTimer -= frameInterval;
             currentFrameIndex++;
+            //reached the end of playback, loop back to the start
             if(currentFrameIndex >= recording.Count - 1)
             {
                 currentFrameIndex = 0;
@@ -76,7 +80,9 @@ public class GhostPlayer : MonoBehaviour
                 playbackStartTime = Time.time;
                 PerformGlitchEffect();
                 audioSource.Play();
-                duration = fullDuration;               
+                duration = fullDuration;
+
+                CheckForPlayerOverlap();
             }
         }
 
@@ -101,14 +107,16 @@ public class GhostPlayer : MonoBehaviour
 
         animationController.PlayMovementAnimation(a.movementInput);
         animationController.SwitchAnimSet(a.isCrouching, a.isSprinting);
-
-        ghostCollider.size = new Vector3(ghostCollider.size.x, a.isCrouching ? 1 : 2, ghostCollider.size.z);
-        ghostCollider.center = a.isCrouching ? new Vector3(0, -0.25f, 0) : Vector3.zero; //recenter the collider if crouching to ensure accuracy
     }
 
     private void FixedUpdate()
     {
         CheckForPlayerWallCollision();
+
+        if (playerOverlapping)
+        {
+            CheckForPlayerOverlap();
+        }
     }
 
     private void PerformGlitchEffect()
@@ -129,15 +137,32 @@ public class GhostPlayer : MonoBehaviour
         StopCoroutine(RecordFrame());
     }
 
-    public bool CheckForPlayerOverlap()
-    {
-        Collider[] hits = Physics.OverlapBox(ghostCollider.bounds.center, ghostCollider.bounds.extents,
-            ghostCollider.transform.rotation, playerLayer);
-        if(hits.Length > 0)
+    public void CheckForPlayerOverlap()
+    {        
+        int count = Physics.OverlapBoxNonAlloc(
+            ghostCollider.bounds.center,
+            ghostCollider.bounds.extents * 0.8f,
+            overlapBuffer,
+            ghostCollider.transform.rotation,
+            playerLayer
+        );
+        
+        //overlapping
+        if(count > 0)
         {
-            return false;
+            playerOverlapping = true;
+            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), true);
         }
-        return true;
+        else //not  
+        {
+            playerOverlapping = false;  
+            Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawCube(ghostCollider.bounds.center, ghostCollider.bounds.extents * 0.8f);
     }
 
     public void CheckForPlayerWallCollision()
@@ -161,6 +186,7 @@ public class GhostPlayer : MonoBehaviour
             collisionsDisabled = false;
             Physics.IgnoreCollision(ghostCollider, target.gameObject.GetComponent<CharacterController>(), false);
         }
+        
     }
 
     public IEnumerator RecordFrame()
@@ -198,6 +224,9 @@ public class GhostPlayer : MonoBehaviour
         transform.rotation = recording[0].rotation;
         isPlaying = true;
         isRecording = false;
+
+        CheckForPlayerOverlap();
+
         //event stuff
         playbackStartTime = Time.time;
         currentEventIndex = 0;
@@ -221,21 +250,32 @@ public class GhostPlayer : MonoBehaviour
                 {
                     TryInteract();
                     break;
-                }   
+                }
+            case GhostEvent.EventType.Crouch:
+                {
+                    OnCrouch();
+                    break;
+                }
         }
     }
 
     private void TryInteract()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, recording[currentFrameIndex].cameraForward, out hit, 5.0f, interactableLayers))
-        {
-            Debug.Log("interacted with " + hit.collider.gameObject);
+
+        if(Physics.SphereCast(transform.position, 0.25f, recording[currentFrameIndex].cameraForward, out hit, 5.0f, interactableLayers))
+        {            
             if (hit.collider.gameObject.TryGetComponent(out Interactable interactable))
             {
                 interactable.Interact(gameObject);
             }
         }
+    }
+
+    private void OnCrouch()
+    {
+        ghostCollider.size = new Vector3(ghostCollider.size.x, 1, ghostCollider.size.z);
+        ghostCollider.center = new Vector3(0, -0.25f, 0); //recenter the collider if crouching to ensure accuracy
     }
 
     public void ClearEventLog()
@@ -327,6 +367,7 @@ public struct GhostEvent
 
     public enum EventType
     {
-        Interact
+        Interact,
+        Crouch
     }
 }

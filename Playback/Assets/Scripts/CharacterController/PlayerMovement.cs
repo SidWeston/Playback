@@ -120,8 +120,8 @@ public class PlayerMovement : MonoBehaviour
         {
             crouching = true;
             playerCamera.transform.localPosition = crouchedCamPos;
-            characterController.height = 1f;
-            characterController.center = new Vector3(0, -0.5f, 0);
+            characterController.height = 1.25f;
+            characterController.center = new Vector3(0, -0.25f, 0);
         }
         else
         {

@@ -5,11 +5,16 @@ using static PlayerInput;
 
 public class InputManager : MonoBehaviour, IPlayerActions
 {
+    //singleton setup
     public static InputManager instance;
     private PlayerInput input;
 
     public bool inputEnabled = true;
 
+    //pspspsps this is persistent across game sessions, so it needs to not change
+    private const string rebindsKey = "InputRebinds";
+
+    //events and keys
     public event Action<Vector2> moveEvent;
     public event Action<Vector2> lookEvent;
 
@@ -26,19 +31,58 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public InputKey dropKey = new InputKey();
 
     private void Awake()
-    {
-        if(input == null)
+    {      
+        //create singleton data if its not there already
+        if(instance != null && instance != this)
         {
-            input = new PlayerInput();
-            input.Player.SetCallbacks(this);
+            Destroy(gameObject);
+            return;
         }
+        instance = this;
 
+        input = new PlayerInput();
+        input.Player.SetCallbacks(this);
         input.Player.Enable();
+        LoadRebinds();
 
-        if(instance == null)
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public void RebindAction(InputAction action, Action onComplete = null)
+    {
+        //make sure no classes are taking input whilst we're rebinding
+        input.Player.Disable();
+
+        //Start() means that the Unity InputSystem will listen for the next button pressed, and assign it to the action.
+        action.PerformInteractiveRebinding().WithControlsExcluding("Mouse").OnMatchWaitForAnother(0.1f).OnComplete(callback =>
         {
-            instance = this;
+            callback.Dispose();
+            input.Player.Enable();
+            onComplete?.Invoke();
+            SaveRebinds();
+        }).Start();
+    }
+
+    public void SaveRebinds()
+    {
+        string rebinds = input.SaveBindingOverridesAsJson();
+        PlayerPrefs.SetString(rebindsKey, rebinds);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadRebinds()
+    {
+        if (PlayerPrefs.HasKey(rebindsKey))
+        {
+            string rebinds = PlayerPrefs.GetString(rebindsKey);
+            input.LoadBindingOverridesFromJson(rebinds);
         }
+    }
+
+    public void ResetBindings()
+    {
+        input.RemoveAllBindingOverrides();
+        PlayerPrefs.DeleteKey(rebindsKey);
     }
 
     public void OnMovement(InputAction.CallbackContext context)
@@ -59,15 +103,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0 && interactKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            interactKey.downCounter++;
-            interactKey.InvokeKeyPress(true);
+            interactKey.KeyDown();           
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            interactKey.downCounter = 0;
-            interactKey.InvokeKeyPress(false);
+            interactKey.KeyUp();
         }
     }
 
@@ -75,15 +117,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0 && jumpKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            jumpKey.downCounter++;
-            jumpKey.InvokeKeyPress(true);
+            jumpKey.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            jumpKey.downCounter = 0;
-            interactKey.InvokeKeyPress(false);
+            jumpKey.KeyUp();
         }
     }
 
@@ -91,15 +131,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0 && crouchKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            crouchKey.downCounter++;
-            crouchKey.InvokeKeyPress(true);
+            crouchKey.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            crouchKey.downCounter = 0;
-            crouchKey.InvokeKeyPress(false);
+            crouchKey.KeyUp();
         }
     }
 
@@ -107,15 +145,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0 && sprintKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            sprintKey.downCounter++;
-            sprintKey.InvokeKeyPress(true);
+            sprintKey.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            sprintKey.downCounter = 0;
-            sprintKey.InvokeKeyPress(false);
+            sprintKey.KeyUp();
         }
     }
 
@@ -123,15 +159,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0 && ghostKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            ghostKey.downCounter++;
-            ghostKey.InvokeKeyPress(true);
+            ghostKey.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            ghostKey.downCounter = 0;
-            ghostKey.InvokeKeyPress(false);
+            ghostKey.KeyUp();
         }
     }
 
@@ -139,113 +173,104 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0 && recordKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            recordKey.downCounter++;
-            recordKey.InvokeKeyPress(true);
+            recordKey.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            recordKey.downCounter = 0;
-            recordKey.InvokeKeyPress(false);
+            recordKey.KeyUp();
         }
     }
 
     public void OnPause(InputAction.CallbackContext context)
     {
-        if (context.ReadValue<float>() > 0 && pauseKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            pauseKey.downCounter++;
-            pauseKey.InvokeKeyPress(true);
+            pauseKey.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            pauseKey.downCounter = 0;
-            pauseKey.InvokeKeyPress(false);
+            pauseKey.KeyUp();
         }
     }
 
     public void OnRewind(InputAction.CallbackContext context)
     {
-        if (context.ReadValue<float>() > 0 && rewindKey.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            rewindKey.downCounter++;
-            rewindKey.InvokeKeyPress(true);
+            rewindKey.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            rewindKey.downCounter = 0;
-            rewindKey.InvokeKeyPress(false);
+            rewindKey.KeyUp();
         }
     }
 
     public void OnSelectOne(InputAction.CallbackContext context)
     {
-        if (context.ReadValue<float>() > 0 && selectOne.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            selectOne.downCounter++;
-            selectOne.InvokeKeyPress(true);
+            selectOne.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            selectOne.downCounter = 0;
-            selectOne.InvokeKeyPress(false);
+            selectOne.KeyUp();
         }
     }
 
     public void OnSelectTwo(InputAction.CallbackContext context)
     {
-        if (context.ReadValue<float>() > 0 && selectTwo.downCounter == 0)
+        if (context.ReadValue<float>() > 0)
         {
-            selectTwo.downCounter++;
-            selectTwo.InvokeKeyPress(true);
+            selectTwo.KeyDown();
         }
         else if (context.ReadValue<float>() <= 0)
         {
-            selectTwo.downCounter = 0;
-            selectTwo.InvokeKeyPress(false);
+            selectTwo.KeyUp();
         }
     }
 
     public void OnDrop(InputAction.CallbackContext context)
     {
-        if(context.ReadValue<float>() > 0 && dropKey.downCounter == 0)
+        if(context.ReadValue<float>() > 0)
         {
-            dropKey.downCounter++;
-            dropKey.InvokeKeyPress(true);
+            dropKey.KeyDown();
         }
         else if(context.ReadValue<float>() <= 0)
         {
-            dropKey.downCounter = 0;
-            dropKey.InvokeKeyPress(false);
+            dropKey.KeyUp();
         }
     }
 }
 
-
-//to anyone reading this - 
-//I made this custom class for inputs because when a button is pressed, Unity's input system records an input twice when it presses.
-//im fairly sure this is because it has two events for a button press: "started" and "performed" (and some for when its released, but those havent caused a problem)
-//setting the input system up properly with these actions will solve it will almost definitely solve this problem,
-//but I cant be bothered to do that, and this works just as well for my purposes, even if its likely a bit wasteful. 
+//basic custom class for handling inputs + getting around unity's weird bullshit with the new input system
 public class InputKey
 {
     public event Action<bool> keyPress;
 
-    public int downCounter = 0;
-    public float lastPressTime = 0;
-    public bool isDown = false;
-    public bool doublePressed = false;
-    
-    public void Init()
-    {
-        downCounter = 0;
-        lastPressTime = 0;
-    }
+    public bool isDown = false;    
     
     public void InvokeKeyPress(bool input)
     {
-        isDown = input;
+        //true for key down, false for key up
         keyPress?.Invoke(input);
+    }
+
+    public void KeyDown()
+    {
+        //check for isDown here, because otherwise the input system will register the key press twice
+        //due to there being both a Started() and Performed() event for inputs.
+        if (!isDown)
+        {
+            isDown = true;
+            InvokeKeyPress(true);
+        }
+    }
+
+    public void KeyUp()
+    {
+        isDown = false;
+        InvokeKeyPress(false);
     }
 }

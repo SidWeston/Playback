@@ -14,6 +14,7 @@ public class GhostController : MonoBehaviour
         InputManager.instance.selectOne.keyPress += SelectGhostA;
         InputManager.instance.selectTwo.keyPress += SelectGhostB;
         InputManager.instance.interactKey.keyPress += OnInteract;
+        InputManager.instance.crouchKey.keyPress += OnCrouch;
 
         if (ghosts.Count == 1)
         {
@@ -80,6 +81,17 @@ public class GhostController : MonoBehaviour
             if(currentGhost && currentGhost.isRecording)
             {
                 RecordEvent(GhostEvent.EventType.Interact);
+            }
+        }
+    }
+
+    private void OnCrouch(bool input)
+    {
+        if(input)
+        {
+            if(currentGhost && currentGhost.isRecording)
+            {
+                RecordEvent(GhostEvent.EventType.Crouch);
             }
         }
     }

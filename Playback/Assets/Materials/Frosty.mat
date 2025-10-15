@@ -255,7 +255,7 @@ Material:
     - _FadePower: 1
     - _FadeTransition: 0.2
     - _FogOn: 0
-    - _GeneralAlpha: -0.00008022087
+    - _GeneralAlpha: -0.00013040977
     - _Glitch: 0
     - _GlitchAmount: 0.5
     - _GlitchSpeed: 2.5

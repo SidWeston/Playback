@@ -5,7 +5,7 @@ using UnityEngine;
 //door with multiple activations required
 public class MultiDoor : ActivatableObject
 {
-    public List<FloorButton> buttons = new List<FloorButton>();
+    public List<ButtonBase> buttons = new List<ButtonBase>();
 
     public Vector3 closedPos;
     public Vector3 openPos;

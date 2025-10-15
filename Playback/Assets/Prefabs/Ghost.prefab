@@ -2908,6 +2908,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  isRecording: 0
   frameInterval: 0.1
   recordDuration: 12
   animationController: {fileID: 5808585837080059873}
@@ -2915,10 +2916,16 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
   head: {fileID: 3192516904129123997}
   body: {fileID: 8160859224214552357}
   ghostMat: {fileID: 2100000, guid: 31810d401580865488e513236e1046d8, type: 2}
   ghostUI: {fileID: 4165520606073552891}
+  interactableLayers:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!114 &7889235734572317722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3005,7 +3012,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: eca91e72089a00a4380c608bd69d3310, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: eca91e72089a00a4380c608bd69d3310, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1

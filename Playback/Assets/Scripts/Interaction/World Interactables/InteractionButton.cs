@@ -1,25 +1,22 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class InteractionButton : MonoBehaviour, Interactable
+public class InteractionButton : ButtonBase, Interactable
 {
 
     [SerializeField] protected ActivatableObject activatableObject;
 
     //if the button is pressed once and activates, or can be pressed again to deactivate
-    [SerializeField] private bool toggleable = false;
-    private bool pressed = false;
+    [SerializeField] private bool toggleable = false;    
 
-    [SerializeField] protected LineRenderer powerline;
-    [SerializeField] protected Material lineOff, lineOn;
-    //powerlight
-    [SerializeField] protected Renderer wallLight;
-    [SerializeField] protected Material lightOff, lightOn;
+    [SerializeField] private bool timed = false;
+    [SerializeField] private float timer = 2.0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        if (powerline) powerline.material = lineOff;
+        if (wallLight) wallLight.material = lightOff;
     }
 
     // Update is called once per frame
@@ -30,29 +27,51 @@ public class InteractionButton : MonoBehaviour, Interactable
 
     public void Interact(GameObject interactor)
     {
-        Debug.Log("interacted");
-        if(!toggleable)
+        if (!toggleable)
         {
-            if(!pressed)
+            if (!active)
             {
                 activatableObject.Activate(interactor);
-                pressed = true;
+                active = true;
+                if (powerline) powerline.material = lineOn;
+                if (wallLight) wallLight.material = lightOn;
             }
 
         }
-        else if(toggleable)
+        else if (toggleable)
         {
-            if(!pressed)
+            if (!active)
             {
                 activatableObject.Activate(interactor);
-                pressed = true;
+                active = true;
+                if (powerline) powerline.material = lineOn;
+                if (wallLight) wallLight.material = lightOn;
             }
             else
             {
                 activatableObject.Deactivate();
-                pressed = false;
+                active = false;
+                if (powerline) powerline.material = lineOff;
+                if (wallLight) wallLight.material = lightOff;
             }
 
         }
+
+        if(timed && active)
+        {
+            Invoke(nameof(DeactivateOnTimer), timer);
+        }
+        else if(timed && !active)
+        {
+            CancelInvoke(nameof(DeactivateOnTimer));
+        }
+    }
+
+    private void DeactivateOnTimer()
+    {
+        activatableObject.Deactivate();
+        active = false;
+        if (powerline) powerline.material = lineOff;
+        if (wallLight) wallLight.material = lightOff;
     }
 }

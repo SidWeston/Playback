@@ -923,6 +923,37 @@ Transform:
   - {fileID: 2904523222903457364}
   m_Father: {fileID: 9124220561365412427}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2061083619156480270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3575327931267699756}
+  m_Layer: 7
+  m_Name: SmallHoldPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3575327931267699756
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061083619156480270}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.222, y: -0.212, z: 0.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5318098511745093592}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2329729654089123610
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,7 +1090,7 @@ SkinnedMeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2582961969218318060}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 3
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -1260,7 +1291,7 @@ Transform:
   m_GameObject: {fileID: 2834466684778157701}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1524,6 +1555,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7309815635431496739}
+  - {fileID: 3575327931267699756}
   m_Father: {fileID: 5044145897290718419}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &3925250576420355490
@@ -1643,6 +1675,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 3925250576420355490}
   playerTransform: {fileID: 5044145897290718419}
+  playerBody: {fileID: 7432467811480830622}
+  playerHead: {fileID: 3513850001916548142}
   lookSensitivity: 200
   camEnabled: 1
 --- !u!1 &3764150393396055352
@@ -2230,7 +2264,7 @@ SkinnedMeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6529159436066507098}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 3
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -3052,7 +3086,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 3925250576420355490}
-  range: 15
+  range: 2
   interactableLayers:
     serializedVersion: 2
     m_Bits: 2816
@@ -3082,9 +3116,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 5318098511745093592}
-  currentObject: {fileID: 0}
-  holdPosition: {fileID: 7309815635431496739}
-  dropThreshold: 1
+  largeObject: {fileID: 0}
+  smallObject: {fileID: 0}
+  largeHoldPos: {fileID: 7309815635431496739}
+  smallHoldPos: {fileID: 3575327931267699756}
+  holdForce: 50
+  forceMultiplier: 100
+  maxHoldDistance: 3
+  dampingMulti: 0.95
 --- !u!114 &5906679367376822722
 MonoBehaviour:
   m_ObjectHideFlags: 0

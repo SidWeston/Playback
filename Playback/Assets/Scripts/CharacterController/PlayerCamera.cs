@@ -6,6 +6,9 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private Camera playerCamera;
     [SerializeField] private Transform playerTransform;
 
+    [SerializeField] private Renderer playerBody;
+    [SerializeField] private Renderer playerHead;
+
     //settings
     [SerializeField] private float lookSensitivity;
 
@@ -22,7 +25,7 @@ public class PlayerCamera : MonoBehaviour
         InputManager.instance.lookEvent += OnLook;
         //InputManager.instance.pauseKey.keyPress += OnPause; //stops working if you go back and forth through the scenes, so its disabled and moved.
 
-        if(GameUI.instance)
+        if (GameUI.instance)
         {
             GameUI.instance.backButton.onClick.AddListener(HideCursor);
             GameUI.instance.backToMenuButton.onClick.AddListener(ShowCursor);

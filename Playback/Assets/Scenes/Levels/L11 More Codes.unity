@@ -8946,9 +8946,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 455757679}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Mass: 6
+  m_Drag: 0.6
+  m_AngularDrag: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -8962,9 +8962,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!65 &455757681
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8998,6 +8998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469451740b01dd0419dec4cc3df70213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 455757680}
 --- !u!1001 &460772046
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25434,9 +25435,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1238249135}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Mass: 6
+  m_Drag: 0.6
+  m_AngularDrag: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -25450,9 +25451,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!65 &1238249137
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25486,6 +25487,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469451740b01dd0419dec4cc3df70213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 455757680}
 --- !u!1001 &1238781644
 PrefabInstance:
   m_ObjectHideFlags: 0
