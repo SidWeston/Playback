@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FloorButton : ButtonBase
-{
-    [SerializeField] protected ActivatableObject activatableObject;
-
+{    
     [SerializeField] protected LayerMask activatableLayers;
 
     [SerializeField] protected List<GameObject> overlappedObjects = new List<GameObject>();
@@ -50,7 +48,7 @@ public class FloorButton : ButtonBase
             if (!buttonDown) buttonDown = true;
             active = true;
             overlappedObjects.Add(other.gameObject);
-            activatableObject.Activate(gameObject);
+            ActivateObjects(gameObject);            
             if(powerline)   powerline.material = lineOn;
             if(wallLight)   wallLight.material = lightOn;
         }
@@ -69,7 +67,7 @@ public class FloorButton : ButtonBase
 
             if(overlappedObjects.Count == 0 && hasRemoved)
             {
-                activatableObject.Deactivate();
+                DeactivateObjects();
                 if (buttonDown) buttonDown = false;
                 active = false;
                 if(powerline)  powerline.material = lineOff;

@@ -29,6 +29,7 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public InputKey selectOne = new InputKey();
     public InputKey selectTwo = new InputKey();
     public InputKey dropKey = new InputKey();
+    public InputKey shootKey = new InputKey();
 
     private void Awake()
     {      
@@ -240,6 +241,18 @@ public class InputManager : MonoBehaviour, IPlayerActions
         else if(context.ReadValue<float>() <= 0)
         {
             dropKey.KeyUp();
+        }
+    }
+
+    public void OnShoot(InputAction.CallbackContext context)
+    {
+        if(context.ReadValue<float>() > 0)
+        {
+            shootKey.KeyDown();
+        }
+        else if(context.ReadValue<float>() <= 0)
+        {
+            shootKey.KeyUp();
         }
     }
 }

@@ -4,8 +4,6 @@ using UnityEngine;
 public class InteractionButton : ButtonBase, Interactable
 {
 
-    [SerializeField] protected ActivatableObject activatableObject;
-
     //if the button is pressed once and activates, or can be pressed again to deactivate
     [SerializeField] private bool toggleable = false;    
 
@@ -29,9 +27,9 @@ public class InteractionButton : ButtonBase, Interactable
     {
         if (!toggleable)
         {
-            if (!active)
+            if (!active && !IsInvoking())
             {
-                activatableObject.Activate(interactor);
+                ActivateObjects(interactor);
                 active = true;
                 if (powerline) powerline.material = lineOn;
                 if (wallLight) wallLight.material = lightOn;
@@ -42,14 +40,14 @@ public class InteractionButton : ButtonBase, Interactable
         {
             if (!active)
             {
-                activatableObject.Activate(interactor);
+                ActivateObjects(interactor);
                 active = true;
                 if (powerline) powerline.material = lineOn;
                 if (wallLight) wallLight.material = lightOn;
             }
             else
             {
-                activatableObject.Deactivate();
+                DeactivateObjects();
                 active = false;
                 if (powerline) powerline.material = lineOff;
                 if (wallLight) wallLight.material = lightOff;
@@ -69,7 +67,7 @@ public class InteractionButton : ButtonBase, Interactable
 
     private void DeactivateOnTimer()
     {
-        activatableObject.Deactivate();
+        DeactivateObjects();
         active = false;
         if (powerline) powerline.material = lineOff;
         if (wallLight) wallLight.material = lightOff;

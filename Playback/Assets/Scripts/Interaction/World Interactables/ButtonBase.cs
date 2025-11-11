@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ButtonBase : MonoBehaviour
-{
+{    
+    [SerializeField] protected List<ActivatableObject> activatableObjects;
+
     public bool active = false;
 
     [SerializeField] protected LineRenderer powerline;
@@ -20,5 +23,21 @@ public class ButtonBase : MonoBehaviour
     void Update()
     {
         
+    }
+
+    protected void ActivateObjects(GameObject activator)
+    {
+        for(int i = 0; i < activatableObjects.Count; i++)
+        {
+            activatableObjects[i].Activate(activator);
+        }
+    }
+
+    protected void DeactivateObjects()
+    {
+        for(int i = 0; i < activatableObjects.Count; i++)
+        {
+            activatableObjects[i].Deactivate();
+        }
     }
 }

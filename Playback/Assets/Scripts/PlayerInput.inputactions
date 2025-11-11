@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "PlayerInput",
     "maps": [
         {
@@ -117,6 +118,15 @@
                     "name": "Drop",
                     "type": "Button",
                     "id": "3396d96c-672f-412d-9a53-38fec01e580d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Shoot",
+                    "type": "Button",
+                    "id": "04f45fcb-dfb6-47ac-b57b-f76ea35925d0",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -330,6 +340,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Drop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "635dff44-5139-4a62-9ef8-b0bc7e7ab29e",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

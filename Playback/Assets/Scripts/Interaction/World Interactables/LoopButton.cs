@@ -45,7 +45,7 @@ public class LoopButton : FloorButton
 
     private void Activate()
     {
-        activatableObject.Activate(gameObject);
+        ActivateObjects(gameObject);        
     }
 
     public override void OnTriggerExit(Collider other)
@@ -61,7 +61,7 @@ public class LoopButton : FloorButton
 
             if (overlappedObjects.Count == 0 && hasRemoved)
             {
-                activatableObject.Deactivate();
+                DeactivateObjects();                
                 CancelInvoke("Activate");
                 if (buttonDown) buttonDown = false;
                 active = false;
