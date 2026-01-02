@@ -720,7 +720,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2220249242083156996, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
       propertyPath: interactableLayers.m_Bits
-      value: 16375
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 3192516904129123997, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
       propertyPath: m_IsActive

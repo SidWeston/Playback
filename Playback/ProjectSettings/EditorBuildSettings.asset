@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 58b2ca2e9b6ef144793fad85314d6465
   - enabled: 1
+    path: Assets/Scenes/Game Levels/Chapter 1/L101.unity
+    guid: 95010a6ff93db784cba21b58e30200c7
+  - enabled: 1
     path: Assets/Scenes/Levels/L01 Boost Up.unity
     guid: 51ca5b86eab876c4d9986f122b1c56ea
   - enabled: 1

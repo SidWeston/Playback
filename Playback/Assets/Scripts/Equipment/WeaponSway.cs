@@ -31,7 +31,7 @@ public class WeaponSway : MonoBehaviour
         InputManager.instance.lookEvent += OnMouseMove;
         InputManager.instance.moveEvent += OnMove;
         InputManager.instance.sprintKey.keyPress += OnSprint;
-        
+        InputManager.instance.shootKey.keyPress += OnShoot;
     }
 
     // Update is called once per frame
@@ -91,6 +91,9 @@ public class WeaponSway : MonoBehaviour
 
     private void OnShoot(bool input)
     {
-
+        if(input)
+        {
+            weaponTransform.localPosition += new Vector3(0, 0, -0.1f);
+        }
     }
 }

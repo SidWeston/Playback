@@ -33,6 +33,9 @@ public class GhostPlayer : MonoBehaviour
     private float playbackStartTime = 0f;
     private bool isPlaying = false;
     private bool active = false;
+    
+    [SerializeField] private Vector3 crouchedColSize;
+    private Vector3 standingColSize;
 
     private bool playerOverlapping = false;
     private Collider[] overlapBuffer = new Collider[4];
@@ -56,6 +59,9 @@ public class GhostPlayer : MonoBehaviour
 
         audioSource = GetComponent<AudioSource>();
         Settings.instance.effectsVolumeChange += SetAudioVolume;
+
+        standingColSize = ghostCollider.size;
+        crouchedColSize = new Vector3(ghostCollider.size.x, ghostCollider.size.y / 2, ghostCollider.size.z);
     }
 
     // Update is called once per frame
@@ -68,12 +74,12 @@ public class GhostPlayer : MonoBehaviour
 
         GameUI.instance.UpdateGhostUITime(ghostUI.index, duration);
 
-        while(frameTimer > frameInterval)
+        while (frameTimer > frameInterval)
         {
             frameTimer -= frameInterval;
             currentFrameIndex++;
             //reached the end of playback, loop back to the start
-            if(currentFrameIndex >= recording.Count - 1)
+            if (currentFrameIndex >= recording.Count - 1)
             {
                 currentFrameIndex = 0;
                 currentEventIndex = 0;
@@ -99,7 +105,7 @@ public class GhostPlayer : MonoBehaviour
 
         float playbackTime = Time.time - playbackStartTime;
 
-        while(currentEventIndex < eventLog.Count && eventLog[currentEventIndex].time <= playbackTime)
+        while (currentEventIndex < eventLog.Count && eventLog[currentEventIndex].time <= playbackTime)
         {
             TriggerEvent(eventLog[currentEventIndex]);
             currentEventIndex++;
@@ -107,6 +113,17 @@ public class GhostPlayer : MonoBehaviour
 
         animationController.PlayMovementAnimation(a.movementInput);
         animationController.SwitchAnimSet(a.isCrouching, a.isSprinting);
+        if (a.isCrouching)
+        {
+            ghostCollider.size = crouchedColSize;
+            ghostCollider.center = new Vector3(0, -0.3f, 0);
+        }
+        else
+        {
+            ghostCollider.size = standingColSize;
+            ghostCollider.center = Vector3.zero;
+        }
+
     }
 
     private void FixedUpdate()
