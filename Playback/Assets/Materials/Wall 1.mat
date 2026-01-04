@@ -12,18 +12,20 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _AFFECTED_BY_LIGHTMAPS_ON
   - _ALPHA_CUTOFF_ON
   - _AOMAP_ON
   - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
   - _GREYSCALESTAGE_BEFORELIGHTING
+  - _LIGHTMAP_COLOR_CORRECTION_ON
   - _LIGHTMODEL_TOON
   - _MATCAPBLENDMODE_MULTIPLY
   - _METALLIC_MAP_ON
   - _NORMAL_MAP_ON
   - _OUTLINETYPE_NONE
   - _RECEIVE_SHADOWS_ON
-  - _REFLECTIONS_NONE
+  - _REFLECTIONS_TOON
   - _RIMLIGHTINGSTAGE_BEFORELIGHTING
   - _SHADINGMODEL_BASIC
   - _SPECULARMODEL_TOON
@@ -42,7 +44,7 @@ Material:
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
-  m_LockedProperties: :m_EnableInstancingVariants
+  m_LockedProperties: :m_EnableInstancingVariants _FogOn
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -193,7 +195,7 @@ Material:
     - _AOMapStrength: 1
     - _AddPrecomputedVelocity: 0
     - _AdvancedConfigurationEnabled: 1
-    - _AffectedByLightmaps: 0
+    - _AffectedByLightmaps: 1
     - _AlbedoVertexColorMode: 1
     - _AlbedoVertexColorOn: 0
     - _AlphaClip: 0
@@ -311,7 +313,7 @@ Material:
     - _IntersectionFadeOn: 0
     - _IntersectionGlowOn: 0
     - _LightModel: 2
-    - _LightmapColorCorrection: 0
+    - _LightmapColorCorrection: 1
     - _Matcap: 0
     - _MatcapBlend: 1
     - _MatcapBlendMode: 0
@@ -342,7 +344,7 @@ Material:
     - _RecalculateNormals: 0
     - _ReceiveShadows: 1
     - _ReceiveShadowsOn: 1
-    - _Reflections: 0
+    - _Reflections: 2
     - _ReflectionsAtten: 0
     - _RenderPreset: 1
     - _RimAttenuation: 1
