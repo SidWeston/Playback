@@ -8,9 +8,11 @@ public class GhostPlayer : MonoBehaviour
     private CharacterController playerCharacterController;
 
     private List<GhostFrame> recording = new List<GhostFrame>();
-    private List<GhostEvent> eventLog = new List<GhostEvent>();    
+    private List<GhostEvent> eventLog = new List<GhostEvent>();
 
     public bool isRecording = false;
+    private bool isPlaying = false;
+    private bool active = false;
 
     [SerializeField] private float frameInterval = 0.1f;
     [SerializeField] private float recordDuration = 5f;
@@ -32,8 +34,6 @@ public class GhostPlayer : MonoBehaviour
     private float duration = 0f, fullDuration = 0f;
     private float recordingStartTime = 0f;
     private float playbackStartTime = 0f;
-    private bool isPlaying = false;
-    private bool active = false;
     
     [SerializeField] private Vector3 crouchedColSize;
     private Vector3 standingColSize;
