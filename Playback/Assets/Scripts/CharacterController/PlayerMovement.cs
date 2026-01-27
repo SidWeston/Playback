@@ -78,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
     private void GroundCheck()
     {
         bool checkGround = Physics.CheckSphere(groundCheckLocation.position, 0.3f, groundLayer);
-        if(checkGround && grounded != checkGround)
+        if(checkGround && grounded != checkGround) //if theyre different, and the newer one is grounded then the player has just landed
         {
             landedEvent?.Invoke(true);
         }
@@ -137,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
         interacting = input;
     }
 
-    //2 seperate frame recording structs, probably messy but who cares
+    //2 seperate frame recording structs, ghosts and rewind need different requirements
 
     //ghost recording
     public GhostFrame RecordFrame()

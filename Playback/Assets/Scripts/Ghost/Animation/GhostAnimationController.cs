@@ -18,12 +18,6 @@ public class GhostAnimationController : MonoBehaviour
         animancer.Play(currentIdle); //assume it starts idle
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void PlayMovementAnimation(Vector2 moveVector)
     {
         if (moveVector == Vector2.zero)
@@ -36,23 +30,31 @@ public class GhostAnimationController : MonoBehaviour
         }
     }
 
-    public void SwitchAnimSet(bool crouching, bool sprinting)
+    public void SwitchAnimSet(MoveMode moveMode)
     {
-        if(crouching)
+        if(moveMode == MoveMode.CROUCH)
         {
             currentMoveSet = animSwitcher.crouchSet;
             currentIdle = animSwitcher.crouchIdle;
             return;
         }
-
-        if(sprinting)
+        else if(moveMode == MoveMode.SPRINT)
         {
             currentMoveSet = animSwitcher.sprintSet;
             currentIdle = animSwitcher.idle;
             return;
         }
-
-        currentMoveSet = animSwitcher.walkSet;
-        currentIdle = animSwitcher.idle;
+        else if(moveMode == MoveMode.WALK)
+        {
+            currentMoveSet = animSwitcher.walkSet;
+            currentIdle = animSwitcher.idle;
+        }
     }
+}
+
+public enum MoveMode //controls what movement/walking animations are played
+{
+    WALK,
+    SPRINT,
+    CROUCH,
 }

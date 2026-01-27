@@ -4,7 +4,7 @@ using UnityEngine;
 public class GhostController : MonoBehaviour
 {
     private GhostPlayer currentGhost;
-    public List<GhostPlayer> ghosts;
+    public List<GhostPlayer> ghosts; //keep it in a list so I can expand to more ghosts if necessary, but need to figure out input first.
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -13,8 +13,7 @@ public class GhostController : MonoBehaviour
         InputManager.instance.recordKey.keyPress += StartRecording;
         InputManager.instance.selectOne.keyPress += SelectGhostA;
         InputManager.instance.selectTwo.keyPress += SelectGhostB;
-        InputManager.instance.interactKey.keyPress += OnInteract;
-        InputManager.instance.crouchKey.keyPress += OnCrouch;
+        InputManager.instance.interactKey.keyPress += OnInteract;        
 
         if (ghosts.Count == 1)
         {
@@ -63,13 +62,13 @@ public class GhostController : MonoBehaviour
         currentGhost.ToggleGhost(true);
     }
 
-    public bool IsRecording()
+    public bool IsRecording() //linked to the player rewind mechanic
     {
         if (currentGhost.isRecording) return true;
         return false;
     }
 
-    private void RecordEvent(GhostEvent.EventType type)
+    private void RecordEvent(GhostEvent.EventType type) //seperate function for potential events not caused by the player
     {
         currentGhost.RecordEvent(type);
     }
@@ -81,17 +80,6 @@ public class GhostController : MonoBehaviour
             if(currentGhost && currentGhost.isRecording)
             {
                 RecordEvent(GhostEvent.EventType.Interact);
-            }
-        }
-    }
-
-    private void OnCrouch(bool input)
-    {
-        if(input)
-        {
-            if(currentGhost && currentGhost.isRecording)
-            {
-                RecordEvent(GhostEvent.EventType.Crouch);
             }
         }
     }
