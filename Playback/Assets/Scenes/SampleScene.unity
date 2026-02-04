@@ -715,6 +715,10 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2220249242083156996, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
+      propertyPath: playerMovement
+      value: 
+      objectReference: {fileID: 1230115888}
+    - target: {fileID: 2220249242083156996, guid: 696bed38fb79ad24bad73f192116d77c, type: 3}
       propertyPath: obstacleLayers.m_Bits
       value: 8256
       objectReference: {fileID: 0}

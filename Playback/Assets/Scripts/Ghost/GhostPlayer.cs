@@ -60,6 +60,8 @@ public class GhostPlayer : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        headRenderer = head.GetComponent<Renderer>();
+        bodyRenderer = body.GetComponent<Renderer>();
         ResetGlitch(); //ensure glitch effect isnt set to high by default
         active = false; //assume ghost starts turned off
 
@@ -70,9 +72,6 @@ public class GhostPlayer : MonoBehaviour
 
         standingColSize = ghostCollider.size;
         crouchedColSize = new Vector3(ghostCollider.size.x, ghostCollider.size.y / 2, ghostCollider.size.z);
-
-        headRenderer = head.GetComponent<Renderer>();
-        bodyRenderer = body.GetComponent<Renderer>();
 
         playerCharacterController = playerMovement.gameObject.GetComponent<CharacterController>();
     }
@@ -146,8 +145,11 @@ public class GhostPlayer : MonoBehaviour
     #region Collision Handling
     private void FixedUpdate()
     {
+        //stops the ghost running the player into a wall and clipping them through it
         CheckForPlayerWallCollision();
 
+        //once the player is overlapping, it only needs to be checked for when they stop overlapping. 
+        //this gets assigned at the start of each playback loop, as this is the primary time when overlaps and collision errors occur
         if (playerOverlapping)
         {
             CheckForPlayerOverlap();
@@ -156,6 +158,7 @@ public class GhostPlayer : MonoBehaviour
 
     public void CheckForPlayerOverlap()
     {        
+        //check for overlaps, with a slightly smaller collider to allow for some clearance
         int count = Physics.OverlapBoxNonAlloc(
             ghostCollider.bounds.center,
             ghostCollider.bounds.extents * 0.8f,
@@ -179,11 +182,14 @@ public class GhostPlayer : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        //visual debugging for the collision checks
         Gizmos.DrawCube(ghostCollider.bounds.center, ghostCollider.bounds.extents * 0.8f);
     }
 
     public void CheckForPlayerWallCollision()
     {
+        //just to check if there is a wall on the other side of the player compared to the ghost
+        //i.e is the player currently between the ghost and a wall and within a distance threshold
         Vector3 toPlayer = playerMovement.transform.position - transform.position;
         Ray rayToPlayer = new Ray(transform.position, toPlayer);
         if(!collisionsDisabled)
@@ -215,8 +221,9 @@ public class GhostPlayer : MonoBehaviour
     #endregion
 
     #region Recording
-    public IEnumerator RecordFrame()
+    public IEnumerator RecordGhostFrames()
     {
+        //setup
         isRecording = true;
         earlyStop = false;
         if(active) ToggleGhost(true);
@@ -226,6 +233,7 @@ public class GhostPlayer : MonoBehaviour
 
         GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Recording);
 
+        //loop through
         while (timer < recordDuration && !earlyStop)
         {
             newFrames.Add(playerMovement.RecordFrame());
@@ -233,15 +241,19 @@ public class GhostPlayer : MonoBehaviour
             timer += frameInterval;
             GameUI.instance.UpdateGhostUITime(ghostUI.index, timer);
         }
+
+        //finish
         fullDuration = timer;
         duration = timer;
 
+        //toggle the ghost visuals and effects
         if (!active) ToggleGhost(true);
         recording = newFrames;
         currentFrameIndex = 0;
         PerformGlitchEffect();
         glitchSound.Play();
 
+        //pass data to the UI handler
         GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Play);
 
         //setup to play the first frame of the recording
@@ -251,6 +263,7 @@ public class GhostPlayer : MonoBehaviour
         isPlaying = true;
         isRecording = false;
 
+        //check if the ghost has spawned in the same space as the player
         CheckForPlayerOverlap();
 
         //event stuff
@@ -275,7 +288,7 @@ public class GhostPlayer : MonoBehaviour
             {
                 canRecord = false;
                 Invoke(nameof(ResetCanRecord), recordDelay); //to stop recordings being spammed there is a short delay between activation and deactivation
-                StartCoroutine(RecordFrame());
+                StartCoroutine(RecordGhostFrames());
             }
             else if (isRecording) //end recording early
             {
@@ -286,7 +299,7 @@ public class GhostPlayer : MonoBehaviour
 
     public void StopRecording()
     {
-        StopCoroutine(RecordFrame());
+        StopCoroutine(RecordGhostFrames());
     }
     #endregion
 
@@ -307,6 +320,9 @@ public class GhostPlayer : MonoBehaviour
     {
         RaycastHit hit;
 
+        //ghost interacts with a sphere cast to account for very slight positional errors.
+        //due to the ghost movement being handled with lerps it may not be in the exact place the player was at the time of interaction
+        //so a spherecast accounts for that by making the cast wider
         if(Physics.SphereCast(transform.position, interactRadius, recording[currentFrameIndex].cameraForward, out hit, interactDistance, interactableLayers))
         {            
             if (hit.collider.gameObject.TryGetComponent(out Interactable interactable))
