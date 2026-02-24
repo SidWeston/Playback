@@ -33,8 +33,8 @@ float3 LightmapColorCorrection(float3 lightmap)
 {
 	float3 res = lightmap;
 
-	res = HueShift(res, ACCESS_PROP(_HueShiftLM), ACCESS_PROP(_HueSaturationLM), ACCESS_PROP(_HueBrightnessLM));
-	res = ContrastBrightness(res, ACCESS_PROP(_ContrastLM), ACCESS_PROP(_BrightnessLM));
+	res = HueShift(res, ACCESS_PROP_FLOAT(_HueShiftLM), ACCESS_PROP_FLOAT(_HueSaturationLM), ACCESS_PROP_FLOAT(_HueBrightnessLM));
+	res = ContrastBrightness(res, ACCESS_PROP_FLOAT(_ContrastLM), ACCESS_PROP_FLOAT(_BrightnessLM));
 
 	return res;
 }
@@ -44,7 +44,7 @@ float3 LightmapColorCorrection(float3 lightmap)
 #ifdef _HUE_SHIFT_ON
 float3 HueShift(float3 inputColor)
 {
-	float3 res = HueShift(inputColor, ACCESS_PROP(_HueShift), ACCESS_PROP(_HueSaturation), ACCESS_PROP(_HueBrightness));
+	float3 res = HueShift(inputColor, ACCESS_PROP_FLOAT(_HueShift), ACCESS_PROP_FLOAT(_HueSaturation), ACCESS_PROP_FLOAT(_HueBrightness));
 	return res;
 }
 #endif
@@ -57,35 +57,35 @@ float4 AlbedoVertexColor(float4 inputColor, EffectsData data)
 
 #ifdef _ALBEDOVERTEXCOLORMODE_MULTIPLY
 	float3 multipliedColor = res.rgb * data.vertexColor.rgb;
-	res.rgb = lerp(res.rgb, multipliedColor, ACCESS_PROP(_VertexColorBlending));
+	res.rgb = lerp(res.rgb, multipliedColor, ACCESS_PROP_FLOAT(_VertexColorBlending));
 #else
-	res.rgb = lerp(inputColor.rgb, data.vertexColor.rgb, ACCESS_PROP(_VertexColorBlending));
+	res.rgb = lerp(inputColor.rgb, data.vertexColor.rgb, ACCESS_PROP_FLOAT(_VertexColorBlending));
 #endif
 
 	return res;
 }
 #endif
 
-#ifdef _TEXTURE_BLENDING_ON
+#if defined(_TEXTURE_BLENDING_ON)
 float4 TextureBlending(float4 inputColor, EffectsData data)
 {
 	float4 res = inputColor;
 
-	#ifdef _TEXTUREBLENDINGSOURCE_TEXTURE
+	#if defined(_TEXTUREBLENDINGSOURCE_TEXTURE)
 		float2 blendingMaskUV = SIMPLE_CUSTOM_TRANSFORM_TEX(data.rawMainUV, _TexBlendingMask);
 		float3 maskColor = SAMPLE_TEX2D(_TexBlendingMask, blendingMaskUV).rgb;
-		#ifdef _TEXTUREBLENDINGMODE_RGB
-			float maskG = smoothstep(ACCESS_PROP(_BlendingMaskCutoffG), ACCESS_PROP(_BlendingMaskCutoffG) + ACCESS_PROP(_BlendingMaskSmoothnessG), maskColor.g);
-			float maskB = smoothstep(ACCESS_PROP(_BlendingMaskCutoffB), ACCESS_PROP(_BlendingMaskCutoffB) + ACCESS_PROP(_BlendingMaskSmoothnessB), maskColor.b);
+		#if defined(_TEXTUREBLENDINGMODE_RGB)
+			float maskG = smoothstep(ACCESS_PROP_FLOAT(_BlendingMaskCutoffG), ACCESS_PROP_FLOAT(_BlendingMaskCutoffG) + ACCESS_PROP_FLOAT(_BlendingMaskSmoothnessG), maskColor.g);
+			float maskB = smoothstep(ACCESS_PROP_FLOAT(_BlendingMaskCutoffB), ACCESS_PROP_FLOAT(_BlendingMaskCutoffB) + ACCESS_PROP_FLOAT(_BlendingMaskSmoothnessB), maskColor.b);
 			maskColor = float3(1.0, maskG, maskB);
-		#else
-			float maskBlackAndWhite = smoothstep(ACCESS_PROP(_BlendingMaskCutoffWhite), ACCESS_PROP(_BlendingMaskCutoffWhite) + ACCESS_PROP(_BlendingMaskSmoothnessWhite), maskColor.r);
+		#else 
+			float maskBlackAndWhite = smoothstep(ACCESS_PROP_FLOAT(_BlendingMaskCutoffWhite), ACCESS_PROP_FLOAT(_BlendingMaskCutoffWhite) + ACCESS_PROP_FLOAT(_BlendingMaskSmoothnessWhite), maskColor.r);
 			maskColor = float3(maskBlackAndWhite, maskBlackAndWhite, maskBlackAndWhite);
 		#endif
 	#else
 		float3 maskColor = data.vertexColor.rgb;
-		float maskG = smoothstep(ACCESS_PROP(_BlendingMaskCutoffG), ACCESS_PROP(_BlendingMaskCutoffG) + ACCESS_PROP(_BlendingMaskSmoothnessG), maskColor.g);
-		float maskB = smoothstep(ACCESS_PROP(_BlendingMaskCutoffB), ACCESS_PROP(_BlendingMaskCutoffB) + ACCESS_PROP(_BlendingMaskSmoothnessB), maskColor.b);
+		float maskG = smoothstep(ACCESS_PROP_FLOAT(_BlendingMaskCutoffG), ACCESS_PROP_FLOAT(_BlendingMaskCutoffG) + ACCESS_PROP_FLOAT(_BlendingMaskSmoothnessG), maskColor.g);
+		float maskB = smoothstep(ACCESS_PROP_FLOAT(_BlendingMaskCutoffB), ACCESS_PROP_FLOAT(_BlendingMaskCutoffB) + ACCESS_PROP_FLOAT(_BlendingMaskSmoothnessB), maskColor.b);
 		
 		maskColor.g = maskG;
 		maskColor.b = maskB;
@@ -95,8 +95,8 @@ float4 TextureBlending(float4 inputColor, EffectsData data)
 		float2 dx = 0;
 		float2 dy = 0;
 			
-		float stochasticScale = ACCESS_PROP(_StochasticScale);
-		float stochasticSkew = ACCESS_PROP(_StochasticSkew);
+		float stochasticScale	= ACCESS_PROP_FLOAT(_StochasticScale);
+		float stochasticSkew	= ACCESS_PROP_FLOAT(_StochasticSkew);
 	#endif
 	
 	#ifdef _TEXTUREBLENDINGMODE_RGB
@@ -142,32 +142,32 @@ float4 Hologram(float4 inputColor, EffectsData data)
 {
 	float4 res = inputColor;
 
-	float3 dir = normalize(ACCESS_PROP(_HologramLineDirection).xyz);
+	float3 dir = normalize(ACCESS_PROP_FLOAT3(_HologramLineDirection).xyz);
                 
     // Calculate primary hologram pattern using direction projection
-    float3 scrollPos1 = data.vertexWS * ACCESS_PROP(_HologramFrequency) + (data.shaderTime.y * ACCESS_PROP(_HologramScrollSpeed));
+    float3 scrollPos1 = data.vertexWS * ACCESS_PROP_FLOAT(_HologramFrequency) + (data.shaderTime.y * ACCESS_PROP_FLOAT(_HologramScrollSpeed));
     float3 scrollUV1 = frac(scrollPos1);
 
 	float projectedValue1 = dot(scrollUV1, normalize(dir));
-    float distance1 = abs(projectedValue1 - ACCESS_PROP(_HologramLineCenter)) * ACCESS_PROP(_HologramLineSpacing);
+    float distance1 = abs(projectedValue1 - ACCESS_PROP_FLOAT(_HologramLineCenter)) * ACCESS_PROP_FLOAT(_HologramLineSpacing);
     float gradientMask1 = 1 - distance1;
-    gradientMask1 = pow(saturate(gradientMask1), ACCESS_PROP(_HologramLineSmoothness));
-    gradientMask1 = max(gradientMask1, ACCESS_PROP(_HologramBaseAlpha));
+    gradientMask1 = pow(saturate(gradientMask1), ACCESS_PROP_FLOAT(_HologramLineSmoothness));
+    gradientMask1 = max(gradientMask1, ACCESS_PROP_FLOAT(_HologramBaseAlpha));
 	
 	// Calculate accent line pattern using direction projection
-    float3 scrollPos2 = data.vertexWS * ACCESS_PROP(_HologramAccentFrequency) + (data.shaderTime.y * ACCESS_PROP(_HologramAccentSpeed));
+    float3 scrollPos2 = data.vertexWS * ACCESS_PROP_FLOAT(_HologramAccentFrequency) + (data.shaderTime.y * ACCESS_PROP_FLOAT(_HologramAccentSpeed));
     float3 scrollUV2 = frac(scrollPos2);
 
 	float projectedValue2 = dot(scrollUV2, normalize(dir));
-    float distance2 = abs(projectedValue2 - ACCESS_PROP(_HologramLineCenter)) * ACCESS_PROP(_HologramLineSpacing);
+    float distance2 = abs(projectedValue2 - ACCESS_PROP_FLOAT(_HologramLineCenter)) * ACCESS_PROP_FLOAT(_HologramLineSpacing);
     float gradientMask2 = 1 - distance2;
-    gradientMask2 = pow(saturate(gradientMask2), ACCESS_PROP(_HologramLineSmoothness));
+    gradientMask2 = pow(saturate(gradientMask2), ACCESS_PROP_FLOAT(_HologramLineSmoothness));
 
 	// Combine both patterns
-    float combinedMask = saturate(gradientMask1 * ACCESS_PROP(_HologramAlpha) + gradientMask2 * ACCESS_PROP(_HologramAccentAlpha));
+    float combinedMask = saturate(gradientMask1 * ACCESS_PROP_FLOAT(_HologramAlpha) + gradientMask2 * ACCESS_PROP_FLOAT(_HologramAccentAlpha));
                 
-    float4 finalColor = ACCESS_PROP(_HologramColor);
-    finalColor.a = combinedMask * ACCESS_PROP(_HologramColor).a;
+    float4 finalColor = ACCESS_PROP_FLOAT4(_HologramColor);
+    finalColor.a = combinedMask * ACCESS_PROP_FLOAT4(_HologramColor).a;
 
 	res *= finalColor;
 
@@ -194,7 +194,7 @@ float3 Matcap(EffectsData data)
 	float v = (normalCrossPosition.x * 0.5) + 0.5;
 
 	float2 matcapUV = float2(u, v);
-	float3 res = SAMPLE_TEX2D(_MatcapTex, matcapUV).rgb * ACCESS_PROP(_MatcapIntensity);
+	float3 res = SAMPLE_TEX2D(_MatcapTex, matcapUV).rgb * ACCESS_PROP_FLOAT(_MatcapIntensity);
 	return res;
 }
 #endif
@@ -204,14 +204,14 @@ float3 Matcap(EffectsData data)
 float4 ColorRamp(float4 inputColor, EffectsData data)
 {
 	float luminance = GetLuminance(inputColor);
-	luminance = saturate(luminance + ACCESS_PROP(_ColorRampLuminosity));
+	luminance = saturate(luminance + ACCESS_PROP_FLOAT(_ColorRampLuminosity));
 
 	float2 rampUV = float2(luminance, 0);
-	rampUV.x *= ACCESS_PROP(_ColorRampTiling);
-	rampUV.x += frac(data.shaderTime.x * ACCESS_PROP(_ColorRampScrollSpeed));
+	rampUV.x *= ACCESS_PROP_FLOAT(_ColorRampTiling);
+	rampUV.x += frac(data.shaderTime.x * ACCESS_PROP_FLOAT(_ColorRampScrollSpeed));
 
 	float3 colorRamp = SAMPLE_TEX2D(_ColorRampTex, rampUV).rgb;
-	float3 resRGB = lerp(inputColor.rgb, colorRamp, ACCESS_PROP(_ColorRampBlend));
+	float3 resRGB = lerp(inputColor.rgb, colorRamp, ACCESS_PROP_FLOAT(_ColorRampBlend));
 
 	float4 res = float4(resRGB, inputColor.a);
 
@@ -223,7 +223,7 @@ float4 ColorRamp(float4 inputColor, EffectsData data)
 
 float4 Hit(float4 inputColor)
 {
-	float3 resRGB = lerp(inputColor.rgb, ACCESS_PROP(_HitColor).rgb * ACCESS_PROP(_HitGlow), ACCESS_PROP(_HitBlend));
+	float3 resRGB = lerp(inputColor.rgb, ACCESS_PROP_FLOAT4(_HitColor).rgb * ACCESS_PROP_FLOAT(_HitGlow), ACCESS_PROP_FLOAT(_HitBlend));
 	float4 res = float4(resRGB, inputColor.a);
 	return res;
 }
@@ -232,7 +232,7 @@ float4 Hit(float4 inputColor)
 #ifdef _RIM_LIGHTING_ON
 float3 Rim(float3 inputColorRGB, EffectsData data)
 {
-	float3 rimOffset = ACCESS_PROP(_RimOffset);
+	float3 rimOffset = ACCESS_PROP_FLOAT3(_RimOffset);
 	float rimIntensity = 0;
     
 	UNITY_BRANCH
@@ -242,16 +242,16 @@ float3 Rim(float3 inputColorRGB, EffectsData data)
 		float3 normalizedViewDir = normalize(data.viewDirWS);
 		float3 biasedViewDir = normalize(normalizedViewDir + viewSpaceOffset);
 		float NdotV = saturate(dot(data.normalWS, biasedViewDir));
-		rimIntensity = smoothstep(ACCESS_PROP(_MinRim), ACCESS_PROP(_MaxRim), 1 - NdotV) * ACCESS_PROP(_RimAttenuation);
+		rimIntensity = smoothstep(ACCESS_PROP_FLOAT(_MinRim), ACCESS_PROP_FLOAT(_MaxRim), 1 - NdotV) * ACCESS_PROP_FLOAT(_RimAttenuation);
 	}
 	else //Otherwise we take quick path
 	{
 		float3 normalizedViewDir = normalize(data.viewDirWS);
 		float NdotV = saturate(dot(data.normalWS, normalizedViewDir));
-		rimIntensity = smoothstep(ACCESS_PROP(_MinRim), ACCESS_PROP(_MaxRim), 1 - NdotV) * ACCESS_PROP(_RimAttenuation);
+		rimIntensity = smoothstep(ACCESS_PROP_FLOAT(_MinRim), ACCESS_PROP_FLOAT(_MaxRim), 1 - NdotV) * ACCESS_PROP_FLOAT(_RimAttenuation);
 	}
     
-	return lerp(inputColorRGB, ACCESS_PROP(_RimColor).rgb, rimIntensity);
+	return lerp(inputColorRGB, ACCESS_PROP_FLOAT4(_RimColor).rgb, rimIntensity);
 }
 #endif
 
@@ -260,8 +260,8 @@ float3 Greyscale(float3 inputColorRGB)
 {
 	float3 res = inputColorRGB;
 	float luminance = GetLuminance(res);
-	luminance = saturate(luminance + ACCESS_PROP(_GreyscaleLuminosity));
-	res = lerp(res, luminance * ACCESS_PROP(_GreyscaleTintColor).rgb, ACCESS_PROP(_GreyscaleBlend));
+	luminance = saturate(luminance + ACCESS_PROP_FLOAT(_GreyscaleLuminosity));
+	res = lerp(res, luminance * ACCESS_PROP_FLOAT4(_GreyscaleTintColor).rgb, ACCESS_PROP_FLOAT(_GreyscaleBlending));
 	
 	return res;
 }
@@ -270,9 +270,9 @@ float3 Greyscale(float3 inputColorRGB)
 #ifdef _POSTERIZE_ON
 float3 Posterize(float3 inputColorRGB)
 {
-	float3 res = inputColorRGB;
-	float gamma = ACCESS_PROP(_PosterizeGamma);
-	float numColors = ACCESS_PROP(_PosterizeNumColors);
+	float3 res		= inputColorRGB;
+	float gamma		= ACCESS_PROP_FLOAT(_PosterizeGamma);
+	float numColors = ACCESS_PROP_FLOAT(_PosterizeNumColors);
 	res.rgb = pow(res.rgb, gamma) * numColors;
 	res.rgb = floor(res.rgb) / numColors;
 	res.rgb = pow(res.rgb, 1.0 / gamma);
@@ -285,20 +285,19 @@ float3 Posterize(float3 inputColorRGB)
 float3 Highlights(float3 inputColorRGB, EffectsData data)
 {
 	float3 normalizedLightDir = normalize(data.lightDir);
-	float3 offsetLightDir = normalize(normalizedLightDir + ACCESS_PROP(_HighlightOffset));
+	float3 offsetLightDir = normalize(normalizedLightDir + ACCESS_PROP_FLOAT3(_HighlightOffset));
 	float3 normalizedViewDir = normalize(data.viewDirWS);
 
 	float NdotL = saturate(dot(data.normalWS, offsetLightDir));
 	float NdotV = saturate(dot(data.normalWS, normalizedViewDir));
 	float rimFactor = 1.0 - NdotV;
     
-	float highlightCutoff = ACCESS_PROP(_HighlightCutoff);
-	float highlightSmoothness = ACCESS_PROP(_HighlightSmoothness);
-	float highlightsIntensity = smoothstep(highlightCutoff, highlightCutoff + highlightSmoothness, rimFactor);
+	float highlightCutoff		= ACCESS_PROP_FLOAT(_HighlightCutoff);
+	float highlightSmoothness	= ACCESS_PROP_FLOAT(_HighlightSmoothness);
+	float highlightsIntensity	= smoothstep(highlightCutoff, highlightCutoff + highlightSmoothness, rimFactor);
     
-	float3 highlights = highlightsIntensity * NdotL * ACCESS_PROP(_HighlightsColor).rgb * ACCESS_PROP(_HighlightsStrength);
+	float3 highlights = highlightsIntensity * NdotL * ACCESS_PROP_FLOAT4(_HighlightsColor).rgb * ACCESS_PROP_FLOAT(_HighlightsStrength);
 
-	//return inputColorRGB + highlights;
 	return inputColorRGB * (highlights + 1);
 }
 #endif
@@ -306,8 +305,7 @@ float3 Highlights(float3 inputColorRGB, EffectsData data)
 #ifdef _CONTRAST_BRIGHTNESS_ON
 float3 ContrastBrightness(float3 inputColorRGB)
 {
-	float3 res = ContrastBrightness(inputColorRGB, ACCESS_PROP(_Contrast), ACCESS_PROP(_Brightness));
-	//float3 res = max(0, (inputColorRGB - float3(0.5, 0.5, 0.5)) * ACCESS_PROP(_Contrast) + float3(0.5, 0.5, 0.5) + ACCESS_PROP(_Brightness));
+	float3 res = ContrastBrightness(inputColorRGB, ACCESS_PROP_FLOAT(_Contrast), ACCESS_PROP_FLOAT(_Brightness));
 	return res;
 }
 #endif
@@ -324,10 +322,10 @@ float4 HeightGradient(float4 inputColor, EffectsData data)
 		float3 selectedPos = data.vertexOS;
 	#endif
 
-	float gradient = RemapFloat(selectedPos.y, ACCESS_PROP(_MinGradientHeight), ACCESS_PROP(_MaxGradientHeight), 0.0, 1.0);
+	float gradient = RemapFloat(selectedPos.y, ACCESS_PROP_FLOAT(_MinGradientHeight), ACCESS_PROP_FLOAT(_MaxGradientHeight), 0.0, 1.0);
 	gradient = saturate(gradient);
 
-	float4 gradientColor = lerp(ACCESS_PROP(_GradientHeightColor01), ACCESS_PROP(_GradientHeightColor02), gradient);
+	float4 gradientColor = lerp(ACCESS_PROP_FLOAT4(_GradientHeightColor01), ACCESS_PROP_FLOAT4(_GradientHeightColor02), gradient);
 
 	res *= gradientColor;
 
@@ -340,10 +338,10 @@ float4 IntersectionGlow(float4 inputColor, EffectsData data)
 {
 	float4 res = inputColor;
 
-	float depthGlowMask = saturate(ACCESS_PROP(_DepthGlowDist) * pow(max(0, 1 - data.sceneDepthDiff), ACCESS_PROP(_DepthGlowPower)));
+	float depthGlowMask = saturate(ACCESS_PROP_FLOAT(_DepthGlowDist) * pow(max(0, 1 - data.sceneDepthDiff), ACCESS_PROP_FLOAT(_DepthGlowPower)));
 
-	res.rgb = lerp(res.rgb, ACCESS_PROP(_DepthGlowGlobalIntensity) * res.rgb, depthGlowMask);
-	res.rgb += ACCESS_PROP(_DepthGlowColor).rgb * ACCESS_PROP(_DepthGlowColorIntensity) * depthGlowMask * res.a;
+	res.rgb = lerp(res.rgb, ACCESS_PROP_FLOAT(_DepthGlowGlobalIntensity) * res.rgb, depthGlowMask);
+	res.rgb += ACCESS_PROP_FLOAT4(_DepthGlowColor).rgb * ACCESS_PROP_FLOAT(_DepthGlowColorIntensity) * depthGlowMask * res.a;
 
 	return res;
 }
@@ -385,24 +383,24 @@ float4 SubsurfaceScattering(float4 inputColor, EffectsData data)
 	float lightIntensity = GetMainLightIntensity();
 
 	float3 normalizedViewDir = normalize(data.viewDirWS);
-	float3 scatterNormal = (data.normalWS * ACCESS_PROP(_NormalInfluence)) + data.lightDir;
+	float3 scatterNormal = (data.normalWS * ACCESS_PROP_FLOAT(_NormalInfluence)) + data.lightDir;
 	scatterNormal = -normalize(scatterNormal);
     
 	float VdotScatterNormal = saturate(dot(scatterNormal, normalizedViewDir));
 
-	float sssPower = max(1.0, ACCESS_PROP(_SSSPower) * sssMapColor.r);
+	float sssPower = max(1.0, ACCESS_PROP_FLOAT(_SSSPower));
 	float backScatterFactor = pow(VdotScatterNormal, sssPower);
 
 	float frontScatter = saturate(dot(data.normalWS, data.lightDir)); // How directly light hits surface
 	float frontVdotN = 1.0 - saturate(dot(normalizedViewDir, data.normalWS)); // Fresnel-like front falloff
-	frontVdotN = pow(frontVdotN, ACCESS_PROP(_SSSFrontPower));
-	float frontScatterFactor = frontScatter * frontVdotN * ACCESS_PROP(_SSSFrontAtten);
+	frontVdotN = pow(frontVdotN, ACCESS_PROP_FLOAT(_SSSFrontPower));
+	float frontScatterFactor = frontScatter * frontVdotN * ACCESS_PROP_FLOAT(_SSSFrontAtten);
 
-	float scatterIntensity = max(backScatterFactor, frontScatterFactor) * ACCESS_PROP(_SSSAtten) * sssMapColor.a;
+	float scatterIntensity = max(backScatterFactor, frontScatterFactor) * ACCESS_PROP_FLOAT(_SSSAtten) * sssMapColor.r;
     
 	// Simulate wavelength-dependent scattering with original scatter calculation
 	float3 deepScatterColor = float3(1.0, 0.3, 0.2);
-	float3 scatterColor = scatterIntensity * lightColor.rgb * lightIntensity * ACCESS_PROP(_SSSColor).rgb;
+	float3 scatterColor = scatterIntensity * lightColor.rgb * lightIntensity * ACCESS_PROP_FLOAT4(_SSSColor).rgb;
 	scatterColor *= lerp(float3(1,1,1), deepScatterColor, VdotScatterNormal);
     
 	res.rgb += scatterColor * inputColor.rgb;

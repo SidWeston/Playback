@@ -38,12 +38,27 @@ namespace AllIn13DShader
 
 		protected virtual void Draw()
 		{
+			bool isShaderVariant = references.IsShaderVariant();
 			bool areDependenciesMet = AreDependenciesMet();
+			bool isEffectAvailableOnGlobalConfig = references.effectsProfileCollection.generalProfile.IsEffectEnabled(effectConfig.effectName);
+			bool isEffectAvailable = AllIn13DEffectConfig.IsEffectAvailable(effectConfig, references);
 
-			EditorGUI.BeginDisabledGroup(!areDependenciesMet);
-			EffectPropertyDrawer.DrawMainProperty(globalEffectIndex, effectConfig, references);
-			bool isAnyPropertyVisible = IsAnyPropertyVisible();
+			bool groupEnabled = isEffectAvailable;
+			if (!isShaderVariant)
+			{
+				groupEnabled = groupEnabled && areDependenciesMet && isEffectAvailableOnGlobalConfig;
+			}
+			//bool groupEnabled = areDependenciesMet && isEffectAvailable && isEffectAvailableOnGlobalConfig /*|| (references.isShaderVariant && isEnabledInEffectsProfile)*/;
+
+			//bool disableGroup = !groupEnabled;
+
+			EditorGUILayout.BeginHorizontal();
+			EditorGUI.BeginDisabledGroup(!groupEnabled);
+			EffectPropertyDrawer.DrawMainProperty(globalEffectIndex, effectConfig, references, isEffectAvailable, isEffectAvailableOnGlobalConfig);
+			EditorGUILayout.EndHorizontal();
 			
+			bool isAnyPropertyVisible = IsAnyPropertyVisible();
+
 			if (isAnyPropertyVisible)
 			{
 				EditorGUILayout.BeginVertical(references.propertiesStyle);
@@ -74,7 +89,6 @@ namespace AllIn13DShader
 						}
 					}
 
-
 					EditorGUILayout.LabelField(customMessage, references.smallLabelStyle, GUILayout.Height(heightField));
 					EditorGUILayout.EndHorizontal();
 				}
@@ -104,7 +118,40 @@ namespace AllIn13DShader
 		{
 			if (IsEffectPropertyVisible(effectProperty, references.targetMatInfos))
 			{
-				EffectPropertyDrawer.DrawProperty(effectProperty, labelPrefix, allowReset, references);
+				EffectProperty.PropertyType propertyType = effectProperty.GetPropertyType();
+				MaterialProperty matProperty = references.matProperties[effectProperty.propertyIndex];
+
+				string propertyCustomValue = string.Empty;
+				if(references.IsShaderVariant() && effectProperty.IsPropertyWithKeywords())
+				{
+					int index = 0;
+					bool isEnabled = references.IsEffectPropertyEnabled(effectProperty, ref index);
+
+					if (isEnabled)
+					{
+						if (effectProperty.IsEnumProperty())
+						{
+							propertyCustomValue = effectProperty.propertyKeywords[index];
+						}
+						else
+						{
+							propertyCustomValue = string.Empty;
+						}
+					}
+				}
+
+				EffectPropertyDrawer.DrawProperty(
+					materialProperty: matProperty,
+					labelPrefix: labelPrefix, 
+					displayName: effectProperty.displayName,
+					customValue: propertyCustomValue,
+					allowReset: allowReset,
+					isKeywordProperty: effectProperty.IsPropertyWithKeywords(),
+					propertyType: effectProperty.GetPropertyType(),
+					references: references);
+
+				//EffectPropertyDrawer.DrawProperty(effectProperty, labelPrefix, effectProperty.displayName, allowReset, effectProperty.IsPropertyWithKeywords(), references);
+				//EffectPropertyDrawer.DrawProperty(effectProperty, labelPrefix, allowReset, references);
 			}
 		}
 
@@ -114,7 +161,7 @@ namespace AllIn13DShader
 
 			for (int matIdx = 0; matIdx < references.targetMatInfos.Length; matIdx++)
 			{
-				MaterialInfo targetMatInfo = references.targetMatInfos[matIdx];
+				AbstractMaterialInfo targetMatInfo = references.targetMatInfos[matIdx];
 
 				bool thisMatParentPropertyEnabled = false;
 				for (int kwIdx = 0; kwIdx < effectConfig.keywords.Count; kwIdx++)
@@ -157,11 +204,11 @@ namespace AllIn13DShader
 			return res;
 		}
 
-		protected bool IsEffectPropertyVisible(EffectProperty effectProperty, MaterialInfo[] targetMatInfos)
+		protected bool IsEffectPropertyVisible(EffectProperty effectProperty, AbstractMaterialInfo[] targetMatInfos)
 		{
 			bool res = true;
 
-			for(int i = 0; i < targetMatInfos.Length; i++)
+			for (int i = 0; i < targetMatInfos.Length; i++)
 			{
 				res = res && IsEffectPropertyVisible(effectProperty, targetMatInfos[i]);
 			}
@@ -169,7 +216,7 @@ namespace AllIn13DShader
 			return res;
 		}
 
-		protected bool IsEffectPropertyVisible(EffectProperty effectProperty, MaterialInfo targetMatInfo)
+		protected bool IsEffectPropertyVisible(EffectProperty effectProperty, AbstractMaterialInfo targetMatInfo)
 		{
 			bool res = false;
 			
@@ -191,6 +238,7 @@ namespace AllIn13DShader
 					for (int i = 0; i < effectProperty.keywords.Count; i++)
 					{
 						string keyword = effectProperty.keywords[i];
+
 						if (targetMatInfo.IsKeywordEnabled(keyword))
 						{
 							res = true;
@@ -262,6 +310,22 @@ namespace AllIn13DShader
 			{
 				AllIn13DEffectConfig dependentEffect = propertiesConfig.FindEffectConfigByID(effectConfig.incompatibleWithEffectID);
 				res = res && !AllIn13DEffectConfig.IsEffectEnabled(dependentEffect, references);
+			}
+
+			return res;
+		}
+
+		protected bool IsShaderVariant()
+		{
+			bool res = true;
+
+			for(int i = 0; i < references.targetMatInfos.Length; i++)
+			{
+				if (references.targetMatInfos[i].IsShaderVariant())
+				{
+					res = false;
+					break;
+				}
 			}
 
 			return res;

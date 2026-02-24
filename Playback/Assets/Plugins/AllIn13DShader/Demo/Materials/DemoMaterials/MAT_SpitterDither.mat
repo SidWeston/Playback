@@ -10,6 +10,7 @@ Material:
   m_Name: MAT_SpitterDither
   m_Shader: {fileID: 4800000, guid: 0dde7f0097aeb2541aea684ca0ad0e3c, type: 3}
   m_ValidKeywords:
+  - _ALBEDOVERTEXCOLORMODE_REPLACE
   - _ALPHA_CUTOFF_ON
   - _AOMAP_ON
   - _CAST_SHADOWS_ON
@@ -20,12 +21,14 @@ Material:
   - _FADE_BY_CAM_DISTANCE_ON
   - _FADE_ON
   - _GREYSCALESTAGE_BEFORELIGHTING
+  - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
   - _HIGHLIGHTS_ON
   - _LIGHTMODEL_FAKEGI
   - _MATCAPBLENDMODE_MULTIPLY
   - _MATCAP_ON
   - _NORMAL_MAP_ON
   - _OUTLINETYPE_NONE
+  - _RECEIVEDSHADOWSTYPE_CLASSIC
   - _RECEIVE_SHADOWS_ON
   - _REFLECTIONS_CLASSIC
   - _RIMLIGHTINGSTAGE_BEFORELIGHTING
@@ -34,14 +37,12 @@ Material:
   - _SPECULARMODEL_CLASSIC
   - _SUBSURFACE_SCATTERING_ON
   - _TEXTUREBLENDINGMODE_RGB
+  - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
+  - _TRIPLANARNORMALSPACE_WORLD
   - _USE_WIND_VERTICAL_MASK
   m_InvalidKeywords:
   - _AFFECTED_BY_AMBIENT_ON
-  - _ALBEDOVERTEXCOLORMODE_REPLACE
   - _GLITCHWORLDSPACE_ON
-  - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
-  - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
-  - _TRIPLANARNORMALSPACE_WORLD
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -291,7 +292,9 @@ Material:
     - _MatcapBlend: 0.379
     - _MatcapBlendMode: 0
     - _MatcapIntensity: 4
+    - _MaxCameraDistance: 1000
     - _MaxDistanceToFade: 12
+    - _MaxFadeDistance: 250
     - _MaxGradientHeight: 0.75
     - _MaxInflate: 0.2
     - _MaxRim: 1
@@ -307,6 +310,8 @@ Material:
     - _NormalMapEnabled: 1
     - _NormalStrength: 1.4
     - _OcclusionStrength: 1
+    - _OutlineMode: 8
+    - _OutlineThickness: 1
     - _OutlineType: 0
     - _Parallax: 0.02
     - _Pixelate: 0
@@ -315,7 +320,9 @@ Material:
     - _PosterizeGamma: 0.75
     - _PosterizeNumColors: 12
     - _RecalculateNormals: 0
+    - _ReceiveShadows: 1
     - _ReceiveShadowsOn: 1
+    - _ReceivedShadowsType: 0
     - _Reflections: 1
     - _ReflectionsAtten: 0.4
     - _RenderPreset: 1
@@ -332,6 +339,7 @@ Material:
     - _ScrollTextureX: 1
     - _ScrollTextureY: 1
     - _ShadingModel: 1
+    - _ShadowCutoff: 0.2
     - _ShakeBlend: 1
     - _ShakeSpeedMult: 1
     - _Shininess: 16
@@ -344,6 +352,7 @@ Material:
     - _SpecularToonSmoothness: 0
     - _SpherizeNormals: 0
     - _SrcBlend: 1
+    - _StencilRef: 1
     - _StochasticSampling: 0
     - _StochasticScale: 3.464
     - _StochasticSkew: 0.57735026
@@ -399,6 +408,7 @@ Material:
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramColor: {r: 0.35, g: 0.8, b: 2, a: 1}
     - _HologramLineDirection: {r: 0, g: 1, b: 0, a: 0}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _RimColor: {r: 0.4554859, g: 0.90982157, b: 0.93207544, a: 1}
     - _RimOffset: {r: 0, g: 0.1, b: 0, a: 0}
     - _SSSColor: {r: 0.5411765, g: 1.6705883, b: 2, a: 1}

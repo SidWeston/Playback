@@ -46,14 +46,45 @@ namespace AllIn13DShader
 			{
 				EditorGUILayout.BeginVertical(references.propertiesStyle);
 
-				EffectPropertyDrawer.DrawProperty(blendSrcIndex, string.Empty, false, false, references);
-				EffectPropertyDrawer.DrawProperty(blendDstIndex, string.Empty, false, false, references);
+				MaterialProperty matPropertyBlendSrc = references.matProperties[blendSrcIndex];
+				MaterialProperty matProeprtyBlendDst = references.matProperties[blendDstIndex];
+
+				EffectPropertyDrawer.DrawProperty(
+					materialProperty: matPropertyBlendSrc, 
+					labelPrefix: string.Empty, 
+					displayName: matPropertyBlendSrc.displayName,
+					customValue: string.Empty,
+					allowReset: false, 
+					isKeywordProperty: false,
+					propertyType: EffectProperty.PropertyType.BASIC,
+					references);
+
+				EffectPropertyDrawer.DrawProperty(
+					materialProperty: matProeprtyBlendDst,
+					labelPrefix: string.Empty,
+					displayName: matProeprtyBlendDst.displayName,
+					customValue: string.Empty,
+					allowReset: false,
+					isKeywordProperty: false,
+					propertyType: EffectProperty.PropertyType.BASIC,
+					references);
+				
 				EditorUtils.DrawThinLine();
 
 				for (int i = 1; i < advancedPropertiesIndices.Count; i++)
 				{
 					//if(i == blendSrcIndex || i == blendDstIndex) { continue; }
-					EffectPropertyDrawer.DrawProperty(advancedPropertiesIndices[i], string.Empty, false, false, references);
+					MaterialProperty matProperty = references.matProperties[advancedPropertiesIndices[i]];
+					EffectPropertyDrawer.DrawProperty(
+						materialProperty: matProperty,
+						labelPrefix: string.Empty,
+						displayName: matProperty.displayName,
+						customValue: string.Empty,
+						allowReset: false,
+						isKeywordProperty: false,
+						propertyType: EffectProperty.PropertyType.BASIC,
+						references: references);
+
 					EditorUtils.DrawThinLine();
 				}
 

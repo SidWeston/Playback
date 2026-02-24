@@ -18,7 +18,7 @@ namespace AllIn13DShader
 			[TextArea]public string message;
 			public string[] keywords;
 
-			public bool IsMessageEnabled(MaterialInfo targetMatInfo)
+			public bool IsMessageEnabled(AbstractMaterialInfo targetMatInfo)
 			{
 				bool res = false;
 

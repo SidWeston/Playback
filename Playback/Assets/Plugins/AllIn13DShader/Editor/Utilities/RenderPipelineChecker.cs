@@ -11,14 +11,6 @@ namespace AllIn13DShader
 {
 	public class RenderPipelineChecker
 	{
-		public enum RenderPipeline
-		{
-			NONE = 0,
-			BIRP = 1,
-			URP = 2,
-			HDRP = 3
-		}
-
 		private const string SYMBOL_URP = "ALLIN13DSHADER_URP";
 		private const string SYMBOL_HDRP = "ALLIN13DSHADER_HDRP";
 		private const string SYMBOL_BIRP = "ALLIN13DSHADER_BIRP";
@@ -39,7 +31,7 @@ namespace AllIn13DShader
 			get; private set;
 		}
 
-		public static RenderPipeline CurrentRenderPipeline
+		public static RenderPipelineEnum CurrentRenderPipeline
 		{
 			get; private set;
 		}
@@ -56,15 +48,15 @@ namespace AllIn13DShader
 
 			else if (IsURP)
 			{
-				CurrentRenderPipeline = RenderPipeline.URP;
+				CurrentRenderPipeline = RenderPipelineEnum.URP;
 			}
 			else if (IsHDRP)
 			{
-				CurrentRenderPipeline = RenderPipeline.HDRP;
+				CurrentRenderPipeline = RenderPipelineEnum.HDRP;
 			}
 			else
 			{
-				CurrentRenderPipeline = RenderPipeline.BIRP;
+				CurrentRenderPipeline = RenderPipelineEnum.BIRP;
 			}
 		}
 
@@ -154,7 +146,7 @@ namespace AllIn13DShader
 		{
 			RefreshData();
 
-			RenderPipeline lastRenderPipeline = (RenderPipeline)EditorPrefs.GetInt(Constants.LAST_RENDER_PIPELINE_CHECKED_KEY, 0);
+			RenderPipelineEnum lastRenderPipeline = (RenderPipelineEnum)SessionState.GetInt(Constants.LAST_RENDER_PIPELINE_CHECKED_KEY, 0);
 
 			if (lastRenderPipeline != CurrentRenderPipeline || !IsRenderPipelineDefined())
 			{
@@ -173,7 +165,7 @@ namespace AllIn13DShader
 				}
 
 				ApplyDefineSymbols(defineSymbols);
-				EditorPrefs.SetInt(Constants.LAST_RENDER_PIPELINE_CHECKED_KEY, (int)CurrentRenderPipeline);
+				SessionState.SetInt(Constants.LAST_RENDER_PIPELINE_CHECKED_KEY, (int)CurrentRenderPipeline);
 			}
 		}
 

@@ -17,6 +17,8 @@ Shader "AllIn13DShader/AllIn13DShader_NoShadowCaster"
 		<DEPTH_ONLY_PASS_URP>
 		
 		<DEPTH_NORMALS_PASS_URP>
+		
+		<META_PASS_URP>
 	}
 
 	SubShader

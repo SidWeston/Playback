@@ -14,13 +14,16 @@ Material:
   - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
   - _COLOR_RAMP_ON
+  - _CUSTOM_AMBIENT_LIGHT_ON
   - _EMISSION_ON
+  - _FADEUVSET_UV1
   - _GREYSCALESTAGE_BEFORELIGHTING
   - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
   - _HIGHLIGHTS_ON
   - _LIGHTMODEL_NONE
   - _MATCAPBLENDMODE_MULTIPLY
   - _OUTLINETYPE_NONE
+  - _RECEIVEDSHADOWSTYPE_CLASSIC
   - _RECEIVE_SHADOWS_ON
   - _REFLECTIONS_NONE
   - _RIMLIGHTINGSTAGE_BEFORELIGHTING
@@ -159,6 +162,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: a26b9f1a12d33184ab5e89d304e441ad, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TriplanarNoiseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TriplanarTopNormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -208,7 +215,7 @@ Material:
     - _ContrastBrightnessOn: 0
     - _ContrastLM: 1
     - _CullingMode: 2
-    - _CustomAmbientLightOn: 0
+    - _CustomAmbientLightOn: 1
     - _CustomShadowColorOn: 0
     - _Cutoff: 0.5
     - _DepthColoringOn: 0
@@ -233,6 +240,9 @@ Material:
     - _FadeOn: 0
     - _FadePower: 1
     - _FadeTransition: 0.2
+    - _FadeUVSet: 0
+    - _FlatNormalsBlend: 1
+    - _FlatNormalsEnabled: 0
     - _FogOn: 0
     - _GeneralAlpha: 1
     - _Glitch: 0
@@ -247,6 +257,7 @@ Material:
     - _GreyScaleStage: 0
     - _Greyscale: 0
     - _GreyscaleBlend: 1
+    - _GreyscaleBlending: 1
     - _GreyscaleLuminosity: 0
     - _HalfLambertWrap: 1
     - _HandDrawn: 0
@@ -292,7 +303,9 @@ Material:
     - _MatcapBlend: 1
     - _MatcapBlendMode: 0
     - _MatcapIntensity: 1
+    - _MaxCameraDistance: 1000
     - _MaxDistanceToFade: 100
+    - _MaxFadeDistance: 250
     - _MaxGradientHeight: 0.75
     - _MaxInflate: 0.2
     - _MaxRim: 1
@@ -308,6 +321,8 @@ Material:
     - _NormalMapEnabled: 0
     - _NormalStrength: 1
     - _OcclusionStrength: 1
+    - _OutlineMode: 8
+    - _OutlineThickness: 1
     - _OutlineType: 0
     - _Parallax: 0.02
     - _Pixelate: 0
@@ -316,7 +331,9 @@ Material:
     - _PosterizeGamma: 0.75
     - _PosterizeNumColors: 8
     - _RecalculateNormals: 0
+    - _ReceiveShadows: 1
     - _ReceiveShadowsOn: 1
+    - _ReceivedShadowsType: 0
     - _Reflections: 0
     - _ReflectionsAtten: 0.25
     - _RenderPreset: 1
@@ -333,6 +350,7 @@ Material:
     - _ScrollTextureX: 1
     - _ScrollTextureY: 1
     - _ShadingModel: 0
+    - _ShadowCutoff: 0.2
     - _ShakeBlend: 1
     - _ShakeSpeedMult: 1
     - _Shininess: 7.1
@@ -345,6 +363,7 @@ Material:
     - _SpecularToonSmoothness: 0
     - _SpherizeNormals: 0
     - _SrcBlend: 1
+    - _StencilRef: 1
     - _StochasticSampling: 0
     - _StochasticScale: 3.464
     - _StochasticSkew: 0.57735026
@@ -358,8 +377,10 @@ Material:
     - _ToonSmoothness: 0.5
     - _TopNormalStrength: 1
     - _TriplanarMappingOn: 0
+    - _TriplanarNoiseTransitionOn: 0
     - _TriplanarNormalSpace: 1
     - _TriplanarSharpness: 15
+    - _TriplanarTransitionPower: 0.75
     - _UVDistortion: 0
     - _UVSec: 0
     - _UseCustomTime: 0
@@ -387,7 +408,7 @@ Material:
     m_Colors:
     - _AOColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0, g: 0, b: 0, a: 1}
-    - _CustomAmbientColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
+    - _CustomAmbientColor: {r: 1, g: 1, b: 1, a: 1}
     - _DepthGlowColor: {r: 1, g: 0.9869999, b: 0.6, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FadeBurnColor: {r: 1, g: 1, b: 0, a: 1}
@@ -400,6 +421,7 @@ Material:
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramColor: {r: 0.35, g: 0.8, b: 2, a: 1}
     - _HologramLineDirection: {r: 0, g: 1, b: 0, a: 0}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimOffset: {r: 0, g: 0, b: 0, a: 0}
     - _SSSColor: {r: 1, g: 1, b: 1, a: 1}

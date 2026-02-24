@@ -13,7 +13,8 @@ namespace AllIn13DShader
         private float normalCreateStrength = 2.0f;
         private float normalCreateSmooth = 1.0f;
         
-        public NormalMapEffectDrawer(AllIn13DShaderInspectorReferences references, PropertiesConfig propertiesConfig) : base(references, propertiesConfig)
+        public NormalMapEffectDrawer(AllIn13DShaderInspectorReferences references, 
+			PropertiesConfig propertiesConfig) : base(references, propertiesConfig)
         {
             drawerID = Constants.NORMAL_MAP_EFFECT_DRAWER_ID;
             

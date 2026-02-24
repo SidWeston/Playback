@@ -6,7 +6,8 @@ namespace AllIn13DShader
 	{
 		private MaterialProperty stencilRefMatProperty;
 
-		public OutlineEffectDrawer(AllIn13DShaderInspectorReferences references, PropertiesConfig propertiesConfig) : base(references, propertiesConfig)
+		public OutlineEffectDrawer(AllIn13DShaderInspectorReferences references, 
+			PropertiesConfig propertiesConfig) : base(references, propertiesConfig)
 		{
 			this.drawerID = Constants.OUTLINE_DRAWER_ID;
 
@@ -19,7 +20,15 @@ namespace AllIn13DShader
 
 			if (stencilRefMatProperty != null)
 			{
-				EffectPropertyDrawer.DrawProperty(stencilRefMatProperty, false, references);
+				EffectPropertyDrawer.DrawProperty(
+					materialProperty: stencilRefMatProperty,
+					labelPrefix: string.Empty,
+					displayName: stencilRefMatProperty.displayName,
+					customValue: string.Empty,
+					allowReset: true,
+					isKeywordProperty: false,
+					propertyType: EffectProperty.PropertyType.BASIC,
+					references: references);		
 			}
 		}
 	}

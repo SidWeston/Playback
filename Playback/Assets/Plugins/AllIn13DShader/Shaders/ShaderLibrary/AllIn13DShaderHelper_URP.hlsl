@@ -3,6 +3,18 @@
 
 #define NUM_ADDITIONAL_LIGHTS GetNumAdditionalLights();
 
+#define OBJECT_TO_WORLD_MATRIX GetObjectToWorldMatrix()
+
+#if defined(ALLIN1_DECALS_SUPPORT) && defined(_DBUFFER)
+	#define ALLIN1_DECALS_READY_TO_USE
+	
+	#if defined(_DBUFFER_MRT1) || defined(_DBUFFER_MRT2) || defined(_DBUFFER_MRT3)
+		#define ALLIN1_DECAL_MODE_DBUFFER
+	#else
+		#define ALLIN1_DECAL_MODE_SCREEN_SPACE
+	#endif
+#endif
+
 #ifdef REQUIRE_SCENE_DEPTH
 
 	#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
@@ -54,9 +66,25 @@ float3 GetPositionWS(float4 positionOS)
 	return TransformObjectToWorld(positionOS.xyz);
 }
 
+float3 GetPositionOS(float4 positionWS)
+{
+	return TransformWorldToObject(positionWS.xyz);
+
+}
+
 float3 GetDirWS(float4 dirOS)
 {
 	return TransformObjectToWorldDir(dirOS.xyz);
+}
+
+float3 GetDirOSFloat3(float3 dirOS)
+{
+	return TransformObjectToWorldDir(dirOS.xyz);
+}
+
+float3 GetDirOS(float4 dirOS)
+{
+	return GetDirOSFloat3(dirOS.xyz);
 }
 
 float3 GetMainLightDir(float3 vertexWS)
@@ -81,20 +109,26 @@ float3 GetMainLightColorRGB()
 	return res;
 }
 
-float2 GetSSAO(float2 normalizedScreenSpaceUV)
+float2 GetSSAO(float2 normalizedScreenSpaceUV, float alpha)
 {
 	AmbientOcclusionFactor aoFactorURP = GetScreenSpaceAmbientOcclusion(normalizedScreenSpaceUV);
+		
+#if defined(_ALLIN13D_SURFACE_TRANSPARENT)
+	float2 res = float2(1, 1);
+#else
 	float2 res = float2(aoFactorURP.directAmbientOcclusion, aoFactorURP.indirectAmbientOcclusion);
+#endif
+	
 	return res;
 }
 
 //normalWS needed for the equivalent method in BIRP
 //effectsData needed for the equivalent method in BIRP
-AllIn1LightData GetPointLightData(int index, float3 vertexWS, float3 normalWS, EffectsData effectsData)
+AllIn1LightData GetPointLightData(int index, float3 vertexWS, float3 normalWS, EffectsData effectsData, AllIn1GI gi)
 {
 	AllIn1LightData lightData;
 
-	Light additionalLight = GetAdditionalLight(index, vertexWS); 
+	Light additionalLight = GetAdditionalLight(index, vertexWS, gi.shadowMask);
 	lightData.lightColor = additionalLight.color;
 	lightData.lightDir = additionalLight.direction;
 
@@ -104,10 +138,13 @@ AllIn1LightData GetPointLightData(int index, float3 vertexWS, float3 normalWS, E
 	int lightIndex = GetPerObjectLightIndex(index);
 #endif
 
+#if defined(_LIGHT_COOKIES)
+    float3 cookieColor = SampleAdditionalLightCookie(lightIndex, effectsData.vertexWS);
+    lightData.lightColor *= cookieColor;
+#endif
 
 #ifdef _RECEIVE_SHADOWS_ON
-	//lightData.realtimeShadow = AdditionalLightRealtimeShadow(perObjectIndex, vertexWS, additionalLight.direction);
-	lightData.realtimeShadow = AdditionalLightShadow(lightIndex, vertexWS, additionalLight.direction, 1.0, 0);
+	lightData.realtimeShadow = additionalLight.shadowAttenuation;
 #else
 	lightData.realtimeShadow = 1.0;
 #endif
@@ -119,18 +156,18 @@ AllIn1LightData GetPointLightData(int index, float3 vertexWS, float3 normalWS, E
 	return lightData;
 }
 
-AllIn1LightData GetMainLightData(float3 vertexWS, EffectsData effectsData)
+AllIn1LightData GetMainLightData(float3 vertexWS, EffectsData effectsData, AllIn1GI gi)
 {
 	AllIn1LightData lightData;
 	
-#ifdef _LIGHTMODEL_NONE
+#if defined(_LIGHTMODEL_NONE)
 	lightData.lightColor = float3(1.0, 1.0, 1.0);
 	lightData.lightDir = float3(0.0, 1.0, 0.0);
 	lightData.distanceAttenuation = 1.0;
 	lightData.shadowColor = 1.0;
 	lightData.realtimeShadow = 1.0;
 	lightData.layerMask = 1;
-#elif _LIGHTMODEL_FASTLIGHTING
+#elif defined(_LIGHTMODEL_FASTLIGHTING)
 	lightData.lightColor = global_lightColor;
 	lightData.lightDir = global_lightDirection;
 	lightData.distanceAttenuation = 1.0;
@@ -142,21 +179,32 @@ AllIn1LightData GetMainLightData(float3 vertexWS, EffectsData effectsData)
 	lightData.lightColor = mainLight.color;
 	lightData.lightDir = mainLight.direction;
 
-	#if defined(_AFFECTED_BY_LIGHTMAPS_ON)
-		lightData.distanceAttenuation = mainLight.distanceAttenuation;
-	#else
-		lightData.distanceAttenuation = 1.0;
-	#endif
+	lightData.distanceAttenuation = mainLight.distanceAttenuation;
 	
 	float4 shadowCoords = TransformWorldToShadowCoord(vertexWS);
 	#ifdef _RECEIVE_SHADOWS_ON
 		lightData.realtimeShadow = MainLightRealtimeShadow(shadowCoords);
+		#if defined(_RECEIVEDSHADOWSTYPE_STYLIZED)
+			lightData.realtimeShadow = AntiAliasing(lightData.realtimeShadow, ACCESS_PROP_FLOAT(_ShadowCutoff));
+		#endif
+
+		float shadowFade = GetMainLightShadowFade(effectsData.vertexWS);
+		float shadowMask = 1.0;
+		#if defined(SHADOWS_SHADOWMASK)
+			shadowMask = gi.shadowMask.r;
+		#endif
+		lightData.realtimeShadow = lerp(lightData.realtimeShadow, shadowMask, shadowFade);
 	#else
 		lightData.realtimeShadow = 1.0;
 	#endif
 
 	lightData.shadowColor = lightData.realtimeShadow;
 	lightData.layerMask = mainLight.layerMask;
+
+	#if defined(_LIGHT_COOKIES)
+        float3 cookieColor = SampleMainLightCookie(effectsData.vertexWS);
+        lightData.lightColor *= cookieColor;
+    #endif
 #endif
 	
 	return lightData;
@@ -194,7 +242,7 @@ FragmentDataShadowCaster GetClipPosShadowCaster(VertexData v, FragmentDataShadow
     return input;
 }
 
-ShadowCoordStruct GetShadowCoords(VertexData v, float4 clipPos, float3 vertexWS)
+ShadowCoordStruct GetShadowCoords(VertexData v, float4 clipPos, float3 vertexWS, float2 uvLightmap)
 {
 	ShadowCoordStruct res;
 
@@ -253,7 +301,7 @@ float3 GetLightmap(float2 uvLightmap, EffectsData data)
 	float3 res = 0.0;
 
 #if defined(_AFFECTED_BY_LIGHTMAPS_ON) && defined(LIGHTMAP_ON)
-	res = SAMPLE_TEXTURE2D(unity_Lightmap, samplerunity_Lightmap, uvLightmap).xyz;
+	res = SampleLightmap(uvLightmap, data.normalWS);
 	#ifdef SUBTRACTIVE_LIGHTING
 		AllIn1LightData mainLight = GetMainLightData(data.vertexWS, data);
 		float attenuation = mainLight.realtimeShadow;
@@ -271,14 +319,55 @@ float3 GetLightmap(float2 uvLightmap, EffectsData data)
 	return res;
 }
 
-float3 GetAmbientColor(float4 normalWS)
+uint AllIn1GetMeshRenderingLayer()
+{
+	uint res;
+	#if UNITY_VERSION >= 202230
+		res = GetMeshRenderingLayer();
+	#else
+		res = GetMeshRenderingLightLayer();
+	#endif
+	
+	return res;
+}
+
+float3 GetAmbientColor(EffectsData data)
 {
 	float3 res = float3(0, 0, 0);
-	
-#ifdef _CUSTOM_AMBIENT_LIGHT_ON
-	res = ACCESS_PROP(_CustomAmbientColor).rgb;
+#if !defined(LIGHTMAP_ON)
+	#if defined(_CUSTOM_AMBIENT_LIGHT_ON)
+		res = ACCESS_PROP_FLOAT4(_CustomAmbientColor).rgb;
+	#else
+		#if defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2)
+			half3 bakedGI;
+			float4 probeOcclusion;
+			EvaluateAdaptiveProbeVolume(data.vertexWS.xyz, data.normalWS.xyz, data.viewDirWS.xyz,
+									  data.projPos.xy, AllIn1GetMeshRenderingLayer(), 
+									  bakedGI, probeOcclusion);
+			res = bakedGI;
+		#else
+			res = SampleSH(data.normalWS);
+		#endif
+	#endif
+
+#endif
+
+	return res;
+}
+
+AllIn1GI CalculateGI(float2 uvLightmap, EffectsData data)
+{
+	AllIn1GI res;
+	INIT_GI(res);
+
+#if defined(LIGHTMAP_ON)
+	res.diffuse = GetLightmap(uvLightmap, data);
 #else
-	res = SampleSH(normalWS.xyz);
+	res.diffuse = GetAmbientColor(data);
+#endif
+
+#if defined(SHADOWS_SHADOWMASK)
+	res.shadowMask = SAMPLE_TEXTURE2D(unity_ShadowMask, samplerunity_ShadowMask, uvLightmap);
 #endif
 
 	return res;
@@ -295,19 +384,106 @@ float GetFogFactor(float4 clipPos)
 	return res;
 }
 
+#if defined(FOG_ENABLED)
 float4 CustomMixFog(float fogFactor, float4 col)
 {
 	float4 res = col;
 	res.rgb = MixFog(res.rgb, fogFactor);
 	return res;
 }
+#endif
+
+void ConfigureDecalData(inout AllIn1DecalData allIn1Decal, float4 positionCS)
+{
+#if defined(_DBUFFER)
+	FETCH_DBUFFER(DBuffer, _DBufferTexture, int2(positionCS.xy));
+
+    DecalSurfaceData decalSurfaceData;
+    DECODE_FROM_DBUFFER(DBuffer, decalSurfaceData);
+
+	allIn1Decal.baseColor = decalSurfaceData.baseColor;
+	allIn1Decal.emissive = decalSurfaceData.emissive;
+	allIn1Decal.mask = step(0.1, allIn1Decal.baseColor.a);
+	allIn1Decal.mask = saturate(allIn1Decal.mask + decalSurfaceData.normalWS.w);
+	allIn1Decal.MAOSAlpha = decalSurfaceData.MAOSAlpha;
+	allIn1Decal.smoothness = decalSurfaceData.smoothness;
+	allIn1Decal.metallic = decalSurfaceData.metallic;
+
+	float4 normalTS = decalSurfaceData.normalWS; //Even if it's called normalWS, the content is a sampled normal map in tangent space
+
+	allIn1Decal.normalTS = lerp(normalTS, DEFAULT_NORMAL_MAP_VALUE, allIn1Decal.mask);
+	allIn1Decal.unpackedNormal = UnpackNormal(allIn1Decal.normalTS);
+#endif
+}
 
 #ifdef REFLECTIONS_ON
 
-float3 GetReflectionsSimple(float3 worldRefl, float cubeLod)
+float3 BoxProjection (
+	float3 direction, float3 position,
+	float4 cubemapPosition, float3 boxMin, float3 boxMax
+) {
+	#if UNITY_SPECCUBE_BOX_PROJECTION
+		UNITY_BRANCH
+		if (cubemapPosition.w > 0) {
+			float3 factors =
+				((direction > 0 ? boxMax : boxMin) - position) / direction;
+			float scalar = min(min(factors.x, factors.y), factors.z);
+			direction = direction * scalar + (position - cubemapPosition.xyz);
+		}
+	#endif
+	return direction;
+}
+
+float3 GetReflectionsSimple(float3 worldRefl, float cubeLod, float3 positionWS)
 {
-	float4 skyData = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, samplerunity_SpecCube0, worldRefl, cubeLod);
-	float3 res = DecodeHDREnvironment (skyData, unity_SpecCube0_HDR);
+	half probe0Volume = CalculateProbeVolumeSqrMagnitude(unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
+    half probe1Volume = CalculateProbeVolumeSqrMagnitude(unity_SpecCube1_BoxMin, unity_SpecCube1_BoxMax);
+
+    half volumeDiff = probe0Volume - probe1Volume;
+    float importanceSign = unity_SpecCube1_BoxMin.w;
+
+	float desiredWeightProbe0 = CalculateProbeWeight(positionWS, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
+    float desiredWeightProbe1 = CalculateProbeWeight(positionWS, unity_SpecCube1_BoxMin, unity_SpecCube1_BoxMax);
+
+	// A probe is dominant if its importance is higher
+    // Or have equal importance but smaller volume
+    bool probe0Dominant = importanceSign > 0.0f || (importanceSign == 0.0f && volumeDiff < -0.0001h);
+    bool probe1Dominant = importanceSign < 0.0f || (importanceSign == 0.0f && volumeDiff > 0.0001h);
+
+    float weightProbe0 = probe1Dominant ? min(desiredWeightProbe0, 1.0f - desiredWeightProbe1) : desiredWeightProbe0;
+    float weightProbe1 = probe0Dominant ? min(desiredWeightProbe1, 1.0f - desiredWeightProbe0) : desiredWeightProbe1;
+
+    float totalWeight = weightProbe0 + weightProbe1;
+
+    // If either probe 0 or probe 1 is dominant the sum of weights is guaranteed to be 1.
+    // If neither is dominant this is not guaranteed - only normalize weights if totalweight exceeds 1.
+    weightProbe0 /= max(totalWeight, 1.0f);
+    weightProbe1 /= max(totalWeight, 1.0f);
+
+	float3 res = 0;
+	if(weightProbe0 > 0.01)
+	{
+		float3 reflUV0 = BoxProjection(worldRefl, positionWS, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin.xyz, unity_SpecCube0_BoxMax.xyz);
+		float4 probe0HDR = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, samplerunity_SpecCube0, reflUV0, cubeLod);
+		float3 probe0 = DecodeHDREnvironment(probe0HDR, unity_SpecCube0_HDR);
+
+		res += weightProbe0 * probe0;
+	}
+	if(weightProbe1 > 0.01f) 
+	{
+		float3 reflUV1 = BoxProjection(worldRefl, positionWS, unity_SpecCube1_ProbePosition, unity_SpecCube1_BoxMin.xyz, unity_SpecCube1_BoxMax.xyz);
+		float4 probe1HDR = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube1, samplerunity_SpecCube0, reflUV1, cubeLod);
+		float3 probe1 = DecodeHDREnvironment(probe1HDR, unity_SpecCube1_HDR);
+
+		res += weightProbe1 * probe1;
+	}
+	if(totalWeight < 0.99)
+	{
+		float4 glossyEnvironmentHDR = SAMPLE_TEXTURECUBE_LOD(_GlossyEnvironmentCubeMap, sampler_GlossyEnvironmentCubeMap, worldRefl, cubeLod);
+		float3 glossyEnvironment = DecodeHDREnvironment(glossyEnvironmentHDR, _GlossyEnvironmentCubeMap_HDR);
+
+		res += (1.0f - totalWeight) * glossyEnvironment;
+	}
 
 	return res;
 }
@@ -423,18 +599,18 @@ float3 GetSkyColor(float3 positionWS, float2 normalizedScreenSpaceUV, float3 nor
 	#if USE_CLUSTER_LIGHT_LOOP && CLUSTER_HAS_REFLECTION_PROBES
 		res = GetReflectionsCluster(positionWS, normalizedScreenSpaceUV, worldRefl, cubeLod);
 	#else
-		res = GetReflectionsSimple(worldRefl, cubeLod);
+		res = GetReflectionsSimple(worldRefl, cubeLod, positionWS);
 	#endif
 #else
-	res = GetReflectionsSimple(worldRefl, cubeLod);
+	res = GetReflectionsSimple(worldRefl, cubeLod, positionWS);
 #endif
 
 #ifdef _REFLECTIONS_TOON
-	float posterizationLevel = lerp(2, 20, ACCESS_PROP(_ToonFactor));
+	float posterizationLevel = lerp(2, 20, ACCESS_PROP_FLOAT(_ToonFactor));
 	res = floor(res * posterizationLevel) / posterizationLevel;
 #endif
 
-	res *= ACCESS_PROP(_ReflectionsAtten);
+	res *= ACCESS_PROP_FLOAT(_ReflectionsAtten);
 
 	return res;
 }

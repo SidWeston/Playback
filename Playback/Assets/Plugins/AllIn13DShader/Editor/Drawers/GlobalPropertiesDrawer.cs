@@ -24,8 +24,18 @@ namespace AllIn13DShader
 			for (int i = 0; i < globalPropertiesIndices.Count; i++)
 			{
 				MaterialProperty matProperty = references.matProperties[globalPropertiesIndices[i]];
-				EffectPropertyDrawer.DrawProperty(matProperty, references);
+
+				EffectPropertyDrawer.DrawProperty(
+					materialProperty: matProperty,
+					labelPrefix: string.Empty,
+					displayName: matProperty.displayName,
+					customValue: string.Empty,
+					allowReset: true,
+					isKeywordProperty: false,
+					propertyType: EffectProperty.PropertyType.BASIC,
+					references: references);
 			}
+
 			EditorGUILayout.EndVertical();
 		}
 	}

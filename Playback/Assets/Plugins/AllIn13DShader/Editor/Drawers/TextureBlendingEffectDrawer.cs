@@ -29,7 +29,8 @@ namespace AllIn13DShader
 		private EffectProperty effectPropBlendingNormalMapB;
 		private EffectProperty effectPropBlendingNormalMapWhite;
 
-		public TextureBlendingEffectDrawer(EffectProperty mainNormalMapEffectProperty, AllIn13DShaderInspectorReferences references, PropertiesConfig propertiesConfig) : base(references, propertiesConfig)
+		public TextureBlendingEffectDrawer(EffectProperty mainNormalMapEffectProperty, AllIn13DShaderInspectorReferences references, 
+			PropertiesConfig propertiesConfig) : base(references, propertiesConfig)
 		{
 			this.drawerID = Constants.TEXTURE_BLENDING_EFFECT_DRAWER_ID;
 
@@ -84,8 +85,10 @@ namespace AllIn13DShader
 					materialProperty: references.matProperties[mainTexPropertyIndex],
 					labelPrefix: string.Empty,
 					displayName: $"{references.matProperties[mainTexPropertyIndex].displayName} (R)",
+					customValue: string.Empty,
 					allowReset: true,
 					isKeywordProperty: false,
+					propertyType: EffectProperty.PropertyType.BASIC,
 					references: references);
 
 				if (isNormalEnabled)
@@ -94,8 +97,10 @@ namespace AllIn13DShader
 						materialProperty: matPropertyMainNormalMap,
 						labelPrefix: string.Empty,
 						displayName: $"{matPropertyMainNormalMap.displayName} (R)",
+						customValue: string.Empty,
 						allowReset: true,
 						isKeywordProperty: false,
+						propertyType: EffectProperty.PropertyType.BASIC,
 						references: references);
 				}
 
@@ -127,8 +132,10 @@ namespace AllIn13DShader
 					materialProperty: references.matProperties[mainTexPropertyIndex],
 					labelPrefix: string.Empty,
 					displayName: $"{references.matProperties[mainTexPropertyIndex].displayName} (Black)",
+					customValue: string.Empty,
 					allowReset: true,
 					isKeywordProperty: false,
+					propertyType: EffectProperty.PropertyType.BASIC,
 					references: references);
 
 				if (isNormalEnabled)
@@ -137,8 +144,10 @@ namespace AllIn13DShader
 						materialProperty: matPropertyMainNormalMap,
 						labelPrefix: string.Empty,
 						displayName: $"{matPropertyMainNormalMap.displayName} (R)",
+						customValue: string.Empty,
 						allowReset: true,
 						isKeywordProperty: false,
+						propertyType: EffectProperty.PropertyType.BASIC,
 						references: references);
 				}
 

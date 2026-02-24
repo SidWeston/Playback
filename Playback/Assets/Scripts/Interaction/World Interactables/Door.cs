@@ -2,20 +2,38 @@ using UnityEngine;
 
 public class Door : ActivatableObject
 {
-    public Vector3 closedPos;
-    public Vector3 openPos;
+    [SerializeField] private Vector3 doorOpenOffset;
+    [SerializeField] private Vector3 doorRotOffset;
+    private Vector3 reverseDoorRot;
+
+    private Vector3 closedPos;
+    private Vector3 openPos;
+    private Quaternion closedRot;
+    private Quaternion openRot;
+
+    //only if the door mesh isnt on this object, i.e its on a child 
+    [SerializeField] private GameObject doorObj; 
 
     public float openTime = 1f;
-    private float t;
+    protected float t;
 
-    private bool open = false;
+    protected bool open = false;    
 
-    [SerializeField] private AudioSource audioSource;
+    [SerializeField] protected AudioSource audioSource;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        closedPos = transform.position;
+        if (!doorObj) doorObj = gameObject;        
+        reverseDoorRot = doorRotOffset * -1;
+
+        //setup positions and offsets
+        closedPos = transform.localPosition;
+        openPos = closedPos + doorOpenOffset;
+
+        closedRot = transform.localRotation;
+        openRot = closedRot * Quaternion.Euler(doorRotOffset);
+
         if(TryGetComponent(out AudioSource source))
         {
             audioSource = source;
@@ -41,14 +59,15 @@ public class Door : ActivatableObject
             }
         }
         t = Mathf.Clamp(t, 0, openTime);
-        transform.position = Vector3.Lerp(closedPos, openPos, t / openTime);
+        doorObj.transform.localPosition = Vector3.Lerp(closedPos, openPos, t / openTime);
+        doorObj.transform.localRotation = Quaternion.Lerp(closedRot, openRot, t / openTime);
     }
 
     public override void Activate(GameObject activator)
     {
         if(!open)
         {
-            open = true;
+            open = true;            
             if(audioSource) audioSource.Play();
         }
     }
@@ -65,5 +84,17 @@ public class Door : ActivatableObject
     private void SetAudioVolume(float volume)
     {
         audioSource.volume = volume;
+    }
+
+    public void SetOpenDirection(int direction)
+    {
+        if(direction == 1)
+        {
+            openRot = closedRot * Quaternion.Euler(doorRotOffset);
+        }
+        else if(direction == -1)
+        {
+            openRot = closedRot * Quaternion.Euler(reverseDoorRot);
+        }        
     }
 }

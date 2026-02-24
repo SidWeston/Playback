@@ -15,6 +15,7 @@ public class ProximityTrigger : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (!wallLight) return;
         wallLight.material = lightOff;
     }
 
@@ -28,7 +29,8 @@ public class ProximityTrigger : MonoBehaviour
     {
         if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
-            obj.Activate(gameObject);
+            obj.Activate(other.gameObject);
+            if (!wallLight) return;
             wallLight.material = lightOn;
         }
     }
@@ -40,6 +42,7 @@ public class ProximityTrigger : MonoBehaviour
         if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
             obj.Deactivate();
+            if (!wallLight) return;
             wallLight.material = lightOff;
         }
     }

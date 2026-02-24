@@ -6,5 +6,6 @@ namespace AllIn13DShader
 	{
 		public string groupID;
 		public string displayName;
+		public string libraryFileName;
 	}
 }

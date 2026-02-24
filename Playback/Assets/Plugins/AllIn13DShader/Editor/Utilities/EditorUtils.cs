@@ -13,7 +13,7 @@ namespace AllIn13DShader
 		{
 			T res = null;
 
-			string[] guids = AssetDatabase.FindAssets($"{assetName} t:{typeof(T).Name}");
+			string[] guids = AssetDatabase.FindAssets($"{assetName} t:{typeof(T).Name}"); 
 
 			if (guids.Length > 0)
 			{
@@ -396,6 +396,96 @@ namespace AllIn13DShader
 					break;
 				}
 			}
+
+			return res;
+		}
+
+		public static AllIn1ShaderPropertyType GetShaderTypeByMaterialProperty(MaterialProperty matProperty)
+		{
+			AllIn1ShaderPropertyType res;
+
+#if UNITY_6000_2_OR_NEWER
+			switch (matProperty.propertyType)
+			{
+				case UnityEngine.Rendering.ShaderPropertyType.Color:
+					res = AllIn1ShaderPropertyType.Color;
+					break;
+				case UnityEngine.Rendering.ShaderPropertyType.Float:
+					res = AllIn1ShaderPropertyType.Float;
+					break;
+				case UnityEngine.Rendering.ShaderPropertyType.Int:
+					res = AllIn1ShaderPropertyType.Int;
+					break;
+				case UnityEngine.Rendering.ShaderPropertyType.Range:
+					res = AllIn1ShaderPropertyType.Range;
+					break;
+				case UnityEngine.Rendering.ShaderPropertyType.Texture:
+					res = AllIn1ShaderPropertyType.Texture;
+					break;
+				case UnityEngine.Rendering.ShaderPropertyType.Vector:
+					res = AllIn1ShaderPropertyType.Vector;
+					break;
+				default:
+					res = AllIn1ShaderPropertyType.Vector;
+					break;
+			}
+#else
+			switch (matProperty.type)
+			{
+				case MaterialProperty.PropType.Color:
+					res = AllIn1ShaderPropertyType.Color;
+					break;
+				case MaterialProperty.PropType.Float:
+					res = AllIn1ShaderPropertyType.Float;
+					break;
+				case MaterialProperty.PropType.Int:
+					res = AllIn1ShaderPropertyType.Int;
+					break;
+				case MaterialProperty.PropType.Range:
+					res = AllIn1ShaderPropertyType.Range;
+					break;
+				case MaterialProperty.PropType.Texture:
+					res = AllIn1ShaderPropertyType.Texture;
+					break;
+				case MaterialProperty.PropType.Vector:
+					res = AllIn1ShaderPropertyType.Vector;
+					break;
+				default:
+					res = AllIn1ShaderPropertyType.Vector;
+					break;
+			}
+#endif
+			return res;
+
+		}
+
+		public static string ReadFileTextWithTabs(string path, int numTabs)
+		{
+			string res = string.Empty;
+
+			string[] allLines = File.ReadAllLines(path);
+
+			for (int i = 0; i < allLines.Length; i++)
+			{
+				string line = allLines[i];
+				for (int j = 0; j < numTabs; j++)
+				{
+					line = "\t" + line;
+				}
+				line += "\n";
+
+				res += line;
+			}
+
+			return res;
+		}
+
+		public static string UnifyEOL(string target)
+		{
+			string res = target;
+
+			res = res.Replace("\r\n", "\n");
+			res = res.Replace("\r", "\n");
 
 			return res;
 		}

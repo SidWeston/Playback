@@ -90,6 +90,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 66e52c3d6beda4989a507a521ac66048, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TerrainHolesTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -144,12 +148,13 @@ Material:
     - _Surface: 0
     - _UVSec: 0
     - _WorkflowMode: 1
+    - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     - _numSteps: 4
     - _value: 0
     m_Colors:
-    - _BaseColor: {r: 0.55294114, g: 0.1333333, b: 0.1333333, a: 1}
-    - _Color: {r: 0.55294114, g: 0.13333327, b: 0.13333327, a: 1}
+    - _BaseColor: {r: 0.55294114, g: 0.13333318, b: 0.13333318, a: 1}
+    - _Color: {r: 0.55294114, g: 0.13333315, b: 0.13333315, a: 1}
     - _Color2: {r: 1, g: 0.45588237, b: 0.45588237, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HighlightColor: {r: 0.8018868, g: 0.094562106, b: 0.21537162, a: 1}
@@ -157,7 +162,7 @@ Material:
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &235553039304594769
+--- !u!114 &106230321821400740
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -168,5 +173,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
   version: 10

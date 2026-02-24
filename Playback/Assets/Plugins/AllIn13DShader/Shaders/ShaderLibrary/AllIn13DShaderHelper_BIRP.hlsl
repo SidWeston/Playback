@@ -3,6 +3,14 @@
 
 #include "AutoLight.cginc"
 
+#define OBJECT_TO_WORLD_MATRIX unity_ObjectToWorld
+
+//#if !defined(LIGHTMAP_ON) && defined(SHADOWS_SCREEN)
+//	#if defined(SHADOWS_SHADOWMASK) && !defined(UNITY_NO_SCREENSPACE_SHADOWS)
+//		#define ADDITIONAL_MASKED_DIRECTIONAL_SHADOWS 1
+//	#endif
+//#endif
+
 #ifdef REQUIRE_SCENE_DEPTH
 
 	UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
@@ -54,9 +62,24 @@ float3 GetPositionWS(float4 positionOS)
 	return mul(unity_ObjectToWorld, positionOS).xyz;
 }
 
+float3 GetPositionOS(float4 positionWS)
+{
+	return mul(unity_WorldToObject, positionWS);
+}
+
 float3 GetDirWS(float4 dirOS)
 {
 	return mul(unity_ObjectToWorld, float4(dirOS.xyz, 0));
+}
+
+float3 GetDirOSFloat3(float3 dirOS)
+{
+	return mul(unity_WorldToObject, float4(dirOS.xyz, 0));
+}
+
+float3 GetDirOS(float4 dirOS)
+{
+	return mul(unity_WorldToObject, dirOS);
 }
 
 float3 GetMainLightDir(float3 vertexWS)
@@ -81,36 +104,44 @@ float3 GetMainLightColorRGB()
 	return res;
 }
 
-float2 GetSSAO(float2 normalizedScreenSpaceUV)
+float2 GetSSAO(float2 normalizedScreenSpaceUV, float alpha)
 {
 	float2 res = float2(1, 1);
 	return res;
 }
 
-//float FadeShadows (float3 worldPos, float shadowAtten) {
-//	float viewZ =
-//		dot(_WorldSpaceCameraPos.xyz - worldPos, UNITY_MATRIX_V[2].xyz);
-//	float shadowFadeDistance =
-//		UnityComputeShadowFadeDistance(worldPos, viewZ);
-//	float shadowFade = UnityComputeShadowFade(shadowFadeDistance);
-//	shadowAtten = saturate(shadowAtten + shadowFade);
+float FadeShadows (float3 worldPos, float shadowAtten, AllIn1GI gi) 
+{
+	float res = shadowAtten;
+#if defined(SHADOWS_SHADOWMASK)
+	float bakedAttenuation = UnitySampleBakedOcclusion(gi.uvLightmap, worldPos);
+	float zDist = dot(_WorldSpaceCameraPos.xyz - worldPos, UNITY_MATRIX_V[2].xyz);
+	float shadowFadeDistance = UnityComputeShadowFadeDistance(worldPos, zDist);
+	float shadowFade = UnityComputeShadowFade(shadowFadeDistance);
+	
+	res = UnityMixRealtimeAndBakedShadows(shadowAtten, bakedAttenuation, shadowFade);
+#endif
 
-//	return shadowAtten;
-//}
+	return res;
+}
 
-float GetShadowAttenuation(EffectsData effectsData)
+float GetShadowAttenuation(EffectsData effectsData, AllIn1GI gi)
 { 
 	float res = 1;
 
 #if !defined(_LIGHTMODEL_FASTLIGHTING)
 	UNITY_LIGHT_ATTENUATION(attenuation, effectsData, effectsData.vertexWS);
+	#if !defined(FORWARD_ADD_PASS)
+		attenuation = FadeShadows(effectsData.vertexWS, attenuation, gi);
+	#endif
+	
 	res = attenuation;
 #endif
-	//attenuation = FadeShadows(effectsData.vertexWS, attenuation);
+
 	return res;
 }
 
-AllIn1LightData GetPointLightData(float3 vertexWS, float3 normalWS, float3 lightPositionWS, float3 lightColor, float pointLightAtten, EffectsData effectsData)
+AllIn1LightData GetPointLightData(float3 vertexWS, float3 normalWS, float3 lightPositionWS, float3 lightColor, float pointLightAtten, EffectsData effectsData, AllIn1GI gi)
 {
 	AllIn1LightData lightData;
 
@@ -123,7 +154,7 @@ AllIn1LightData GetPointLightData(float3 vertexWS, float3 normalWS, float3 light
 	lightData.lightDir = lightDir;
 	
 #ifdef _RECEIVE_SHADOWS_ON
-	lightData.realtimeShadow = GetShadowAttenuation(effectsData);
+	lightData.realtimeShadow = GetShadowAttenuation(effectsData, gi);
 #else
 	lightData.realtimeShadow = 1.0;
 #endif
@@ -135,7 +166,7 @@ AllIn1LightData GetPointLightData(float3 vertexWS, float3 normalWS, float3 light
 	return lightData;
 }
 
-AllIn1LightData GetMainLightData(float3 vertexWS, EffectsData effectsData)
+AllIn1LightData GetMainLightData(float3 vertexWS, EffectsData effectsData, AllIn1GI gi)
 {
 	AllIn1LightData lightData;
 	
@@ -153,7 +184,10 @@ AllIn1LightData GetMainLightData(float3 vertexWS, EffectsData effectsData)
 			lightData.realtimeShadow = 1.0;
 		#else
 			#ifdef _RECEIVE_SHADOWS_ON
-			lightData.realtimeShadow = GetShadowAttenuation(effectsData);
+			lightData.realtimeShadow = GetShadowAttenuation(effectsData, gi);
+				#if defined(_RECEIVEDSHADOWSTYPE_STYLIZED) && !defined(FORWARD_ADD_PASS)
+					lightData.realtimeShadow = AntiAliasing(lightData.realtimeShadow, ACCESS_PROP_FLOAT(_ShadowCutoff));
+				#endif
 			#else
 			lightData.realtimeShadow = 1.0;
 			#endif
@@ -183,9 +217,9 @@ float3 GetPointLightPosition(int index)
 	return pointLightPosition;
 }
 
-AllIn1LightData GetPointLightData(int index, float3 vertexWS, float3 normalWS, EffectsData effectsData)
+AllIn1LightData GetPointLightData(int index, float3 vertexWS, float3 normalWS, EffectsData effectsData, AllIn1GI gi)
 {
-	return GetPointLightData(vertexWS, normalWS, GetPointLightPosition(index), unity_LightColor[index], unity_4LightAtten0[index], effectsData);
+	return GetPointLightData(vertexWS, normalWS, GetPointLightPosition(index), unity_LightColor[index], unity_4LightAtten0[index], effectsData, gi);
 }
 
 FragmentDataShadowCaster GetClipPosShadowCaster( /*VertexData v*/VertexData v, FragmentDataShadowCaster o)
@@ -229,14 +263,14 @@ FragmentDataShadowCaster GetClipPosShadowCaster( /*VertexData v*/VertexData v, F
 //	return attenuation;
 //}
 
-ShadowCoordStruct GetShadowCoords(VertexData v, float4 clipPos, float3 vertexWS)
+ShadowCoordStruct GetShadowCoords(VertexData v, float4 clipPos, float3 vertexWS, float2 uvLightmap)
 {
 	ShadowCoordStruct res;
 
 	res.pos = clipPos;
 	res._ShadowCoord = 0;
 	
-	UNITY_TRANSFER_SHADOW(res, float2(0, 0));
+	UNITY_TRANSFER_SHADOW(res, uvLightmap);
 	
 	return res;
 }
@@ -262,16 +296,36 @@ float3 GetLightmap(float2 uvLightmap, EffectsData data)
 	return res;
 }
 
-float3 GetAmbientColor(float4 normalWS)
+float3 GetAmbientColor(EffectsData data)
 {
 	float3 res = float3(0, 0, 0);
 
 #ifdef _CUSTOM_AMBIENT_LIGHT_ON
-	res = ACCESS_PROP(_CustomAmbientColor).rgb;
+	res = ACCESS_PROP_FLOAT4(_CustomAmbientColor).rgb;
 #else
-	res = ShadeSH9(normalWS);
+	res = ShadeSH9(float4(data.normalWS, 1.0));
 #endif
 	
+	return res;
+}
+
+AllIn1GI CalculateGI(float2 uvLightmap, EffectsData data)
+{
+	AllIn1GI res;
+	INIT_GI(res);
+
+#if defined(LIGHTMAP_ON)
+	res.diffuse = GetLightmap(uvLightmap, data);
+#else
+	res.diffuse = GetAmbientColor(data);
+#endif
+
+#if defined(SHADOWS_SHADOWMASK)
+	res.shadowMask = UnitySampleBakedOcclusion(uvLightmap, data.vertexWS);
+#endif
+
+	res.uvLightmap = uvLightmap;
+
 	return res;
 }
 
@@ -299,28 +353,75 @@ float GetFogFactor(float4 clipPos)
 	return res;
 }
 
+
+#if defined(FOG_ENABLED)
 float4 CustomMixFog(float fogFactor, float4 col)
 {
 	float4 res = col;
 	UNITY_APPLY_FOG(fogFactor, res);
 	return res;
 }
+#endif
 
 #ifdef REFLECTIONS_ON
 
+float3 BoxProjection (
+	float3 direction, float3 position,
+	float4 cubemapPosition, float3 boxMin, float3 boxMax
+) {
+	#if UNITY_SPECCUBE_BOX_PROJECTION
+		UNITY_BRANCH
+		if (cubemapPosition.w > 0) {
+			float3 factors =
+				((direction > 0 ? boxMax : boxMin) - position) / direction;
+			float scalar = min(min(factors.x, factors.y), factors.z);
+			direction = direction * scalar + (position - cubemapPosition);
+		}
+	#endif
+	return direction;
+}
 
-float3 GetSkyColor(float3 positionWS, float2 normalizedScreenSpaceUV, float3 normalWS, float3 viewDirWS, float cubeLod)
+float3 GetReflectionsSimple(float3 worldRefl, float cubeLod, float3 positionWS)
+{
+	float3 reflUV0 = BoxProjection(worldRefl, positionWS, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
+	float4 probe0HDR = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, reflUV0, cubeLod);
+	float3 probe0 = DecodeHDR(probe0HDR, unity_SpecCube0_HDR);
+
+
+	float3 res = probe0;
+#if UNITY_SPECCUBE_BLENDING
+	float interpolator = unity_SpecCube0_BoxMin.w;
+
+	if(interpolator < 0.99999)
+    {
+		float3 reflUV1 = BoxProjection(worldRefl, positionWS, unity_SpecCube1_ProbePosition, unity_SpecCube1_BoxMin, unity_SpecCube1_BoxMax);
+		float4 probe1HDR = UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(unity_SpecCube1, unity_SpecCube0, reflUV1, cubeLod);
+		float3 probe1 = DecodeHDR(probe1HDR, unity_SpecCube1_HDR);
+                    
+        res = lerp(probe1, probe0, interpolator);
+	}
+	else
+	{
+		res = probe0;
+	}
+#endif
+
+	return res;
+}
+
+float3 GetSkyColor(float3 positionWS, float2 normalizedScreenSpaceUV, 
+	float3 normalWS, float3 viewDirWS, float cubeLod)
 {
 	float3 worldRefl = normalize(reflect(-viewDirWS, normalWS));
-	float4 skyData = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, worldRefl, cubeLod);
-	float3 res = DecodeHDR (skyData, unity_SpecCube0_HDR);
+	
+	float3 res = GetReflectionsSimple(worldRefl, cubeLod, positionWS);
 
 #ifdef _REFLECTIONS_TOON
-	float posterizationLevel = lerp(2, 20, ACCESS_PROP(_ToonFactor));
+	float posterizationLevel = lerp(2, 20, ACCESS_PROP_FLOAT(_ToonFactor));
 	res = floor(res * posterizationLevel) / posterizationLevel;
 #endif
 
-	res *= ACCESS_PROP(_ReflectionsAtten);
+	res *= ACCESS_PROP_FLOAT(_ReflectionsAtten);
 
 	return res;
 }

@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ namespace AllIn13DShader
 
 		private int currTab = 0;
 		private string[] tabsNames;
+		private AssetWindowTabDrawer[] tabDrawers;
 
 		private CommonStyles commonStyles;
 		private GlobalConfiguration globalConfiguration;
@@ -25,6 +27,7 @@ namespace AllIn13DShader
 
 		private OverrideMaterialsTabDrawer overrideMaterialsTabDrawer;
 		private OtherTabDrawer otherTabDrawer;
+		private EffectsProfileTabDrawer effectsProfileTabDrawer;
 		private URPSettingsDrawer urpSettingsDrawer;
 
 
@@ -45,26 +48,54 @@ namespace AllIn13DShader
 			commonStyles = new CommonStyles();
 			globalConfiguration = EditorUtils.FindAssetByName<GlobalConfiguration>("GlobalConfiguration");
 
+			PropertiesConfigCollection propertiesConfigCollection = EditorUtils.FindAsset<ScriptableObject>("PropertiesConfigCollection") as PropertiesConfigCollection;
 
 			scrollPosition = Vector2.zero;
-
-#if ALLIN13DSHADER_URP
-			tabsNames = new string[] { "Save Paths", "Texture Editor", "Texture Creators", "Override Materials", "Other", "URP Settings"};
-#else
-			tabsNames = new string[] { "Save Paths", "Texture Editor", "Texture Creators", "Override Materials", "Other" };
-#endif
-
-			if (imageInspector == null)
-			{
-				imageInspector = AllIn13DShaderConfig.GetInspectorImage();
-			}
 
 			savePathsTabDrawer = new SavePathsTabDrawer(commonStyles, this);
 			textureEditorTabDrawer = new TextureEditorTabDrawer(commonStyles, this);
 			textureCreatorTabDrawer = new TextureCreatorTabDrawer(commonStyles, this);
 			overrideMaterialsTabDrawer = new OverrideMaterialsTabDrawer(commonStyles, this);
 			otherTabDrawer = new OtherTabDrawer(globalConfiguration, commonStyles, this);
+			effectsProfileTabDrawer = new EffectsProfileTabDrawer(propertiesConfigCollection.propertiesConfig, globalConfiguration, commonStyles, this);
 			urpSettingsDrawer = new URPSettingsDrawer(commonStyles, this);
+
+#if ALLIN13DSHADER_URP
+			tabDrawers = new AssetWindowTabDrawer[]
+			{
+				savePathsTabDrawer,
+				textureEditorTabDrawer,
+				textureCreatorTabDrawer,
+				overrideMaterialsTabDrawer,
+				effectsProfileTabDrawer,
+				otherTabDrawer,
+				urpSettingsDrawer
+			};
+
+#else
+			tabDrawers = new AssetWindowTabDrawer[]
+			{
+				savePathsTabDrawer,
+				textureEditorTabDrawer,
+				textureCreatorTabDrawer,
+				overrideMaterialsTabDrawer,
+				effectsProfileTabDrawer,
+				otherTabDrawer
+			};			
+#endif
+
+			tabsNames = new string[tabDrawers.Length];
+			for(int i = 0; i < tabsNames.Length; i++)
+			{
+				tabsNames[i] = tabDrawers[i].GetTabName();
+			}
+
+			if (imageInspector == null)
+			{
+				imageInspector = AllIn13DShaderConfig.GetInspectorImage();
+			}
+
+
 
 			currentTabDrawer = savePathsTabDrawer;
 
@@ -73,7 +104,7 @@ namespace AllIn13DShader
 
 		private void OnEnable()
 		{
-			Init();
+			Init(); 
 
 			EditorApplication.playModeStateChanged += PlayModeStateChanged;
 			currentTabDrawer.OnEnable();
@@ -147,30 +178,7 @@ namespace AllIn13DShader
 				else
 				{
 					int newTab = GUILayout.Toolbar(currTab, tabsNames);
-					AssetWindowTabDrawer newTabDrawer = null;
-					switch (newTab)
-					{
-						case 0:
-							newTabDrawer = savePathsTabDrawer;
-							break;
-						case 1:
-							newTabDrawer = textureEditorTabDrawer;
-							break;
-						case 2:
-							newTabDrawer = textureCreatorTabDrawer;
-							break;
-						case 3:
-							newTabDrawer = overrideMaterialsTabDrawer;
-							break;
-						case 4:
-							newTabDrawer = otherTabDrawer;
-							break;
-#if ALLIN13DSHADER_URP
-					case 5:
-						newTabDrawer = urpSettingsDrawer;
-						break;
-#endif
-					}
+					AssetWindowTabDrawer newTabDrawer = tabDrawers[newTab];
 
 					if (newTabDrawer != currentTabDrawer)
 					{

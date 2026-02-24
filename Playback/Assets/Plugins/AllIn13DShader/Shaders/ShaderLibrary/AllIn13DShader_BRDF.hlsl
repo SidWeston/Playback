@@ -17,6 +17,7 @@ struct BDRFPerLightData
 	float3 correctedLightColor;
 
 	float rawNdotL;
+	float correctedRawNdotL;
 	float NdotL;
 	float TdotL;
 	float BdotL;
@@ -205,13 +206,13 @@ float3 DiffuseTerm02(float NdotV, float NdotL, float LdotH, float perceptualRoug
 	return res;
 }
 
-float3 IndirectLighting(float3 albedo, float3 specularColor, float3 lightmap, BDRFCommonData commonData)
+float3 IndirectLighting(float3 albedo, float3 specularColor, EffectsData effectsData, BDRFCommonData commonData, AllIn1GI gi)
 {
 	float3 N = commonData.N;
 	float3 V = commonData.V;
 
-	float3 ambientColor = GetAmbientColor(float4(N,1));
-	float3 diffuse = (ambientColor + lightmap) * albedo;
+	//float3 ambientColor = GetAmbientColor(effectsData);
+	float3 diffuse = gi.diffuse * albedo;
 
 	float3 F = fresnelSchlickRoughness(commonData.NdotV, commonData.F0, commonData.roughness);
 	float3 kS = F;
@@ -219,8 +220,8 @@ float3 IndirectLighting(float3 albedo, float3 specularColor, float3 lightmap, BD
 #ifdef REFLECTIONS_ON
 	float3 specularIBL = SpecularIBL(commonData.positionWS, commonData.normalizedScreenSpaceUV, N, V, commonData.cubeLod);
 	
-	float reflectionLuminance = GetLuminance(float4(specularIBL, 1.0));
-	specularIBL = lerp(diffuse, specularIBL, smoothstep(0.0, 0.1, reflectionLuminance * (1 - commonData.roughness)));
+	//float reflectionLuminance = GetLuminance(float4(specularIBL, 1.0));
+	//specularIBL = lerp(diffuse, specularIBL, smoothstep(0.0, 0.1, reflectionLuminance * (1 - commonData.roughness)));
 	
 	//TODO: Intermediate _Metallic values looks weird
 	float F_factor = 1 - commonData.metallic;
@@ -247,23 +248,25 @@ float3 IndirectLighting(float3 albedo, float3 specularColor, float3 lightmap, BD
 float3 DirectDiffuse_PBR(float3 albedo, BDRFCommonData commonData, BDRFPerLightData perLightData, AllIn1LightData lightData)
 {	
 	float3 diffuseTerm = DiffuseTerm02(commonData.NdotV, perLightData.NdotL, perLightData.LdotH, commonData.roughness, albedo);
-
+	
+	float correctedNdotL = saturate(perLightData.correctedRawNdotL);
 	float3 directDiffuse = 0;
-#ifdef _LIGHTMODEL_CLASSIC
-	directDiffuse = diffuseTerm * perLightData.kD * perLightData.correctedLightColor * perLightData.NdotL;
-#elif _LIGHTMODEL_HALFLAMBERT
-	float halfLambertTerm = (perLightData.NdotL * ACCESS_PROP(_HalfLambertWrap)) + (1 - ACCESS_PROP(_HalfLambertWrap));
+#if defined(_LIGHTMODEL_CLASSIC)
+	directDiffuse = diffuseTerm * perLightData.kD * perLightData.correctedLightColor * correctedNdotL;
+#elif defined(_LIGHTMODEL_HALFLAMBERT)
+	float NdotL = saturate(perLightData.correctedRawNdotL);
+	float halfLambertTerm = (NdotL * ACCESS_PROP_FLOAT(_HalfLambertWrap)) + (1 - ACCESS_PROP_FLOAT(_HalfLambertWrap));
 	float halfLambertTerm_2 = halfLambertTerm * halfLambertTerm;
 	directDiffuse = diffuseTerm * halfLambertTerm_2 * perLightData.correctedLightColor;
-#elif _LIGHTMODEL_FAKEGI
-	float fakeGI = (perLightData.NdotL * ACCESS_PROP(_HardnessFakeGI)) + 1.0 - ACCESS_PROP(_HardnessFakeGI);
+#elif defined(_LIGHTMODEL_FAKEGI)
+	float fakeGI = (correctedNdotL * ACCESS_PROP_FLOAT(_HardnessFakeGI)) + 1.0 - ACCESS_PROP_FLOAT(_HardnessFakeGI);
 	directDiffuse = diffuseTerm * fakeGI * perLightData.correctedLightColor;
-#elif _LIGHTMODEL_TOON
-	directDiffuse = diffuseTerm * perLightData.kD * perLightData.correctedLightColor * perLightData.NdotL;
-	float toonFactor = smoothstep(ACCESS_PROP(_ToonCutoff), ACCESS_PROP(_ToonCutoff) + ACCESS_PROP(_ToonSmoothness), perLightData.NdotL);
+#elif defined(_LIGHTMODEL_TOON)
+	directDiffuse = diffuseTerm * perLightData.kD * perLightData.correctedLightColor * correctedNdotL;
+	float toonFactor = smoothstep(ACCESS_PROP_FLOAT(_ToonCutoff), ACCESS_PROP_FLOAT(_ToonCutoff) + ACCESS_PROP_FLOAT(_ToonSmoothness), correctedNdotL);
 	directDiffuse *= toonFactor;
-#elif _LIGHTMODEL_TOONRAMP
-	float3 rampLight = SAMPLE_TEX2D_LOD(_ToonRamp, float4((perLightData.rawNdotL * 0.5) + 0.5, 0, 0, 0)).rgb;
+#elif defined(_LIGHTMODEL_TOONRAMP)
+	float3 rampLight = SAMPLE_TEX2D_LOD(_ToonRamp, float4((perLightData.correctedRawNdotL * 0.5) + 0.5, 0, 0, 0)).rgb;
 	directDiffuse = diffuseTerm * perLightData.kD * perLightData.correctedLightColor * rampLight;
 	//float diffuseTermLuminance = GetLuminance(directDiffuse);
 	//directDiffuse = SAMPLE_TEX2D(_ToonRamp, float2(diffuseTermLuminance, diffuseTermLuminance)).rgb;
@@ -279,16 +282,16 @@ float3 DirectSpecular_PBR(float3 specularColor, BDRFCommonData commonData, BDRFP
 
 	//float4 specularMap = SAMPLE_TEX2D(_SpecularMap, commonData.mainUV);
 
-	#ifdef _SPECULARMODEL_CLASSIC
+	#if defined(_SPECULARMODEL_CLASSIC)
 		specularTerm = SpecularTerm(commonData.roughness_2, commonData.roughness, perLightData.F, perLightData.NdotH, commonData.NdotV, perLightData.NdotL, perLightData.VdotH);
-	#elif _SPECULARMODEL_TOON
+	#elif defined(_SPECULARMODEL_TOON)
 		specularTerm = SpecularTerm(commonData.roughness_2, commonData.roughness, perLightData.F, perLightData.NdotH, commonData.NdotV, perLightData.NdotL, perLightData.VdotH);
-		specularTerm = smoothstep(ACCESS_PROP(_SpecularToonCutoff), ACCESS_PROP(_SpecularToonCutoff) + ACCESS_PROP(_SpecularToonSmoothness), specularTerm);
+		specularTerm = smoothstep(ACCESS_PROP_FLOAT(_SpecularToonCutoff), ACCESS_PROP_FLOAT(_SpecularToonCutoff) + ACCESS_PROP_FLOAT(_SpecularToonSmoothness), specularTerm);
 	#elif defined(_SPECULARMODEL_ANISOTROPIC) || defined(_SPECULARMODEL_ANISOTROPICTOON)
 		//https://google.github.io/filament/Filament.html?utm_source=chatgpt.com#materialsystem/anisotropicmodel
-		float aniso = ACCESS_PROP(_Anisotropy);
-		float at = max((1 - ACCESS_PROP(_AnisoShininess)) * (1.0 + aniso), 0.001);
-		float ab = max((1 - ACCESS_PROP(_AnisoShininess)) * (1.0 - aniso), 0.001);
+		float aniso = ACCESS_PROP_FLOAT(_Anisotropy);
+		float at = max((1 - ACCESS_PROP_FLOAT(_AnisoShininess)) * (1.0 + aniso), 0.001);
+		float ab = max((1 - ACCESS_PROP_FLOAT(_AnisoShininess)) * (1.0 - aniso), 0.001);
 
 		specularTerm = SpecularAnisoTerm(at, ab, perLightData.F, 
 											perLightData.NdotH, commonData.NdotV, perLightData.NdotL, 
@@ -298,14 +301,14 @@ float3 DirectSpecular_PBR(float3 specularColor, BDRFCommonData commonData, BDRFP
 		specularTerm = saturate(specularTerm);
 
 		#if defined(_SPECULARMODEL_ANISOTROPICTOON)
-			float specularSmoothness = max(ACCESS_PROP(_SpecularToonSmoothness), 0.001);
-			specularTerm = smoothstep(ACCESS_PROP(_SpecularToonCutoff), ACCESS_PROP(_SpecularToonCutoff) + specularSmoothness, specularTerm);
+			float specularSmoothness = max(ACCESS_PROP_FLOAT(_SpecularToonSmoothness), 0.001);
+			specularTerm = smoothstep(ACCESS_PROP_FLOAT(_SpecularToonCutoff), ACCESS_PROP_FLOAT(_SpecularToonCutoff) + specularSmoothness, specularTerm);
 		#endif
 	#endif
 
 	specularTerm *= specularMap.r;
 
-	float3 directSpecular = specularTerm * specularColor * ACCESS_PROP(_SpecularAtten) * perLightData.correctedLightColor * perLightData.NdotL;
+	float3 directSpecular = specularTerm * specularColor * ACCESS_PROP_FLOAT(_SpecularAtten) * perLightData.correctedLightColor * perLightData.NdotL;
 	return directSpecular;
 }
 #endif
@@ -334,21 +337,21 @@ BDRFCommonData CreateCommonBDRFData(float3 albedo, EffectsData effectsData)
 	res.B = effectsData.bitangentWS;
 	res.V =  normalize(_WorldSpaceCameraPos.xyz - effectsData.vertexWS);
 
-	res.metallic = ACCESS_PROP(_Metallic);
+	res.metallic = effectsData.metallic;
+	float smoothness = effectsData.smoothness;
 #ifdef _METALLIC_MAP_ON
-	float metallicMapValue = SAMPLE_TEX2D(_MetallicMap, effectsData.mainUV).r;
+	float4 metallicMapColor = SAMPLE_TEX2D(_MetallicMap, effectsData.mainUV);
+
+	float metallicMapValue = metallicMapColor.r;
 	res.metallic *= metallicMapValue;
 	res.metallic = saturate(res.metallic);
-#endif
 
-	float smoothness = ACCESS_PROP(_Smoothness);
-#ifdef _GLOSS_MAP_ON
-	float glossMapValue = SAMPLE_TEX2D(_GlossMap, effectsData.mainUV).r;
+	float glossMapValue = metallicMapColor.a;
 	smoothness *= glossMapValue;
 	smoothness = saturate(smoothness);
 #endif
-	res.smoothness = lerp(0, 0.95, smoothness);
 
+	res.smoothness = lerp(0, 0.95, smoothness);
 
 	res.roughness = (1 - res.smoothness);
 	res.roughness_2 = res.roughness * res.roughness;
@@ -385,16 +388,18 @@ BDRFPerLightData CreatePerLightData(BDRFCommonData commonData, AllIn1LightData l
 	res.shadowColor = lightData.shadowColor.rgb;
 	res.correctedLightColor = lightData.lightColor.rgb * lightData.distanceAttenuation * lightData.shadowColor.rgb;
 
-#if !defined(FORWARD_ADD_PASS)
-	#if defined(_LIGHTMODEL_HALFLAMBERT) || defined(_LIGHTMODEL_FAKEGI) || defined(_LIGHTMODEL_TOONRAMP)
-		res.correctedLightColor = isAdditionalLight > 0 ? res.correctedLightColor : res.lightColor;
-	#endif
-#endif
-
 	res.H = normalize(commonData.V + res.L);
 
 	res.NdotH = max(dot(commonData.N, res.H), 0.0);
 	res.rawNdotL = dot(commonData.N, res.L);
+	res.correctedRawNdotL = res.rawNdotL;
+	#if !defined(FORWARD_ADD_PASS)
+		#if defined(_LIGHTMODEL_HALFLAMBERT) || defined(_LIGHTMODEL_FAKEGI) || defined(_LIGHTMODEL_TOONRAMP)
+			res.correctedLightColor = isAdditionalLight > 0 ? res.correctedLightColor : res.lightColor;
+			res.correctedRawNdotL = isAdditionalLight > 0 ? res.correctedRawNdotL : res.correctedRawNdotL * GetLuminance(lightData.shadowColor.rgb);
+		#endif
+	#endif
+
 	res.NdotL = max(res.rawNdotL, 0.0);
 	res.TdotL = max(dot(commonData.T, res.L), 0.0);
 	res.BdotL = max(dot(commonData.B, res.L), 0.0);
@@ -415,13 +420,13 @@ BDRFPerLightData CreatePerLightData(BDRFCommonData commonData, AllIn1LightData l
 	return res;
 }
 
-float3 CalculateLighting_PBR(float3 albedo, float3 lightmap, EffectsData effectsData)
+float3 CalculateLighting_PBR(float3 albedo, float alpha, EffectsData effectsData, AllIn1GI gi)
 {
 	BDRFCommonData commonData = CreateCommonBDRFData(albedo, effectsData);
 
 	float3 specularColor = lerp(1.0, albedo, commonData.metallic);
 
-	AllIn1LightData mainLightData = GetMainLightData(effectsData.vertexWS, effectsData);
+	AllIn1LightData mainLightData = GetMainLightData(effectsData.vertexWS, effectsData, gi);
 
 
 	float3 directLighting = albedo;
@@ -429,11 +434,12 @@ float3 CalculateLighting_PBR(float3 albedo, float3 lightmap, EffectsData effects
 
 
 #ifdef ALLIN1_USE_LIGHT_LAYERS
-	uint meshRenderingLayers = GetMeshRenderingLayer();
+	uint meshRenderingLayers = AllIn1GetMeshRenderingLayer();
+	directLighting = 0;
 	if (IsMatchingLightLayer(mainLightData.layerMask, meshRenderingLayers))
-	{ 
+	{
+		directLighting = albedo;
 #endif
-
 	BDRFPerLightData perLightData_mainLight = CreatePerLightData(commonData, mainLightData, 0.0);
 
 #ifdef SPECULAR_ON
@@ -446,12 +452,31 @@ float3 CalculateLighting_PBR(float3 albedo, float3 lightmap, EffectsData effects
 	}
 #endif
 
-#if defined(ADDITIONAL_LIGHT_LOOP)
+#if defined(ADDITIONAL_LIGHT_LOOP) && !defined(_LIGHTMODEL_FASTLIGHTING)
+	// Additional light loop for non-main directional lights. This block is specific to Forward+.
+	#if USE_CLUSTER_LIGHT_LOOP
+	UNITY_LOOP for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
+	{
+		AllIn1LightData additionalLightData = GetPointLightData(lightIndex, effectsData.vertexWS, effectsData.normalWS, effectsData, gi);
+		#ifdef ALLIN1_USE_LIGHT_LAYERS
+		if (IsMatchingLightLayer(additionalLightData.layerMask, meshRenderingLayers))
+		{
+		#endif
+			BDRFPerLightData perLightData_additionalLight = CreatePerLightData(commonData, additionalLightData, 1.0);
+			directLighting += DirectLighting_PBR(albedo, commonData, perLightData_additionalLight, additionalLightData, specularMap);
+		#ifdef ALLIN1_USE_LIGHT_LAYERS
+		}
+		#endif
+	}
+	#endif
+	
+	
 	uint numAdditionalLights = NUM_ADDITIONAL_LIGHTS;
 	LIGHT_LOOP_BEGIN_ALLIN13D(numAdditionalLights, effectsData)
-		AllIn1LightData additionalLightData = GetPointLightData(lightIndex, effectsData.vertexWS, effectsData.normalWS, effectsData);
+		AllIn1LightData additionalLightData = GetPointLightData(lightIndex, effectsData.vertexWS, effectsData.normalWS, effectsData, gi);
 	#ifdef ALLIN1_USE_LIGHT_LAYERS
-		uint meshRenderingLayers = GetMeshRenderingLayer();
+		
+		uint meshRenderingLayers = AllIn1GetMeshRenderingLayer();
 		if (IsMatchingLightLayer(additionalLightData.layerMask, meshRenderingLayers))
 		{ 
 	#endif
@@ -465,8 +490,8 @@ float3 CalculateLighting_PBR(float3 albedo, float3 lightmap, EffectsData effects
 	LIGHT_LOOP_END_ALLIN13D
 #endif
 	
-	float2 ssaoFactor = GetSSAO(effectsData.normalizedScreenSpaceUV.xy);
-
+	float2 ssaoFactor = GetSSAO(effectsData.normalizedScreenSpaceUV.xy, alpha);
+	
 	float3 res = directLighting * ssaoFactor.x;
 
 	
@@ -483,7 +508,7 @@ float3 CalculateLighting_PBR(float3 albedo, float3 lightmap, EffectsData effects
 		ao = GetAOMapTerm(effectsData.mainUV);
 	#endif
 
-	float3 indirectLighting = IndirectLighting(albedo, specularColor, lightmap, commonData);
+	float3 indirectLighting = IndirectLighting(albedo, specularColor, effectsData, commonData, gi);
 	res += (indirectLighting) * ao * ssaoFactor.y;
 #endif
 

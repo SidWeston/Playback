@@ -6,9 +6,9 @@ float3 VertexShake(float3 vertexPos, float3 shaderTime)
 {
 	float3 res = vertexPos;
     
-	float3 speedOffset = float3(1.0f, 1.13f, 1.07f) * ACCESS_PROP(_ShakeSpeedMult);
-	float3 displacement = sin(shaderTime.y * ACCESS_PROP(_ShakeSpeed).xyz * speedOffset) * ACCESS_PROP(_ShakeMaxDisplacement).xyz;
-	displacement *= ACCESS_PROP(_ShakeBlend);
+	float3 speedOffset = float3(1.0f, 1.13f, 1.07f) * ACCESS_PROP_FLOAT(_ShakeSpeedMult);
+	float3 displacement = sin(shaderTime.y * ACCESS_PROP_FLOAT4(_ShakeSpeed).xyz * speedOffset) * ACCESS_PROP_FLOAT4(_ShakeMaxDisplacement).xyz;
+	displacement *= ACCESS_PROP_FLOAT(_ShakeBlend);
     
 	res += displacement;
 
@@ -21,7 +21,7 @@ float3 VertexInflate(float3 vertexPos, float3 normalOS, float3 shaderTime)
 {
 	float3 res = vertexPos;
 
-	float inflateValue = lerp(ACCESS_PROP(_MinInflate), ACCESS_PROP(_MaxInflate), ACCESS_PROP(_InflateBlend));
+	float inflateValue = lerp(ACCESS_PROP_FLOAT(_MinInflate), ACCESS_PROP_FLOAT(_MaxInflate), ACCESS_PROP_FLOAT(_InflateBlend));
 	res += normalOS * inflateValue;
 	
 	return res;
@@ -38,12 +38,12 @@ float3 VertexDistortion(float3 vertexPos, float3 normalOS, float3 shaderTime)
 	float2 noiseUV = SIMPLE_CUSTOM_TRANSFORM_TEX(vertexPos.xy, _VertexDistortionNoiseTex);
 	float4 correctedNoiseUV = float4(noiseUV.x, noiseUV.y, 0, 0);
 	
-	correctedNoiseUV.x += frac(shaderTime.x * ACCESS_PROP(_VertexDistortionNoiseSpeed.x));
-	correctedNoiseUV.y += frac(shaderTime.x * ACCESS_PROP(_VertexDistortionNoiseSpeed.y));
+	correctedNoiseUV.x += frac(shaderTime.x * ACCESS_PROP_FLOAT(_VertexDistortionNoiseSpeedX));
+	correctedNoiseUV.y += frac(shaderTime.x * ACCESS_PROP_FLOAT(_VertexDistortionNoiseSpeedY));
 
 	noisePower = SAMPLE_TEX2D_LOD(_VertexDistortionNoiseTex, correctedNoiseUV).r;
 
-	res += normalOS * noisePower * ACCESS_PROP(_VertexDistortionAmount);
+	res += normalOS * noisePower * ACCESS_PROP_FLOAT(_VertexDistortionAmount);
 	
 	return res;
 }
@@ -52,8 +52,8 @@ float3 VertexDistortion(float3 vertexPos, float3 normalOS, float3 shaderTime)
 #ifdef _VOXELIZE_ON
 float3 VertexVoxel(float3 vertexPos)
 {
-	float3 voxelizedPosition = round(vertexPos * ACCESS_PROP(_VoxelSize)) / ACCESS_PROP(_VoxelSize);
-	return lerp(vertexPos, voxelizedPosition, ACCESS_PROP(_VoxelBlend));
+	float3 voxelizedPosition = round(vertexPos * ACCESS_PROP_FLOAT(_VoxelSize)) / ACCESS_PROP_FLOAT(_VoxelSize);
+	return lerp(vertexPos, voxelizedPosition, ACCESS_PROP_FLOAT(_VoxelBlend));
 }
 #endif
 
@@ -62,15 +62,16 @@ float3 Glitch(float3 vertexPos, float3 shaderTime)
 {
 	float3 res = vertexPos;
 
-	float3 glitchDir = mul((float3x3)unity_WorldToObject, ACCESS_PROP(_GlitchOffset));
-	float3 scale = float3(length(unity_ObjectToWorld[0].xyz),
-					length(unity_ObjectToWorld[1].xyz),
-					length(unity_ObjectToWorld[2].xyz));
-	float pos = ACCESS_PROP(_GlitchWorldSpace) ? mul(unity_ObjectToWorld, float4(vertexPos, 1.0)).y : vertexPos.y;
-	float time = shaderTime.y * ACCESS_PROP(_GlitchSpeed);
+	float3 glitchDir = GetDirOSFloat3(ACCESS_PROP_FLOAT3(_GlitchOffset));
+
+	float3 scale = float3(length(OBJECT_TO_WORLD_MATRIX[0].xyz),
+					length(OBJECT_TO_WORLD_MATRIX[1].xyz),
+					length(OBJECT_TO_WORLD_MATRIX[2].xyz));
+	float pos = ACCESS_PROP_FLOAT(_GlitchWorldSpace) ? mul(OBJECT_TO_WORLD_MATRIX, float4(vertexPos, 1.0)).y : vertexPos.y;
+	float time = shaderTime.y * ACCESS_PROP_FLOAT(_GlitchSpeed);
 	
 	// Add high frequency noise to the main UV
-    float2 glitchUV = float2(pos * ACCESS_PROP(_GlitchTiling) + time, time * 0.89);
+    float2 glitchUV = float2(pos * ACCESS_PROP_FLOAT(_GlitchTiling) + time, time * 0.89);
     float mainNoise = noise2D(glitchUV);
     float fastNoise = noise2D(glitchUV * 2.5 + float2(time * 3.7, 0));
     mainNoise = mainNoise * 0.6 + fastNoise * 0.4;
@@ -83,7 +84,7 @@ float3 Glitch(float3 vertexPos, float3 shaderTime)
     float glitchValue = (2.0 * mainNoise - 1.0) * periodicNoise;
     glitchValue += glitchValue * lerp(0, saturate(2.0 * detailNoise - 1.0), 2.0);
 
-	res += (glitchDir / scale) * glitchValue * ACCESS_PROP(_GlitchAmount);
+	res += (glitchDir / scale) * glitchValue * ACCESS_PROP_FLOAT(_GlitchAmount);
 
 	return res;
 }
@@ -103,7 +104,7 @@ float3 Wind(float3 vertexPos, float3 shaderTime)
 
 	float windMask = 1.0;
 	#ifdef _USE_WIND_VERTICAL_MASK
-	windMask = RemapFloat(vertexPos.y, ACCESS_PROP(_WindVerticalMaskMinY), ACCESS_PROP(_WindVerticalMaskMaxY), 0, 1);
+	windMask = RemapFloat(vertexPos.y, ACCESS_PROP_FLOAT(_WindVerticalMaskMinY), ACCESS_PROP_FLOAT(_WindVerticalMaskMaxY), 0, 1);
 	#endif
 
 	float3 vertexWS = GetPositionWS(float4(vertexPos, 1.0));
@@ -121,14 +122,15 @@ float3 Wind(float3 vertexPos, float3 shaderTime)
 	}
 
 	float3 windDisplacement = windNoise * global_windForce * windMask * global_windDir;
-	windDisplacement = lerp(0, windDisplacement, ACCESS_PROP(_WindAttenuation));
+	windDisplacement = lerp(0, windDisplacement, ACCESS_PROP_FLOAT(_WindAttenuation));
 
 	windDisplacement.y = 0;
 	
+	float3 positionWS = GetPositionWS(float4(res, 1.0));
+	positionWS += windDisplacement;
 	
+	res = GetPositionOS(float4(positionWS, 1.0));
 	
-	res += windDisplacement;
-
 	return res;
 }
 #endif

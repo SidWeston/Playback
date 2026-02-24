@@ -5,6 +5,8 @@ namespace AllIn13DShader
 {
 	public class OtherTabDrawer : AssetWindowTabDrawer
 	{
+		private const string TAB_NAME = "Other";
+
 		private GlobalConfiguration globalConfiguration;
 
 		public OtherTabDrawer(GlobalConfiguration globalConfiguration, CommonStyles commonStyles, AllIn13DShaderWindow parentWindow) : base(commonStyles, parentWindow)
@@ -83,6 +85,11 @@ namespace AllIn13DShader
 			}
 
 			EditorGUILayout.LabelField("The asset uses auto generated cached data to display the properties of the Material inspector\nYou should never need this button", commonStyles.wordWrappedStyle);
+		}
+
+		public override string GetTabName()
+		{
+			return TAB_NAME;
 		}
 	}
 }

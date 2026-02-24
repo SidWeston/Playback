@@ -2,6 +2,8 @@ namespace AllIn13DShader
 {
 	public class TextureCreatorTabDrawer : AssetWindowTabDrawer
 	{
+		private const string TAB_NAME = "Texture Creators";
+
 		private NormalMapCreatorTool normalMapCreatorTool;
 		private NormalMapCreatorDrawer normalMapCreatorDrawer;
 
@@ -13,6 +15,9 @@ namespace AllIn13DShader
 
 		private NoiseCreatorTool noiseCreatorTool;
 		private NoiseCreatorDrawer noiseCreatorDrawer;
+
+		private RGBAPackerTool rgbaPackerTool;
+		private RGBAPackerDrawer rgbaPackerDrawer;
 
 		public TextureCreatorTabDrawer(CommonStyles commonStyles, AllIn13DShaderWindow parentWindow) : base(commonStyles, parentWindow)
 		{
@@ -32,6 +37,9 @@ namespace AllIn13DShader
 
 			noiseCreatorTool = new NoiseCreatorTool();
 			noiseCreatorDrawer = new NoiseCreatorDrawer(noiseCreatorTool, commonStyles);
+
+			rgbaPackerTool = new RGBAPackerTool();
+			rgbaPackerDrawer = new RGBAPackerDrawer(rgbaPackerTool, commonStyles);
 		}
 
 		public override void OnEnable()
@@ -74,11 +82,20 @@ namespace AllIn13DShader
 			EditorUtils.DrawThinLine();
 
 			noiseCreatorDrawer.Draw();
+
+			EditorUtils.DrawThinLine();
+
+			rgbaPackerDrawer.Draw();
 		}
 
 		private void Repaint()
 		{
 			parentWindow.Repaint();
+		}
+
+		public override string GetTabName()
+		{
+			return TAB_NAME;
 		}
 	}
 }

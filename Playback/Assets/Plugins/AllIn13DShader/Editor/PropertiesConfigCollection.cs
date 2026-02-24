@@ -5,30 +5,18 @@ namespace AllIn13DShader
 {
 	public class PropertiesConfigCollection : ScriptableObject
 	{
-		public PropertiesConfig[] shaderPropertiesConfig;
-
+		public PropertiesConfig propertiesConfig;
+		
 		public void AddConfig(PropertiesConfig config)
 		{
-			if (shaderPropertiesConfig == null)
-			{
-				shaderPropertiesConfig = new PropertiesConfig[0];
-			}
-
-			ArrayUtility.Add(ref shaderPropertiesConfig, config);
+			this.propertiesConfig = config;
 		}
 
 		public PropertiesConfig FindPropertiesConfigByShader(Shader shader)
 		{
 			PropertiesConfig res = null;
 
-			for (int i = 0; i < shaderPropertiesConfig.Length; i++)
-			{
-				if (shaderPropertiesConfig[i].shader == shader)
-				{
-					res = shaderPropertiesConfig[i];
-					break;
-				}
-			}
+			res = propertiesConfig;
 
 			return res;
 		}
@@ -37,20 +25,9 @@ namespace AllIn13DShader
 		{
 			bool res = false;
 
-			for (int i = 0; i < shaderPropertiesConfig.Length; i++)
-			{
-				if (shaderPropertiesConfig[i].shader == mat.shader)
-				{
-					res = true;
-				}
-			}
+			res = mat.shader.name.Contains("AllIn13DShader");
 
 			return res;
-		}
-
-		public void Clear()
-		{
-			ArrayUtility.Clear(ref shaderPropertiesConfig);
 		}
 	}
 }

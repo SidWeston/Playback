@@ -74,3 +74,9 @@ MonoBehaviour:
     - message: "*You need to use WindController.cs component\n in order to use this
         effect."
       keywords: []
+  - effectID: RECEIVE_SHADOWS
+    docURL: https://seasidestudios.gitbook.io/seaside-studios/3d-shader/receive-shadows-and-stylized-shadows
+    customMessages:
+    - message: "*Additional lights will not be \naffected by this effect"
+      keywords:
+      - _RECEIVEDSHADOWSTYPE_STYLIZED

@@ -124,7 +124,8 @@ namespace AllIn13DShader
 				Material currMaterial = allIn13DShaderComponent.currMaterial;
 				if (currMaterial == null || !propertiesConfigCollection.IsAllIn3DShaderMaterial(currMaterial))
 				{
-					Shader shader = propertiesConfigCollection.shaderPropertiesConfig[0].shader;
+					Shader shader = GlobalConfiguration.instance.shStandard;
+					//Shader shader = propertiesConfigCollection.shaderPropertiesConfig[0].shader;
 
 					Material oldMaterial = allIn13DShaderComponent.currMaterial;
 					allIn13DShaderComponent.NewCleanMaterial(shader, globalConfiguration.defaultPreset);
@@ -166,8 +167,9 @@ namespace AllIn13DShader
 			for (int i = 0; i < targets.Length; i++)
 			{
 				AllIn13DShaderComponent allIn13DShaderComponent = (AllIn13DShaderComponent)targets[i];
-				
-				Shader shader = propertiesConfigCollection.shaderPropertiesConfig[0].shader;
+
+				Shader shader = GlobalConfiguration.instance.shStandard;
+				//Shader shader = propertiesConfigCollection.shaderPropertiesConfig[0].shader;
 				allIn13DShaderComponent.NewCleanMaterial(shader, globalConfiguration.defaultPreset);
 			}
 		}

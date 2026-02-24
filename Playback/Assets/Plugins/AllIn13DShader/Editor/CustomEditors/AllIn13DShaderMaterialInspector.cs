@@ -1,13 +1,13 @@
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
-namespace AllIn13DShader
+namespace AllIn13DShader 
 {
 	[CanEditMultipleObjects]
 	public class AllIn13DShaderMaterialInspector : ShaderGUI
 	{
 		private PropertiesConfigCollection propertiesConfigCollection;
+		
 		private PropertiesConfig currentPropertiesConfig;
 
 		private AllIn13DShaderInspectorReferences inspectorReferences;
@@ -23,7 +23,6 @@ namespace AllIn13DShader
 		private MaterialProperty matPropertyZWrite;
 		
 		private int lastRenderQueue;
-		private float lasTimeRebuilt;
 
 		private static CommonStyles commonStyles;
 
@@ -59,8 +58,6 @@ namespace AllIn13DShader
 				}
 
 				RefreshPropertiesConfig();
-
-				lasTimeRebuilt = (float)EditorApplication.timeSinceStartup;
 			}
 
 			if (blendingModeCollection == null)
@@ -100,7 +97,12 @@ namespace AllIn13DShader
 
 		private void CreateDrawers()
 		{
-			if (drawers == null)
+			if (propertiesConfigCollection == null || 
+				currentPropertiesConfig == null ||
+				inspectorReferences == null ||
+				drawers == null ||
+				globalPropertiesDrawer == null ||
+				advancedPropertiesDrawer == null)
 			{
 				drawers = new AbstractEffectDrawer[0];
 
@@ -173,12 +175,6 @@ namespace AllIn13DShader
 
 		public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties)
 		{
-			if (lasTimeRebuilt <= EditorPrefs.GetFloat(Constants.LAST_TIME_SHADER_PROPERTIES_REBUILT_KEY, float.MaxValue))
-			{
-				ResetReferences();
-				lasTimeRebuilt = (float)EditorApplication.timeSinceStartup;
-			}
-
 			if (inspectorReferences != null && drawers != null)
 			{
 				inspectorReferences.Setup(materialEditor, properties);
@@ -210,7 +206,7 @@ namespace AllIn13DShader
 			EditorGUI.EndDisabledGroup();
 #endif
 
-
+			CheckLightmapFlags();
 			bool shaderChanged = false;
 			for (int i = 0; i < inspectorReferences.targetMatInfos.Length; i++)
 			{
@@ -218,8 +214,45 @@ namespace AllIn13DShader
 
 				lastRenderQueue = targetMat.renderQueue;
 
-				CheckPasses(targetMat);
-				shaderChanged = shaderChanged || MaterialUtils.CheckMaterialShader(targetMat);
+				if (!inspectorReferences.targetMatInfos[i].IsShaderVariant())
+				{
+					shaderChanged = shaderChanged || MaterialUtils.CheckMaterialShader(targetMat);
+				}
+			}
+
+
+
+			EditorGUILayout.Separator();
+			EditorUtils.DrawLine(Color.grey, 1, 3);
+
+			if (inspectorReferences.AreAllMaterialsShaderGeneric())
+			{
+				if (GUILayout.Button("Bake Shader Keywords"))
+				{
+					for (int i = 0; i < inspectorReferences.targetMatInfos.Length; i++)
+					{
+						string variantName = Selection.objects[i].name;
+						Shader newShader = ShaderVariantCreator.CreateVariantByMaterialInfo(currentPropertiesConfig, inspectorReferences.targetMatInfos[i], variantName);
+						inspectorReferences.targetMatInfos[i].mat.shader = newShader;
+					}
+					//Shader newShader = ShaderVariantCreator.CreateVariantByMaterialInfo(currentPropertiesConfig, inspectorReferences.targetMatInfos[0], variantName);
+					//materialEditor.SetShader(newShader);
+
+					shaderChanged = true;
+				}
+			}
+			else
+			{
+				if (GUILayout.Button("Revert To Generic Shader"))
+				{
+					Shader currentShader = inspectorReferences.GetShader();
+					GlobalConfiguration.instance.effectsProfileCollection.RemoveEffectsProfileByShader(currentShader);
+
+					Shader newShader = Shader.Find(Constants.SHADER_FULL_NAME_ALLIN13D);
+					materialEditor.SetShader(newShader);
+
+					shaderChanged = true;
+				}
 			}
 
 			if (shaderChanged)
@@ -228,17 +261,17 @@ namespace AllIn13DShader
 			}
 		}
 
-		private void CheckPasses(Material targetMat)
-		{
-			if (targetMat.IsKeywordEnabled("_LIGHTMODEL_FASTLIGHTING") || targetMat.IsKeywordEnabled("_LIGHTMODEL_NONE"))
-			{
-				targetMat.SetShaderPassEnabled("ForwardAdd", false);
-			}
-			else
-			{
-				targetMat.SetShaderPassEnabled("ForwardAdd", true);
-			}
-		}
+		//private void CheckPasses(Material targetMat)
+		//{
+		//	if (targetMat.IsKeywordEnabled("_LIGHTMODEL_FASTLIGHTING") || targetMat.IsKeywordEnabled("_LIGHTMODEL_NONE"))
+		//	{
+		//		targetMat.SetShaderPassEnabled("ForwardAdd", false);
+		//	}
+		//	else
+		//	{
+		//		targetMat.SetShaderPassEnabled("ForwardAdd", true);
+		//	}
+		//}
 
 		private void DrawPresetsTabs()
 		{
@@ -276,7 +309,11 @@ namespace AllIn13DShader
 
 		private void DrawAdvancedProperties()
 		{
-			advancedPropertiesDrawer.Draw();
+			//Security check
+			if (advancedPropertiesDrawer != null)
+			{
+				advancedPropertiesDrawer.Draw();
+			}
 		}
 
 		private void DrawGlobalProperties()
@@ -308,6 +345,24 @@ namespace AllIn13DShader
 			}
 		}
 
+		private void CheckLightmapFlags()
+		{
+			for (int i = 0; i < inspectorReferences.targetMatInfos.Length; i++)
+			{
+				AbstractMaterialInfo matInfo = inspectorReferences.targetMatInfos[i];
+				AllIn13DEffectConfig emissionEffectConfig = propertiesConfigCollection.propertiesConfig.FindEffectConfigByID(Constants.EFFECT_ID_EMISSION);
+				bool emissionEnabled = AllIn13DEffectConfig.IsEffectEnabled(emissionEffectConfig, matInfo);
+				if (emissionEnabled)
+				{
+					matInfo.mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+				}
+				else
+				{
+					matInfo.mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+				}
+			}
+		}
+
 		private void ApplyMaterialPreset(Material targetMat, BlendingMode previousPresset, BlendingMode newPreset)
 		{
 			matPropertyBlendSrc.floatValue = (float)newPreset.blendSrc;
@@ -327,7 +382,7 @@ namespace AllIn13DShader
 
 					for(int matIdx = 0; matIdx < inspectorReferences.targetMatInfos.Length; matIdx++)
 					{
-						MaterialInfo matInfo = inspectorReferences.targetMatInfos[matIdx];
+						AbstractMaterialInfo matInfo = inspectorReferences.targetMatInfos[matIdx];
 						AllIn13DEffectConfig.DisableEffectToggle(effectConfig, inspectorReferences, matInfo);
 					}
 				}
@@ -335,14 +390,23 @@ namespace AllIn13DShader
 
 			if (newPreset.defaultEnabledEffects != null)
 			{
-				for (int i = 0; i < newPreset.defaultEnabledEffects.Length; i++)
+				for (int matIdx = 0; matIdx < inspectorReferences.targetMatInfos.Length; matIdx++)
 				{
-					string effectID = newPreset.defaultEnabledEffects[i];
-					AllIn13DEffectConfig effectConfig = currentPropertiesConfig.FindEffectConfigByID(effectID);
+					AbstractMaterialInfo matInfo = inspectorReferences.targetMatInfos[matIdx];
 
-					for (int matIdx = 0; matIdx < inspectorReferences.targetMatInfos.Length; matIdx++)
+					if (newPreset.isTransparent)
 					{
-						MaterialInfo matInfo = inspectorReferences.targetMatInfos[matIdx];
+						matInfo.EnableKeyword(Constants.KEYWORD_ALLIN13D_SURFACE_TRANSPARENT);
+					}
+					else
+					{
+						matInfo.DisableKeyword(Constants.KEYWORD_ALLIN13D_SURFACE_TRANSPARENT);
+					}
+
+					for (int i = 0; i < newPreset.defaultEnabledEffects.Length; i++)
+					{
+						string effectID = newPreset.defaultEnabledEffects[i];
+						AllIn13DEffectConfig effectConfig = currentPropertiesConfig.FindEffectConfigByID(effectID);
 						AllIn13DEffectConfig.EnableEffectToggle(effectConfig, inspectorReferences, matInfo);
 					}
 				}

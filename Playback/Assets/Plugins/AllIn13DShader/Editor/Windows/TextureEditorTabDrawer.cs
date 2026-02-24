@@ -5,6 +5,8 @@ namespace AllIn13DShader
 {
 	public class TextureEditorTabDrawer : AssetWindowTabDrawer
 	{
+		private const string TAB_NAME = "Texture Editor";
+
 		private TextureEditorTool textureEditorTool;
 		private TextureEditorValuesDrawer textureEditorValuesDrawer;
 
@@ -61,6 +63,11 @@ namespace AllIn13DShader
 			{
 				GUILayout.Label("Please select an Image to Edit above", EditorStyles.boldLabel);
 			}
+		}
+
+		public override string GetTabName()
+		{
+			return TAB_NAME;
 		}
 	}
 }

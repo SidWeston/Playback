@@ -8,6 +8,7 @@ namespace AllIn13DShader
 		public List<string> keywords;
 		public List<string> incompatibleWithKws;
 		public List<string> propertyKeywords;
+		public List<string> keywordsDisplayNames;
 		public bool allowReset;
 		public KeywordsOp keywordsOp;
 		
@@ -17,6 +18,7 @@ namespace AllIn13DShader
 			keywords = new List<string>();
 			incompatibleWithKws = new List<string>();
 			propertyKeywords = new List<string>();
+			keywordsDisplayNames = new List<string>();
 			allowReset = true;
 			keywordsOp = KeywordsOp.OR;
 		}

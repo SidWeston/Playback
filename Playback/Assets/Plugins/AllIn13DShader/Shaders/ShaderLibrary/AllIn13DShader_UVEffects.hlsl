@@ -2,33 +2,38 @@
 #define ALLIN13DSHADER_UV_EFFECTS
 
 #ifdef _SCROLL_TEXTURE_ON
+//<EffectsCode id=SCROLL_TEXTURE>
 float2 ScrollTexture(float2 inputUV, float3 shaderTime)
 {
 	float2 res = inputUV;
 
-	res.x += frac(shaderTime.x * ACCESS_PROP(_ScrollTextureX)); 
-	res.y += frac(shaderTime.x * ACCESS_PROP(_ScrollTextureY));
+	res.x += (shaderTime.x * ACCESS_PROP_FLOAT(_ScrollTextureX)) % 1;
+	res.y += (shaderTime.x * ACCESS_PROP_FLOAT(_ScrollTextureY)) % 1;
 
 	return res;
 }
+//</EffectsCode>
 #endif
 
 #ifdef _WAVE_UV_ON
+//<EffectsCode id=WAVE_UV, initial_param_name=initialValue, return_type=float2>
+//<Replace from=res.mainUV to=initialValue>
 EffectsData WaveUV(EffectsData data)
 {
 	EffectsData res = data;
 
-	float2 uvWaveDiff = float2(ACCESS_PROP(_WaveX) * ACCESS_PROP(_MainTex_ST).x, ACCESS_PROP(_WaveY) * ACCESS_PROP(_MainTex_ST).y) - res.mainUV;
+	float2 uvWaveDiff = float2(ACCESS_PROP_FLOAT(_WaveX) * ACCESS_PROP_FLOAT4(_MainTex_ST).x, ACCESS_PROP_FLOAT(_WaveY) * ACCESS_PROP_FLOAT4(_MainTex_ST).y) - res.mainUV;
 	
 	uvWaveDiff.x *= _ScreenParams.x / _ScreenParams.y;
 	float waveTime = data.shaderTime.y;
-	float angWave = (sqrt(dot(uvWaveDiff, uvWaveDiff)) * ACCESS_PROP(_WaveAmount)) - ((waveTime *  ACCESS_PROP(_WaveSpeed) % 360.0));
+	float angWave = (sqrt(dot(uvWaveDiff, uvWaveDiff)) * ACCESS_PROP_FLOAT(_WaveAmount)) - ((waveTime *  ACCESS_PROP_FLOAT(_WaveSpeed) % 360.0));
 
-	uvWaveDiff = normalize(uvWaveDiff) * sin(angWave) * (ACCESS_PROP(_WaveStrength) / 1000.0);
+	uvWaveDiff = normalize(uvWaveDiff) * sin(angWave) * (ACCESS_PROP_FLOAT(_WaveStrength) / 1000.0);
 	DISPLACE_ALL_UVS(res, uvWaveDiff);
 
 	return res;
 }
+//</EffectsCode>
 #endif
 
 #ifdef _SCREEN_SPACE_UV_ON
@@ -55,25 +60,27 @@ float2 ScreenSpaceUV(float2 inputUV, float3 vertexWS, float4 projPos)
 	float2 stableUVs = (screenUV - pivotCS.xy + 0.5) * -positionVS.z;
 	stableUVs *= 0.1;
 	
-	res = lerp(screenUV, stableUVs, ACCESS_PROP(_ScaleWithCameraDistance));
+	res = lerp(screenUV, stableUVs, ACCESS_PROP_FLOAT(_ScaleWithCameraDistance));
 	return res;
 }
 #endif
 
 #ifdef _HAND_DRAWN_ON
+//<EffectsCode id=HAND_DRAWN>
 float2 HandDrawn(float2 inputUV, float3 shaderTime)
 {
 	float2 uvCopy = inputUV;
 	float2 res = inputUV;
 
 
-	float drawnSpeed = (floor(frac(shaderTime.x) * 20 * ACCESS_PROP(_HandDrawnSpeed)) / ACCESS_PROP(_HandDrawnSpeed)) * ACCESS_PROP(_HandDrawnSpeed);
-	uvCopy.x = sin((uvCopy.x * ACCESS_PROP(_HandDrawnAmount) + drawnSpeed) * 4);
-	uvCopy.y = cos((uvCopy.y * ACCESS_PROP(_HandDrawnAmount) + drawnSpeed) * 4);
-	res = lerp(res, res + uvCopy, 0.0005 * ACCESS_PROP(_HandDrawnAmount));
+	float drawnSpeed = (floor(frac(shaderTime.x) * 20 * ACCESS_PROP_FLOAT(_HandDrawnSpeed)) / ACCESS_PROP_FLOAT(_HandDrawnSpeed)) * ACCESS_PROP_FLOAT(_HandDrawnSpeed);
+	uvCopy.x = sin((uvCopy.x * ACCESS_PROP_FLOAT(_HandDrawnAmount) + drawnSpeed) * 4);
+	uvCopy.y = cos((uvCopy.y * ACCESS_PROP_FLOAT(_HandDrawnAmount) + drawnSpeed) * 4);
+	res = lerp(res, res + uvCopy, 0.0005 * ACCESS_PROP_FLOAT(_HandDrawnAmount));
 	
 	return res;
 }
+//</EffectsCode>
 #endif
 
 
@@ -94,18 +101,22 @@ EffectsData TriplanarMapping(EffectsData input)
 		uvDiff *= 10.0;
 	#endif
 
-	float3 triplanarWeights = GetTriplanarWeights(normal);
+	float3 triplanarWeights = GetTriplanarWeights(normal, input.mainUV);
 
-	res.uvMatrix._m00_m01 = CUSTOM_TRANSFORM_TEX(position.xy, uvDiff, _MainTex); //Front
+	float2 positionXY = position.xy;
+	float2 positionZY = position.zy;
+	float2 positionXZ = position.xz;
+
+	res.uvMatrix._m00_m01 = CUSTOM_TRANSFORM_TEX(positionXY, uvDiff, _MainTex); //Front
 	res.uvMatrix._m02 = triplanarWeights.z;
 
-	res.uvMatrix._m10_m11 = CUSTOM_TRANSFORM_TEX(position.zy, uvDiff, _MainTex); //Side
+	res.uvMatrix._m10_m11 = CUSTOM_TRANSFORM_TEX(positionZY, uvDiff, _MainTex); //Side
 	res.uvMatrix._m12 = triplanarWeights.x;
 
-	res.uvMatrix._m20_m21 = CUSTOM_TRANSFORM_TEX(position.xz, uvDiff, _TriplanarTopTex); //Top
+	res.uvMatrix._m20_m21 = CUSTOM_TRANSFORM_TEX(positionXZ, uvDiff, _TriplanarTopTex); //Top
 	res.uvMatrix._m22 = triplanarWeights.y;
 
-	res.uvMatrix._m30_m31 = CUSTOM_TRANSFORM_TEX(position.xz, uvDiff, _MainTex); //Down
+	res.uvMatrix._m30_m31 = CUSTOM_TRANSFORM_TEX(positionXZ, uvDiff, _MainTex); //Down
 	res.uvMatrix._m32 = 1 - normal.y;
 
 #ifdef _NORMAL_MAP_ON
@@ -128,35 +139,39 @@ EffectsData TriplanarMapping(EffectsData input)
 #endif
 
 #ifdef _UV_DISTORTION_ON
+//<EffectsCode id=UV_DISTORTION, initial_param_name=initialValue, return_type=float2>
 EffectsData UVDistortion(EffectsData data)
 {
 	EffectsData res = data;
 	
 	float2 distortTexUV = data.uv_dist;
 	
-	distortTexUV.x += frac((data.shaderTime.x) * ACCESS_PROP(_DistortTexXSpeed));
-	distortTexUV.y += frac((data.shaderTime.x) * ACCESS_PROP(_DistortTexYSpeed));
+	distortTexUV.x += frac((data.shaderTime.x) * ACCESS_PROP_FLOAT(_DistortTexXSpeed));
+	distortTexUV.y += frac((data.shaderTime.x) * ACCESS_PROP_FLOAT(_DistortTexYSpeed));
 	
 	float4 distortTexCol = SAMPLE_TEX2D_LOD(_DistortTex, float4(distortTexUV.x, distortTexUV.y, 0, 0));
-	float distortAmnt = (distortTexCol.r - 0.5) * 0.2 * ACCESS_PROP(_DistortAmount);
+	float distortAmnt = (distortTexCol.r - 0.5) * 0.2 * ACCESS_PROP_FLOAT(_DistortAmount);
 	
 	DISPLACE_ALL_UVS(res, distortAmnt);
 
 	return res;
 }
+//</EffectsCode>
 #endif
 
 #ifdef _PIXELATE_ON
+//<EffectsCode id=PIXELATE, initial_param_name=initialValue, return_type=float2>
 EffectsData Pixelate(EffectsData data)
 {
 	EffectsData res = data;
 
-	half aspectRatio = ACCESS_PROP(_MainTex_TexelSize).x / ACCESS_PROP(_MainTex_TexelSize).y;
-	half2 pixelSize = float2(ACCESS_PROP(_PixelateSize), ACCESS_PROP(_PixelateSize) * aspectRatio);
+	half aspectRatio = ACCESS_PROP_FLOAT4(_MainTex_TexelSize).x / ACCESS_PROP_FLOAT4(_MainTex_TexelSize).y;
+	half2 pixelSize = float2(ACCESS_PROP_FLOAT(_PixelateSize), ACCESS_PROP_FLOAT(_PixelateSize) * aspectRatio);
 	
 	QUANTIZE_ALL_UVS(res, pixelSize)
 	return res;
 }
+//</EffectsCode>
 #endif
 
 //#ifdef _STOCHASTIC_SAMPLING_ON

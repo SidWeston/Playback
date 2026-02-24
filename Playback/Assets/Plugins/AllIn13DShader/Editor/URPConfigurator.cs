@@ -57,11 +57,10 @@ namespace AllIn13DShader
 					ConfigureURPAccepted(pipeline);
 
 					GlobalConfiguration.instance.URPConfiguredFirstTime = true;
-					GlobalConfiguration.instance.LastPipelineConfiguredGUID = guid;
 				}
 				else
 				{
-					if (!GlobalConfiguration.instance.URPConfiguredFirstTime || GlobalConfiguration.instance.LastPipelineConfiguredGUID != guid)
+					if (!GlobalConfiguration.instance.URPConfiguredFirstTime)
 					{
 						bool configureAccepted = EditorUtility.DisplayDialog("AllIn13DShader automatic configuration", "Do you want to automatically configure this URP project to work with all 3D-Shader?\n" +
 		                                                                                               "If you Cancel please check the Documentation:\n" +
@@ -72,7 +71,6 @@ namespace AllIn13DShader
 						}
 
 						GlobalConfiguration.instance.URPConfiguredFirstTime = true;
-						GlobalConfiguration.instance.LastPipelineConfiguredGUID = guid;
 					}
 				}
 			}
@@ -167,20 +165,23 @@ namespace AllIn13DShader
 
 			UniversalRendererData universalRendererData = scriptableRendererDatas[0] as UniversalRendererData;
 
-			Undo.RecordObject(universalRendererData, "");
+			if(universalRendererData != null)
+			{
+				Undo.RecordObject(universalRendererData, "");
 
-			universalRendererData.depthPrimingMode = DepthPrimingMode.Disabled;
+				universalRendererData.depthPrimingMode = DepthPrimingMode.Disabled;
 
 
-			CreateRenderFeatureOutline(universalRendererData: universalRendererData, renderFeatureName: OUTLINE_OPAQUE_RENDER_FEATURE_NAME, 
-				renderQueueType: RenderQueueType.Opaque, renderPassEvent: RenderPassEvent.AfterRenderingOpaques);
+				CreateRenderFeatureOutline(universalRendererData: universalRendererData, renderFeatureName: OUTLINE_OPAQUE_RENDER_FEATURE_NAME, 
+					renderQueueType: RenderQueueType.Opaque, renderPassEvent: RenderPassEvent.AfterRenderingOpaques);
 
-			CreateRenderFeatureOutline(universalRendererData: universalRendererData, renderFeatureName: OUTLINE_TRANSPARENT_RENDER_FEATURE_NAME,
-				renderQueueType: RenderQueueType.Transparent, renderPassEvent: RenderPassEvent.AfterRenderingTransparents);
+				CreateRenderFeatureOutline(universalRendererData: universalRendererData, renderFeatureName: OUTLINE_TRANSPARENT_RENDER_FEATURE_NAME,
+					renderQueueType: RenderQueueType.Transparent, renderPassEvent: RenderPassEvent.AfterRenderingTransparents);
 
-			EditorUtility.SetDirty(universalRendererData);
-			EditorUtility.SetDirty(pipeline);
-			AssetDatabase.SaveAssets();
+				EditorUtility.SetDirty(universalRendererData);
+				EditorUtility.SetDirty(pipeline);
+				AssetDatabase.SaveAssets();
+			}
 		}
 
 		public static void ConvertMaterialsFolder(string dirPath)

@@ -8,9 +8,11 @@ namespace AllIn13DShader
 		public string displayName;
 
 		public RenderQueue renderQueue;
-		public BlendMode blendSrc;
-		public BlendMode blendDst;
+		public UnityEngine.Rendering.BlendMode blendSrc;
+		public UnityEngine.Rendering.BlendMode blendDst;
 		public bool depthWrite;
+
+		public bool isTransparent;
 
 		public string[] defaultEnabledEffects;
 	}

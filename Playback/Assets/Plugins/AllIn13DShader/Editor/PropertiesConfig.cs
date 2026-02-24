@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -30,7 +30,7 @@ namespace AllIn13DShader
 			CreateGroups(effectGroupGlobalConfigCollection);
 
 			int numProperties = shader.GetPropertyCount();
-
+			int effectIndex = 0;
 			for (int i = 0; i < numProperties; i++)
 			{
 				string[] attributes = shader.GetPropertyAttributes(i);
@@ -57,7 +57,7 @@ namespace AllIn13DShader
 
 						if (firstAttribute.Contains(Constants.EFFECT_ATTRIBUTE_PREFIX))
 						{
-							ConfigureEffect(displayName, i, propertyName, firstAttribute, attributes[idxOffset + 1], effectsExtraData);
+							ConfigureEffect(displayName, i, propertyName, firstAttribute, attributes[idxOffset + 1], effectsExtraData, effectIndex + 1);
 						}
 						else if (firstAttribute.StartsWith(Constants.EFFECT_PROPERTY_ATTRIBUTE_PREFIX))
 						{
@@ -74,6 +74,7 @@ namespace AllIn13DShader
 						}
 					}
 				}
+
 				if (propertyName == Constants.MATPROPERTY_BLEND_SRC)
 				{
 					this.blendSrcIdx = i;
@@ -84,7 +85,22 @@ namespace AllIn13DShader
 				}
 			}
 
+			RefreshDisplayIndices();
+
 			zWriteIndex = FindPropertyIndex("_ZWrite");
+		}
+
+		private void RefreshDisplayIndices()
+		{
+			int effectDisplayIndex = 0;
+			for (int i = 0; i < effectsGroups.Length; i++)
+			{
+				for (int j = 0; j < effectsGroups[i].effects.Length; j++)
+				{
+					effectsGroups[i].effects[j].displayIndex = effectDisplayIndex + 1;
+					effectDisplayIndex++;
+				}
+			}
 		}
 
 		private void CreateGroups(EffectGroupGlobalConfigCollection effectGroupGlobalConfigCollection)
@@ -121,10 +137,10 @@ namespace AllIn13DShader
 					res.AddIncompatibleKeyword(incompatibleKw);
 				}
 
-				string strAllowReset = matchCollection[0].Groups[5].Value.ToUpper();
+				string strAllowReset = matchCollection[0].Groups[5].Value.ToUpperInvariant();
 				res.allowReset = strAllowReset == "TRUE";
 			
-				string strKeywordsOp = matchCollection[0].Groups[2].Value.ToUpper();
+				string strKeywordsOp = matchCollection[0].Groups[2].Value.ToUpperInvariant();
 				if (!string.IsNullOrEmpty(strKeywordsOp))
 				{
 					res.keywordsOp = strKeywordsOp == "AND" ? KeywordsOp.AND : KeywordsOp.OR;
@@ -186,11 +202,11 @@ namespace AllIn13DShader
 				string keyword = string.Empty;
 				if(matchSplitted.Length == 1)
 				{
-					keyword = $"{matchSplitted[i].ToUpper()}";
+					keyword = $"{matchSplitted[i].ToUpperInvariant()}";
 				}
 				else
 				{
-					keyword = $"_{effectName}_{matchSplitted[i].ToUpper()}";
+					keyword = $"_{effectName}_{matchSplitted[i].ToUpperInvariant()}";
 				}
 
 				res[i] = new EffectKeywordData(keyword, displayName);
@@ -203,14 +219,26 @@ namespace AllIn13DShader
 		private EffectAttributeData GetEffectAttributeData(string rawAttribute)
 		{
 			EffectAttributeData res = new EffectAttributeData();
+			res.Init();
 
 			Match match = Regex.Match(rawAttribute, Constants.REGEX_EFFECT);
 			res.effectID = match.Groups[1].Value.Trim();
 			res.groupID = match.Groups[2].Value.Trim();
 			res.dependentEffectID = match.Groups[4].Value.Trim();
 			res.incompatibleWithEffectID = match.Groups[5].Value.Trim();
-			res.docEnabled = match.Groups[6].Value.Trim().ToUpper() == "TRUE";
+			res.docEnabled = match.Groups[6].Value.Trim().ToUpperInvariant() == "TRUE";
 			res.drawerID = match.Groups[7].Value.Trim();
+
+			string extraPassesRaw = match.Groups[8].Value.Trim();
+			if (!string.IsNullOrEmpty(extraPassesRaw))
+			{
+				string[] extraPassesSplitted = extraPassesRaw.Split(",", System.StringSplitOptions.RemoveEmptyEntries);
+				
+				for(int i = 0; i < extraPassesSplitted.Length; i++)
+				{
+					ArrayUtility.Add(ref res.extraPasses, extraPassesSplitted[i].Trim());
+				}
+			}
 
 			if (string.IsNullOrEmpty(res.drawerID))
 			{
@@ -221,7 +249,7 @@ namespace AllIn13DShader
 		}
 
 		private void ConfigureEffect(string displayName, int propertyIndex, string propertyName, string rawEffectAttribute, string attributeKeywords,
-			EffectsExtraData effectsExtraData)
+			EffectsExtraData effectsExtraData, int displayIndex)
 		{
 			EffectAttributeData effectAttributeData = GetEffectAttributeData(rawEffectAttribute);
 
@@ -234,7 +262,7 @@ namespace AllIn13DShader
 			if (effectConfig == null)
 			{
 				effectConfig = new AllIn13DEffectConfig(displayName, propertyName, propertyIndex, effectConfigType, 
-					effectAttributeData, effectsExtraData);
+					effectAttributeData, effectsExtraData, displayIndex);
 
 				effectConfig.AddKeywords(keywordsDatas);
 				effectConfig.Setup();

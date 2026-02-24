@@ -69,8 +69,8 @@ namespace AllIn13DShader
 
 			if (this.propertyOverrideType != PropertyOverrideType.BASIC)
 			{
-				keywords = new string[effectProperty.propertyKeywords.Count];
-				for (int i = 0; i < effectProperty.propertyKeywords.Count; i++)
+				keywords = new string[effectProperty.propertyKeywords.Length];
+				for (int i = 0; i < effectProperty.propertyKeywords.Length; i++)
 				{
 					keywords[i] = effectProperty.propertyKeywords[i];
 				}
@@ -183,7 +183,7 @@ namespace AllIn13DShader
 			{
 				for(int i = 0; i < keywords.Length; i++)
 				{
-					string kw = (propertyName + "_" + keywords[i]).ToUpper();
+					string kw = (propertyName + "_" + keywords[i]).ToUpperInvariant();
 					mat.DisableKeyword(kw);
 
 					if(i == floatValue)

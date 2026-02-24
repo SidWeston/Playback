@@ -22,16 +22,11 @@ namespace AllIn13DShader
 			effectGroupGlobalConfigCollection = GetEffectGroupGlobalConfigCollection();
 			effectsExtraData = GetEffectsExtraData();
 
-			for (int i = 0; i < Constants.SHADERS_NAMES.Length; i++)
-			{
-				CreatePropertiesConfig(propertiesCollection, Constants.SHADERS_NAMES[i]);
-			}
-
+			CreatePropertiesConfig(propertiesCollection, Constants.SHADER_NAME_ALLIN13D_OUTLINE);
+			
 			EditorUtility.SetDirty(propertiesCollection);
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-
-			EditorPrefs.SetFloat(Constants.LAST_TIME_SHADER_PROPERTIES_REBUILT_KEY, (float)EditorApplication.timeSinceStartup);
 
 			Debug.LogWarning("Creating data...");
 
@@ -49,10 +44,6 @@ namespace AllIn13DShader
 				res = ScriptableObject.CreateInstance<PropertiesConfigCollection>();
 				AssetDatabase.CreateAsset(res, propertiesCollectionPath);
 				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-			}
-			else
-			{
-				res.Clear();
 			}
 
 			return res;
@@ -79,7 +70,7 @@ namespace AllIn13DShader
 		private static void CreatePropertiesConfig(PropertiesConfigCollection propertiesCollection, string shaderName)
 		{
 			string shaderNameWithExtension = shaderName + ".shader";
-			string assetPath = Path.Combine(Constants.SHADERS_FOLDER_PATH, shaderNameWithExtension);
+			string assetPath = Path.Combine(Constants.SHADERS_GENERIC_FOLDER_PATH, shaderNameWithExtension);
 
 			Shader shader = AssetDatabase.LoadAssetAtPath<Shader>(assetPath);
 
@@ -113,7 +104,18 @@ namespace AllIn13DShader
 			assetDeleted = EditorUtils.ConstainsFileName(deletedAssets, ASSET_NAME);
 			
 			bool configCreatedFirstTime = SessionState.GetBool(KEY_PROPERTIES_CONFIG_CREATED_FIRST_TIME, false);
-			
+
+			if (!configCreatedFirstTime)
+			{
+#if UNITY_WEBGL
+				URPSettingsController.DisableFeature("ALLIN1_DOTS_INSTANCING_SUPPORT");
+#endif
+			}
+
+#if !ALLIN13DSHADER_DEVELOP
+			configCreatedFirstTime = true;
+#endif
+
 			bool shadersDeleted = EditorUtils.ContainsAnyFolowingFileNames(deletedAssets, Constants.SHADERS_NAMES, "shader");
 			bool shadersImported = false;
 			if (!shadersDeleted)
@@ -121,12 +123,15 @@ namespace AllIn13DShader
 				shadersImported = EditorUtils.ContainsAnyFolowingFileNames(importedAssets, Constants.SHADERS_NAMES, "shader");
 			}
 
-			if (res == null || !configCreatedFirstTime || assetDeleted || shadersDeleted || shadersImported)
+			if (res == null || !configCreatedFirstTime || assetDeleted || shadersDeleted /*|| shadersImported*/)
 			{
 				SessionState.SetBool(KEY_PROPERTIES_CONFIG_CREATED_FIRST_TIME, true);
 				ShadersCreatorTool.BuildShaderFiles();
 				res = CreateConfig();
 			}
+
+
+			SessionState.SetBool(KEY_PROPERTIES_CONFIG_CREATED_FIRST_TIME, true);
 
 			return res;
 		}

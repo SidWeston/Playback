@@ -1,13 +1,22 @@
 #ifndef ALLIN13DSHADER_LIGHT_ADD_PASS_INCLUDED
 #define ALLIN13DSHADER_LIGHT_ADD_PASS_INCLUDED
 
+#include "../ShaderLibrary/AllIn13DShader_BasePass.hlsl"
+
 float4 CalculateLightingAdd(float3 vertexWS, float3 normalWS, float3 viewDirWS, 
-	float4 objectColor, float shadows, float2 mainUV, 
-	FragmentData fragmentData, EffectsData effectsData)
+	float4 objectColor, float shadows, 
+	float2 mainUV,
+	FragmentData fragmentData, EffectsData effectsData, 
+	AllIn1GI gi)
 {
 	float4 col = float4(0, 0, 0, objectColor.a);
-	col.rgb = CalculateLighting(vertexWS, normalWS, 0, 0, objectColor.rgb,
-		0, 0, 0, viewDirWS, mainUV, 0, 1.0, fragmentData, 1.0, effectsData);
+	col.rgb = CalculateLighting(vertexWS, 
+		normalWS, 0, 0, 
+		objectColor.rgb, objectColor.a,
+		0, 0, viewDirWS, 
+		mainUV, 
+		0, 1.0, fragmentData, 1.0, effectsData, 
+		gi);
 
 	return col;
 }
@@ -34,8 +43,16 @@ FragmentData BasicVertexAdd(VertexData v)
 	
 	o.pos = OBJECT_TO_CLIP_SPACE(v);
 
-	ShadowCoordStruct shadowCoordStruct = GetShadowCoords(v, o.pos, POSITION_WS(o));
+	ShadowCoordStruct shadowCoordStruct = GetShadowCoords(v, o.pos, POSITION_WS(o), v.uvLightmap);
+	o._ShadowCoord = shadowCoordStruct._ShadowCoord;
+
 	FOGCOORD(o) = GetFogFactor(o.pos);
+
+#if defined(LIGHTMAP_ON) || defined(SHADOWS_SHADOWMASK)
+	UV_LIGHTMAP(o) = v.uvLightmap * unity_LightmapST.xy + unity_LightmapST.zw;
+#else
+	UV_LIGHTMAP(o) = v.uvLightmap;
+#endif
 
 #ifdef REQUIRE_TANGENT_WS
 	float3 tangentWS = GetDirWS(float4(v.tangent.xyz, 0));
@@ -54,10 +71,18 @@ float4 BasicFragmentAdd(FragmentData i) : SV_Target
 #ifdef _LIGHTMODEL_FASTLIGHTING
 	float4 additiveRes = 0;
 #else
-	EffectsData data = CalculateEffectsData(i);
+
+	AllIn1DecalData decalData;
+	INIT_DECAL_DATA(decalData)
+
+#ifdef ALLIN1_DECALS_READY_TO_USE
+	ConfigureDecalData(decalData, i.pos);
+#endif
+
+	EffectsData data = CalculateEffectsData(i, decalData);
 
 	data = ApplyUVEffects_FragmentStage(data);
-	data.normalWS = GetNormalWS(data, i);
+	data.normalWS = GetNormalWS(data, i, decalData);
 
 	float4 objectColor = GetBaseColor(data);
 
@@ -65,29 +90,32 @@ float4 BasicFragmentAdd(FragmentData i) : SV_Target
 	float3 normalWS = data.normalWS;
 	float3 viewDirWS = data.viewDirWS;
 	
-	objectColor *= ACCESS_PROP(_Color);
+	objectColor *= ACCESS_PROP_FLOAT4(_Color);
 	objectColor = ApplyColorEffectsBeforeLighting(objectColor, data);
 
 	float4 col = objectColor;
 
-	col = CalculateLightingAdd(POSITION_WS(i), normalWS, VIEWDIR_WS(i), objectColor, 1.0, i.mainUV, i, data);
+	AllIn1GI gi = CalculateGI(UV_LIGHTMAP(i), data);
+	col = CalculateLightingAdd(POSITION_WS(i), normalWS, VIEWDIR_WS(i), objectColor, 1.0, i.mainUV, i, data, gi);
 	
-	col = ApplyAlphaEffects(col, i.mainUV, 0, data.camDistance, data.projPos);
+	col = ApplyAlphaEffects(col,
+		i.mainUV, UV_LIGHTMAP(i), data.vertexWS,
+		0, data.camDistance, data.projPos);
 
 #ifdef _ALPHA_CUTOFF_ON
-	clip((col.a - ACCESS_PROP(_AlphaCutoffValue)) - 0.001);
+	clip((col.a - ACCESS_PROP_FLOAT(_AlphaCutoffValue)) - 0.001);
 #endif	
 
 	col = ApplyColorEffectsAfterLighting(col, data);
-	col.a *= ACCESS_PROP(_GeneralAlpha);
+	col.a *= ACCESS_PROP_FLOAT(_GeneralAlpha);
 
-#ifdef _FOG_ON
+#if defined(FOG_ENABLED)
 	col = CustomMixFog(FOGCOORD(i), col); 
 #endif
 
 	float4 additiveRes = col * col.a;
 #endif
-
+	
 	return additiveRes;
 }
 

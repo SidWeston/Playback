@@ -23,6 +23,7 @@ Material:
   - _MATCAPBLENDMODE_MULTIPLY
   - _MATCAP_ON
   - _OUTLINETYPE_NONE
+  - _RECEIVEDSHADOWSTYPE_CLASSIC
   - _RECEIVE_SHADOWS_ON
   - _REFLECTIONS_CLASSIC
   - _RIMLIGHTINGSTAGE_BEFORELIGHTINGLAST
@@ -313,7 +314,9 @@ Material:
     - _PosterizeGamma: 0.9
     - _PosterizeNumColors: 6
     - _RecalculateNormals: 0
+    - _ReceiveShadows: 1
     - _ReceiveShadowsOn: 1
+    - _ReceivedShadowsType: 0
     - _Reflections: 1
     - _ReflectionsAtten: 0.025
     - _RenderPreset: 1
@@ -332,6 +335,7 @@ Material:
     - _ScrollTextureX: 1
     - _ScrollTextureY: 1
     - _ShadingModel: 1
+    - _ShadowCutoff: 0.2
     - _ShakeBlend: 1
     - _ShakeSpeedMult: 1
     - _Shininess: 12.8

@@ -10,21 +10,21 @@ namespace AllIn13DShader
 			{
 				if (from.IsKeywordEnabled("_ALPHAPREMULTIPLY_ON"))
 				{
-					SetBlendSrc(BlendMode.One);
-					SetBlendDst(BlendMode.OneMinusSrcAlpha);
+					SetBlendSrc(UnityEngine.Rendering.BlendMode.One);
+					SetBlendDst(UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
 				}
 				else
 				{
-					SetBlendSrc(BlendMode.SrcAlpha);
-					SetBlendDst(BlendMode.OneMinusSrcAlpha);
+					SetBlendSrc(UnityEngine.Rendering.BlendMode.SrcAlpha);
+					SetBlendDst(UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
 				}
 
 				SetAlphaPreset();
 			}
 			else
 			{
-				SetBlendSrc(BlendMode.One);
-				SetBlendDst(BlendMode.Zero);
+				SetBlendSrc(UnityEngine.Rendering.BlendMode.One);
+				SetBlendDst(UnityEngine.Rendering.BlendMode.Zero);
 				SetOpaquePreset();
 			}
 		}

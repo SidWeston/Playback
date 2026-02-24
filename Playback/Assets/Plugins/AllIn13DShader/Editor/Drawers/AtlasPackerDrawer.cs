@@ -6,95 +6,12 @@ namespace AllIn13DShader
 {
 	public class AtlasPackerDrawer
 	{
-		//public Texture2D[] Atlas;
-		
 		private AtlasPackerTool atlasPackerTool;
-		//private AtlasPackerValues atlasPackerValues;
 
-		public AtlasPackerValues ToolValues
-		{
-			get
-			{
-				return atlasPackerTool.values;
-			}
-		}
-
-
+		public AtlasPackerValues ToolValues => atlasPackerTool.values;
 
 		private CommonStyles commonStyles;
 		private SerializedObject soAtlasPackerValues;
-
-		//private bool SquareAtlas
-		//{
-		//	get
-		//	{
-		//		return atlasPackerTool.squareAtlas;
-		//	}
-		//	set
-		//	{
-		//		atlasPackerTool.squareAtlas = value;
-		//	}
-		//}
-
-		//private int AtlasXCount
-		//{
-		//	get
-		//	{
-		//		return atlasPackerTool.atlasXCount;
-		//	}
-		//	set
-		//	{
-		//		atlasPackerTool.atlasXCount = value;
-		//	}
-		//}
-
-		//private int AtlasYCount
-		//{
-		//	get
-		//	{
-		//		return atlasPackerTool.atlasYCount;
-		//	}
-		//	set
-		//	{
-		//		atlasPackerTool.atlasYCount = value;
-		//	}
-		//}
-
-		//private FilterMode AtlasFiltering
-		//{
-		//	get
-		//	{
-		//		return atlasPackerTool.atlasFiltering;
-		//	}
-		//	set
-		//	{
-		//		atlasPackerTool.atlasFiltering = value;
-		//	}
-		//}
-
-		//private TextureSizes AtlasSizesX
-		//{
-		//	get
-		//	{
-		//		return atlasPackerTool.atlasSizesX;
-		//	}
-		//	set
-		//	{
-		//		atlasPackerTool.atlasSizesX = value;
-		//	}
-		//}
-
-		//private TextureSizes AtlasSizesY
-		//{
-		//	get
-		//	{
-		//		return atlasPackerTool.atlasSizesY;
-		//	}
-		//	set
-		//	{
-		//		atlasPackerTool.atlasSizesY = value;
-		//	}
-		//}
 
 		public AtlasPackerDrawer(AtlasPackerTool atlasPackerTool, CommonStyles commonStyles)
 		{
@@ -102,21 +19,10 @@ namespace AllIn13DShader
 			this.commonStyles = commonStyles;
 
 			RefreshAtlasPackerValues();
-			//atlasPackerValues = ScriptableObject.CreateInstance<AtlasPackerValues>();
-			//atlasPackerValues.Atlas = new Texture2D[0];
 		}
-
-		//public void Setup(AtlasPackerTool atlasPackerTool, CommonStyles commonStyles)
-		//{
-		//	this.atlasPackerTool = atlasPackerTool;
-		//	this.commonStyles = commonStyles;
-		//	Atlas = new Texture2D[0];
-		//}
 
 		private void RefreshAtlasPackerValues()
 		{
-			//atlasPackerValues = ScriptableObject.CreateInstance<AtlasPackerValues>();
-			//atlasPackerValues.
 			soAtlasPackerValues = new SerializedObject(ToolValues);
 		}
 

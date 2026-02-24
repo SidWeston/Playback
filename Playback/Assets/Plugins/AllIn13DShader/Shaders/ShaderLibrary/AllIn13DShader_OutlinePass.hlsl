@@ -26,7 +26,7 @@ float4 Outline_Constant(float4 vertexPos, float3 normalOS, float3 thicknessScale
 	
     float4 res = vertexPos;
 	
-    float normalizedDistanceToCamera = distanceToCamera / ACCESS_PROP(_MaxCameraDistance);
+    float normalizedDistanceToCamera = distanceToCamera / ACCESS_PROP_FLOAT(_MaxCameraDistance);
     float displacement = thicknessScaled.x * normalizedDistanceToCamera;
 	res.xyz += normalOS * displacement;
 
@@ -49,7 +49,7 @@ float4 Outline_FadeWithDistance(float4 vertexPos, float3 normalOS, float3 thickn
 	float3 vertexToCameraWS = _WorldSpaceCameraPos.xyz - vertexWS;
 	float distanceToCamera = length(vertexToCameraWS);
 	
-	float normalizedDistanceToCamera = saturate(distanceToCamera / ACCESS_PROP(_MaxFadeDistance));
+	float normalizedDistanceToCamera = saturate(distanceToCamera / ACCESS_PROP_FLOAT(_MaxFadeDistance));
 	float3 correctedThickness = (1 - normalizedDistanceToCamera) * thicknessScaled;
 	
 	res.xyz += normalOS * correctedThickness;
@@ -69,30 +69,30 @@ FragmentDataOutline OutlinePass_Vertex(VertexData v)
     UNITY_TRANSFER_INSTANCE_ID(v, o);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); 
 
-#ifdef OUTLINE_ON
+#if defined(OUTLINE_ON)
     float3 _Object_Scale = GetObjectScale();
-    float3 thicknessScaled = (ACCESS_PROP(_OutlineThickness) / _Object_Scale) * OUTLINE_FACTOR;
+    float3 thicknessScaled = (ACCESS_PROP_FLOAT(_OutlineThickness) / _Object_Scale) * OUTLINE_FACTOR;
 #endif
 	
-#ifdef _SPHERIZE_NORMALS_ON
+#if defined(_SPHERIZE_NORMALS_ON)
 	float3 normalOS = normalize(v.vertex);
 #else
 	float3 normalOS = v.normal;
 #endif
 
-#ifdef _USE_CUSTOM_TIME
-	SHADER_TIME(o) = allIn13DShader_globalTime.xyz + ACCESS_PROP(_TimingSeed);
+#if defined(_USE_CUSTOM_TIME)
+	SHADER_TIME(o) = allIn13DShader_globalTime.xyz + ACCESS_PROP_FLOAT(_TimingSeed);
 #else
-	SHADER_TIME(o) = _Time.xyz + ACCESS_PROP(_TimingSeed);
+	SHADER_TIME(o) = _Time.xyz + ACCESS_PROP_FLOAT(_TimingSeed);
 #endif
 
 	v.vertex = ApplyVertexEffects(v.vertex, normalOS, SHADER_TIME(o));
 
-#ifdef _OUTLINETYPE_SIMPLE
+#if defined(_OUTLINETYPE_SIMPLE)
 	v.vertex = Outline_Simple(v.vertex, v.normal, thicknessScaled);
-#elif _OUTLINETYPE_CONSTANT
+#elif defined(_OUTLINETYPE_CONSTANT)
     v.vertex = Outline_Constant(v.vertex, v.normal, thicknessScaled);
-#elif _OUTLINETYPE_FADEWITHDISTANCE
+#elif defined(_OUTLINETYPE_FADEWITHDISTANCE)
 	v.vertex = Outline_FadeWithDistance(v.vertex, v.normal, thicknessScaled);
 #endif
 	
@@ -100,6 +100,7 @@ FragmentDataOutline OutlinePass_Vertex(VertexData v)
 	o.mainUV = SIMPLE_CUSTOM_TRANSFORM_TEX(v.uv, _MainTex);
 	o.pos = OBJECT_TO_CLIP_SPACE(v);
 	o.positionWS = GetPositionWS(v.vertex);
+	UV_LIGHTMAP(o) = v.uvLightmap;
 
 	FOGCOORD(o) = GetFogFactor(o.pos);
 	
@@ -114,22 +115,24 @@ float4 OutlinePass_Fragment(FragmentDataOutline i) : SV_Target
 	float4 col = float4(0, 0, 0, 0);
 	
 #ifdef OUTLINE_ON
-	col = ACCESS_PROP(_OutlineColor);
+	col = ACCESS_PROP_FLOAT4(_OutlineColor);
 #endif
 
 	float camDistance = distance(i.positionWS, _WorldSpaceCameraPos); 
 	float4 screenPos = ComputeScreenPos(i.pos);
-	col = ApplyAlphaEffects(col, SCALED_MAIN_UV(i), 1.0, camDistance, screenPos);
+	col = ApplyAlphaEffects(col,
+		SCALED_MAIN_UV(i), UV_LIGHTMAP(i), i.positionWS,
+		1.0, camDistance, screenPos);
 
 #ifdef _ALPHA_CUTOFF_ON
-	clip((col.a - ACCESS_PROP(_AlphaCutoffValue)) - 0.001);
+	clip((col.a - ACCESS_PROP_FLOAT(_AlphaCutoffValue)) - 0.001);
 #endif	
 
+#if defined(FOG_ENABLED)
 	col = CustomMixFog(FOGCOORD(i), col);
+#endif
 
-	col.a *= ACCESS_PROP(_GeneralAlpha);
-
-
+	col.a *= ACCESS_PROP_FLOAT(_GeneralAlpha);
 
 	return col;
 }

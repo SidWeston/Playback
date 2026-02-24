@@ -113,12 +113,12 @@ namespace AllIn13DShader
 			target.SetFloat(specularModelEffect.keywordPropertyName, 1.0f);
 		}
 
-		protected void SetBlendSrc(BlendMode blendMode)
+		protected void SetBlendSrc(UnityEngine.Rendering.BlendMode blendMode)
 		{
 			target.SetInt("_BlendSrc", (int)blendMode);
 		}
 
-		protected void SetBlendDst(BlendMode blendMode)
+		protected void SetBlendDst(UnityEngine.Rendering.BlendMode blendMode)
 		{
 			target.SetInt("_BlendDst", (int)blendMode);
 		}

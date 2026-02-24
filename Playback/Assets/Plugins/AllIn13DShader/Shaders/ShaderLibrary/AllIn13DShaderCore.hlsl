@@ -15,8 +15,8 @@ float4 GetBaseColor(EffectsData data)
 		float2 dx = 0;
 		float2 dy = 0;
 
-		float stochasticScale = ACCESS_PROP(_StochasticScale);
-		float stochasticSkew = ACCESS_PROP(_StochasticSkew);
+		float stochasticScale = ACCESS_PROP_FLOAT(_StochasticScale);
+		float stochasticSkew = ACCESS_PROP_FLOAT(_StochasticSkew);
 		float4x3 stochasticOffsets_front = getStochasticOffsets(UV_FRONT(data), stochasticScale, stochasticSkew);
 		STOCHASTIC_SAMPLING_NO_DEF_DD(_MainTex, UV_FRONT(data), stochasticOffsets_front, colFront)
 	
@@ -36,7 +36,7 @@ float4 GetBaseColor(EffectsData data)
 		colDown = SAMPLE_TEX2D(_MainTex, UV_DOWN(data));
 	#endif
 	
-	float faceDown = smoothstep(ACCESS_PROP(_FaceDownCutoff), 1.0, UV_DOWN_WEIGHT(data));
+	float faceDown = smoothstep(ACCESS_PROP_FLOAT(_FaceDownCutoff), 1.0, UV_DOWN_WEIGHT(data));
 	colTop = lerp(colTop, colDown, faceDown);
 
 	colFront *= UV_FRONT_WEIGHT(data);
@@ -46,7 +46,7 @@ float4 GetBaseColor(EffectsData data)
 	res = colFront + colSide + colTop;
 #else
 	#ifdef _STOCHASTIC_SAMPLING_ON
-		float4x3 stochasticOffsets = getStochasticOffsets(MAIN_UV(data), ACCESS_PROP(_StochasticScale), ACCESS_PROP(_StochasticSkew));
+		float4x3 stochasticOffsets = getStochasticOffsets(MAIN_UV(data), ACCESS_PROP_FLOAT(_StochasticScale), ACCESS_PROP_FLOAT(_StochasticSkew));
 		STOCHASTIC_SAMPLING(_MainTex, MAIN_UV(data), stochasticOffsets, res)
 	#else
 		res = SAMPLE_TEX2D(_MainTex, MAIN_UV(data));
@@ -56,10 +56,10 @@ float4 GetBaseColor(EffectsData data)
 	return res;
 }
 
-float3 GetNormalWS(EffectsData data, FragmentData i)
+float3 GetNormalWS(EffectsData data, FragmentData i, AllIn1DecalData decalData)
 {
 	float3 res = data.normalWS;
-	
+
 #ifdef _STOCHASTIC_SAMPLING_ON
 	float4x3 stochasticOffset = 0;
 	float2 dx = 0;
@@ -67,7 +67,7 @@ float3 GetNormalWS(EffectsData data, FragmentData i)
 #endif
 
 #ifdef _NORMAL_MAP_ON
-	#ifdef _TRIPLANAR_MAPPING_ON	
+	#ifdef _TRIPLANAR_MAPPING_ON
 		#ifdef _TRIPLANARNORMALSPACE_LOCAL
 			float3 normalReference = data.normalOS;
 		#else 
@@ -77,10 +77,11 @@ float3 GetNormalWS(EffectsData data, FragmentData i)
 		float4 sampledNormal_side = 0;
 		float4 sampledNormal_top = 0;
 		float4 sampledNormal_front = 0;
-		
+		float4 sampledNormal_down = 0;
+
 		#ifdef _STOCHASTIC_SAMPLING_ON
-			float stochasticScale = ACCESS_PROP(_StochasticScale);
-			float stochasticSkew = ACCESS_PROP(_StochasticSkew);	
+			float stochasticScale	= ACCESS_PROP_FLOAT(_StochasticScale);
+			float stochasticSkew	= ACCESS_PROP_FLOAT(_StochasticSkew);	
 			float4x3 stochasticOffsets_side = getStochasticOffsets(NORMAL_UV_SIDE(data), stochasticScale, stochasticSkew);
 			STOCHASTIC_SAMPLING_NO_DEF_DD(_NormalMap, NORMAL_UV_SIDE(data), stochasticOffsets_side, sampledNormal_side)
 			
@@ -93,16 +94,21 @@ float3 GetNormalWS(EffectsData data, FragmentData i)
 			sampledNormal_side	= SAMPLE_TEX2D(_NormalMap, NORMAL_UV_SIDE(data));
 			sampledNormal_top	= SAMPLE_TEX2D(_TriplanarTopNormalMap, NORMAL_UV_TOP(data));
 			sampledNormal_front = SAMPLE_TEX2D(_NormalMap, NORMAL_UV_FRONT(data));
+			sampledNormal_down	= SAMPLE_TEX2D(_NormalMap, UV_DOWN(data));
 		#endif
 		
+		float faceDown = smoothstep(ACCESS_PROP_FLOAT(_FaceDownCutoff), 1.0, UV_DOWN_WEIGHT(data));
+		sampledNormal_top = lerp(sampledNormal_top, sampledNormal_down, faceDown);
+		float tNormalYWeight = lerp(ACCESS_PROP_FLOAT(_TopNormalStrength), ACCESS_PROP_FLOAT(_NormalStrength), faceDown);
+
 		float3 tnormalX = UnpackNormal(sampledNormal_side);
-		tnormalX.xy *= ACCESS_PROP(_NormalStrength);
+		tnormalX.xy *= ACCESS_PROP_FLOAT(_NormalStrength);
 
 		float3 tnormalY = UnpackNormal(sampledNormal_top);
-		tnormalY.xy *= ACCESS_PROP(_TopNormalStrength);
+		tnormalY.xy *= tNormalYWeight;
 
 		float3 tnormalZ = UnpackNormal(sampledNormal_front);
-		tnormalZ.xy *= ACCESS_PROP(_NormalStrength);
+		tnormalZ.xy *= ACCESS_PROP_FLOAT(_NormalStrength);
 
 		tnormalX = float3(tnormalX.xy + normalReference.zy, normalReference.x);
 		tnormalY = float3(tnormalY.xy + normalReference.xz, normalReference.y);
@@ -113,23 +119,36 @@ float3 GetNormalWS(EffectsData data, FragmentData i)
 			tnormalY.xzy * UV_TOP_WEIGHT(data) +
 			tnormalZ.xyz * UV_FRONT_WEIGHT(data)
 		);
+
+		#ifdef ALLIN1_DECALS_READY_TO_USE
+			res = lerp(decalData.normalTS, res, decalData.mask);
+		#endif
+
 	#else
 	
 		float4 sampledNormal = 0;
 		#ifdef _STOCHASTIC_SAMPLING_ON
-			float4x3 stochasticOffsets = getStochasticOffsets(MAIN_UV(data), ACCESS_PROP(_StochasticScale), ACCESS_PROP(_StochasticSkew));
+			float4x3 stochasticOffsets = getStochasticOffsets(MAIN_UV(data), ACCESS_PROP_FLOAT(_StochasticScale), ACCESS_PROP_FLOAT(_StochasticSkew));
 			STOCHASTIC_SAMPLING_NO_DEF_DD(_NormalMap, MAIN_UV(data), stochasticOffsets, sampledNormal)
 		#else
 			sampledNormal = SAMPLE_TEX2D(_NormalMap, MAIN_UV(data));
 		#endif
 		
 		float3 tnormal = UnpackNormal(sampledNormal);
-		tnormal.xy *= ACCESS_PROP(_NormalStrength); 
-
+		tnormal.xy *= ACCESS_PROP_FLOAT(_NormalStrength); 
+		
+		#if defined(ALLIN1_DECALS_READY_TO_USE) && defined(ALLIN1_DECAL_MODE_SCREEN_SPACE)
+			tnormal = BlendingUnpackedNormals(tnormal, decalData.unpackedNormal);
+		#endif
+		
 		res.x = dot(i.tspace0, tnormal);
 		res.y = dot(i.tspace1, tnormal);
 		res.z = dot(i.tspace2, tnormal);
     
+		#if defined(ALLIN1_DECALS_READY_TO_USE) && defined(ALLIN1_DECAL_MODE_DBUFFER)
+			res = lerp(decalData.normalTS, res, decalData.mask);
+		#endif
+	
 		res = normalize(res);
 	#endif
 
@@ -159,11 +178,11 @@ float3 GetNormalWS(EffectsData data, FragmentData i)
 			float3 tnormalB = UnpackNormal(sampledNormalB);
 			
 			float3 normalG = GetNormalWSFromNormalMap(
-				tnormalG, ACCESS_PROP(_NormalStrength), 
+				tnormalG, ACCESS_PROP_FLOAT(_NormalStrength), 
 				i.tspace0, i.tspace1, i.tspace2);
 
 			float3 normalB = GetNormalWSFromNormalMap(
-				tnormalB, ACCESS_PROP(_NormalStrength), 
+				tnormalB, ACCESS_PROP_FLOAT(_NormalStrength), 
 				i.tspace0, i.tspace1, i.tspace2);
 
 			res = normalize(lerp(res, normalG, maskColor.g));
@@ -180,7 +199,7 @@ float3 GetNormalWS(EffectsData data, FragmentData i)
 			
 			float3 tnormalWhite = UnpackNormal(sampledNormalWhite);
 			float3 normalWhite = GetNormalWSFromNormalMap(
-				tnormalWhite, ACCESS_PROP(_NormalStrength), 
+				tnormalWhite, ACCESS_PROP_FLOAT(_NormalStrength), 
 				i.tspace0, i.tspace1, i.tspace2);
 			float maskLuminosity = GetLuminanceRaw(float4(maskColor.rgb, 1.0));
 			maskLuminosity = saturate(maskLuminosity);
@@ -189,10 +208,53 @@ float3 GetNormalWS(EffectsData data, FragmentData i)
 	#endif
 #endif
 
+
+
+
 	return res;
 }
 
-EffectsData CalculateEffectsData(FragmentData i)
+#if defined(_FLAT_NORMALS_ON)
+float3 GetFlatNormalWS(float3 originalNormal, float3 positionWS)
+{
+	float3 res = originalNormal;
+	float3 worldPosDDX = ddx(positionWS);
+	float3 worldPosDDY = ddy(positionWS);
+
+	float3 flatNormal = normalize(cross(worldPosDDY, worldPosDDX));
+
+	float3 blendedNormal = lerp(originalNormal, flatNormal, ACCESS_PROP_FLOAT(_FlatNormalsBlend));
+	blendedNormal = normalize(blendedNormal);
+	res = blendedNormal;
+
+	return res;
+}
+#endif
+
+
+EffectsData CalculateEffectsData_ShadowCaster(FragmentDataShadowCaster i)
+{
+	EffectsData res;
+	
+	INIT_EFFECTS_DATA(res)
+	
+	res.vertexColor = 1.0;
+	res.mainUV = SCALED_MAIN_UV(i);
+	res.rawMainUV = i.uv2;
+	res.shaderTime = i.shaderTime;
+	
+	res.uvMatrix = 0;
+	res.uvMatrix._m00_m01 = i.mainUV.xy;
+	res.normalOS = normalize(i.normalOS);
+	res.normalWS = normalize(i.normalWS);
+	
+	res.vertexOS = i.positionOS;
+	res.vertexWS = i.positionWS;
+	
+	return res;
+}
+
+EffectsData CalculateEffectsData(FragmentData i, AllIn1DecalData decalData)
 {
 	EffectsData res;
 	
@@ -217,9 +279,9 @@ EffectsData CalculateEffectsData(FragmentData i)
 	res.vertexWS = POSITION_WS(i);
 	res.vertexVS = mul(UNITY_MATRIX_MV, float4(res.vertexOS, 1.0)).xyz;
 
-	res.normalOS = NORMAL_OS(i);
+	res.normalOS = normalize(NORMAL_OS(i));
 	res.normalWS = normalize(i.normalWS);
-	res.viewDirWS = VIEWDIR_WS(i);
+	res.viewDirWS = normalize(VIEWDIR_WS(i));
 
 	res.tangentWS = 0;
 	res.bitangentWS = 0;
@@ -243,6 +305,8 @@ EffectsData CalculateEffectsData(FragmentData i)
 	res.sceneDepthDiff = GetSceneDepthDiff(i.projPos);
 	res.normalizedDepth = GetNormalizedDepth(i.projPos);
 #endif
+
+	res.pos = i.pos;
 
 	res.camDistance = 0;
 #ifdef REQUIRE_CAM_DISTANCE
@@ -269,6 +333,11 @@ EffectsData CalculateEffectsData(FragmentData i)
 	
 	res._ShadowCoord = i._ShadowCoord;
 
+#ifdef HAS_PBR_PROPERTIES
+	res.metallic = ACCESS_PROP_FLOAT(_Metallic) * decalData.MAOSAlpha + decalData.metallic;
+	res.smoothness = ACCESS_PROP_FLOAT(_Smoothness) * decalData.MAOSAlpha + decalData.smoothness;
+#endif
+	
 	return res;
 }
 
@@ -379,7 +448,7 @@ float4 ApplyColorEffectsBeforeLighting(float4 inputColor, EffectsData data)
 		float3 colorWithMatcapApplied = matcap;
 	#endif
 
-	res.rgb = lerp(res.rgb, colorWithMatcapApplied, ACCESS_PROP(_MatcapBlend));
+	res.rgb = lerp(res.rgb, colorWithMatcapApplied, ACCESS_PROP_FLOAT(_MatcapBlend));
 #endif
 
 #ifdef _POSTERIZE_ON
@@ -448,11 +517,24 @@ float4 ApplyColorEffectsAfterLighting(float4 inputColor, EffectsData data)
 	return res;
 }
 
-float4 ApplyAlphaEffects(float4 inputColor, float2 uv, float sceneDepthDiff, float camDistance, float4 screenPos)
+float4 ApplyAlphaEffects(float4 inputColor,
+	float2 uv, float2 uv2, float3 worldPos, 
+	float sceneDepthDiff, float camDistance, float4 screenPos)
 {
 	float4 res = inputColor;
+	
 #ifdef _FADE_ON
-	res = Fade(res, uv);
+		float2 selectedUV;
+		#if defined(_FADEUVSET_UV1)
+			selectedUV = uv;
+		#elif defined(_FADEUVSET_UV2)
+			selectedUV = uv2;
+		#else
+			selectedUV = worldPos.xy;
+		#endif
+		
+		res = Fade(res, selectedUV);
+	#endif
 #endif
 
 #ifdef _INTERSECTION_FADE_ON
@@ -474,5 +556,3 @@ float4 ApplyAlphaEffects(float4 inputColor, float2 uv, float sceneDepthDiff, flo
 
 	return res;
 }
-
-#endif

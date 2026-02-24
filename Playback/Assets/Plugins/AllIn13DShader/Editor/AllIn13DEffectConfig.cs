@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -29,11 +30,14 @@ namespace AllIn13DShader
 
 		public string disabledKeyword;
 
+		public int displayIndex;
+
 		public EffectConfigType effectConfigType;
+		public AllIn13DPassType[] extraPasses;
 
 		public AllIn13DEffectConfig(
 			string displayName, string propertyName, int propertyIndex, EffectConfigType effectConfigType,
-			EffectAttributeData data, EffectsExtraData effectsExtraData)
+			EffectAttributeData data, EffectsExtraData effectsExtraData, int displayIndex)
 		{
 			this.displayName = displayName;
 			this.keywordPropertyName = propertyName;
@@ -56,6 +60,17 @@ namespace AllIn13DShader
 			this.keywords = new List<EffectKeywordData>();
 			this.effectProperties = new List<EffectProperty>();
 			this.keywordsDisplayNames = new string[0];
+			this.extraPasses = new AllIn13DPassType[0];
+
+			for(int i = 0; i < data.extraPasses.Length; i++)
+			{
+				AllIn13DPassType passType;
+				Enum.TryParse(data.extraPasses[i], out passType);
+
+				ArrayUtility.Add(ref extraPasses, passType);
+			}
+
+			this.displayIndex = displayIndex;
 		}
 
 		public void AddKeyword(EffectKeywordData kw)
@@ -108,7 +123,8 @@ namespace AllIn13DShader
 			return res;
 		}
 
-		public EffectProperty CreateEffectProperty(int propertyIndex, string propertyName, string displayName, ShaderPropertyType shaderPropertyType, ShaderPropertyFlags shaderPropertyFlags,
+		public EffectProperty CreateEffectProperty(int propertyIndex, string propertyName, string displayName, 
+			ShaderPropertyType shaderPropertyType, ShaderPropertyFlags shaderPropertyFlags,
 			EffectPropertyAttributeData data)
 		{
 			EffectProperty res = new EffectProperty(this, propertyIndex, propertyName, displayName, 
@@ -130,7 +146,7 @@ namespace AllIn13DShader
 			return res;
 		}
 
-		public string GetCustomMessage(MaterialInfo[] targetMatInfos)
+		public string GetCustomMessage(AbstractMaterialInfo[] targetMatInfos)
 		{
 			string res = string.Empty;
 			if(targetMatInfos.Length == 1)
@@ -140,7 +156,7 @@ namespace AllIn13DShader
 			return res;
 		}
 
-		public string GetCustomMessage(MaterialInfo targetMatInfo)
+		public string GetCustomMessage(AbstractMaterialInfo targetMatInfo)
 		{
 			string res = string.Empty;
 
@@ -161,13 +177,30 @@ namespace AllIn13DShader
 			return res;
 		}
 
+		public static bool IsEffectAvailable(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references)
+		{
+			bool res = true;
+			bool isShaderVariant = references.IsShaderVariant();
+
+			if (isShaderVariant)
+			{
+				for (int i = 0; i < references.targetMatInfos.Length; i++)
+				{
+					AbstractMaterialInfo matInfo = references.targetMatInfos[i];
+					res = res && AllIn13DEffectConfig.IsEffectEnabled(effectConfig, matInfo);
+				}
+			}
+
+			return res;
+		}
+
 		public static bool IsEffectEnabled(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references)
 		{
 			int selectedIndex = 0;
 			return IsEffectEnabled(effectConfig, ref selectedIndex, references);
 		}
 
-		public static bool IsEffectEnabled(AllIn13DEffectConfig effectConfig, MaterialInfo targetMatInfo)
+		public static bool IsEffectEnabled(AllIn13DEffectConfig effectConfig, AbstractMaterialInfo targetMatInfo)
 		{
 			int selectedIndex = 0;
 			return IsEffectEnabled(effectConfig, ref selectedIndex, targetMatInfo);
@@ -184,7 +217,20 @@ namespace AllIn13DShader
 			return res;
 		}
 
-		public static bool IsEffectEnabled(AllIn13DEffectConfig effectConfig, ref int selectedIndex, MaterialInfo targetMatInfo)
+		public bool AreDependenciesMet(PropertiesConfig propertiesConfig, AbstractMaterialInfo targetMatInfo)
+		{
+			bool res = true;
+
+			if (!string.IsNullOrEmpty(dependentOnEffect))
+			{
+				AllIn13DEffectConfig dependentEffect = propertiesConfig.FindEffectConfigByID(dependentOnEffect);
+				res = res && IsEffectEnabled(dependentEffect, targetMatInfo);
+			}
+
+			return res;
+		}
+
+		public static bool IsEffectEnabled(AllIn13DEffectConfig effectConfig, ref int selectedIndex, AbstractMaterialInfo targetMatInfo)
 		{
 			selectedIndex = 0;
 
@@ -192,14 +238,10 @@ namespace AllIn13DShader
 
 			if (effectConfig.keywords.Count == 1)
 			{
-				for (int i = 0; i < targetMatInfo.enabledKeywords.Length; i++)
+				if (targetMatInfo.IsKeywordEnabled(effectConfig.keywords[0].keyword))
 				{
-					if (targetMatInfo.IsKeywordEnabled(effectConfig.keywords[0].keyword))
-					{
-						res = true;
-						selectedIndex = 0;
-						break;
-					}
+					res = true;
+					selectedIndex = 0;
 				}
 			}
 			else
@@ -208,7 +250,37 @@ namespace AllIn13DShader
 				{
 					string keywordToCheck = effectConfig.keywords[i].keyword;
 
-					if (targetMatInfo.IsKeywordEnabled(keywordToCheck) && i > 0)
+					bool isNoneOption = effectConfig.keywordsDisplayNames[i] == Constants.DISABLED_ENUM_OPTION_STR;
+					if (targetMatInfo.IsKeywordEnabled(keywordToCheck) && !isNoneOption)
+					{
+						res = true;
+						selectedIndex = i;
+						break;
+					}
+				}
+			}
+
+
+			return res;
+		}
+
+		public static bool IsEffectPropertyEnabled(EffectProperty effectProperty, ref int selectedIndex, string[] enabledKeywords)
+		{
+			bool res = false;
+
+			if (effectProperty.fullKeywordNames.Length == 1)
+			{
+				if (ArrayUtility.Contains(enabledKeywords, effectProperty.fullKeywordNames[0]))
+				{
+					res = true;
+					selectedIndex = 0;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < effectProperty.fullKeywordNames.Length; i++)
+				{
+					if (ArrayUtility.Contains(enabledKeywords, effectProperty.fullKeywordNames[i]))
 					{
 						res = true;
 						selectedIndex = i;
@@ -220,36 +292,64 @@ namespace AllIn13DShader
 			return res;
 		}
 
-
-		public static void ResetProperty(MaterialProperty targetProperty, AllIn13DShaderInspectorReferences references, MaterialInfo targetMatInfo)
+		public static bool IsEffectPropertyEnabled(EffectProperty effectProperty, ref int selectedIndex, AbstractMaterialInfo targetMatInfo)
 		{
-			Shader shader = targetMatInfo.mat.shader;
+			bool res = false;
+
+			if(effectProperty.fullKeywordNames.Length == 1)
+			{
+				if (targetMatInfo.IsKeywordEnabled(effectProperty.fullKeywordNames[0]))
+				{
+					res = true;
+					selectedIndex = 0;
+				}
+			}
+			else
+			{
+				for(int i = 0; i < effectProperty.fullKeywordNames.Length; i++)
+				{
+					if (targetMatInfo.IsKeywordEnabled(effectProperty.fullKeywordNames[i]))
+					{
+						res = true;
+						selectedIndex = i;
+						break;
+					}
+				}
+			}
+
+			return res;
+		}
+
+		public static void ResetProperty(MaterialProperty targetProperty, AllIn13DShaderInspectorReferences references, AbstractMaterialInfo targetMatInfo)
+		{
+			Shader shader = targetMatInfo.mat.shader; 
 
 			if (references.materialWithDefaultValues == null)
 			{
 				references.materialWithDefaultValues = new Material(shader);
 			}
 
+			AllIn1ShaderPropertyType targetPropertyType = EditorUtils.GetShaderTypeByMaterialProperty(targetProperty);
 			int propertyIndex = shader.FindPropertyIndex(targetProperty.name);
-			if (targetProperty.type == MaterialProperty.PropType.Float || targetProperty.type == MaterialProperty.PropType.Range)
+			if (targetPropertyType == AllIn1ShaderPropertyType.Float || targetPropertyType == AllIn1ShaderPropertyType.Range)
 			{
 				targetProperty.floatValue = references.materialWithDefaultValues.GetFloat(targetProperty.name);
 			}
-			else if (targetProperty.type == MaterialProperty.PropType.Vector)
+			else if (targetPropertyType == AllIn1ShaderPropertyType.Vector)
 			{
 				targetProperty.vectorValue = references.materialWithDefaultValues.GetVector(targetProperty.name);
 			}
-			else if (targetProperty.type == MaterialProperty.PropType.Color)
+			else if (targetPropertyType == AllIn1ShaderPropertyType.Color)
 			{
 				targetProperty.colorValue = references.materialWithDefaultValues.GetColor(targetProperty.name);
 			}
-			else if (targetProperty.type == MaterialProperty.PropType.Texture)
+			else if (targetPropertyType == AllIn1ShaderPropertyType.Texture)
 			{
 				targetProperty.textureValue = references.materialWithDefaultValues.GetTexture(targetProperty.name);
 			}
 		}
 
-		public static void EnableEffect(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references, MaterialInfo targetMatInfo)
+		public static void EnableEffect(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references, AbstractMaterialInfo targetMatInfo)
 		{
 			for (int i = 0; i < effectConfig.keywords.Count; i++)
 			{
@@ -258,19 +358,19 @@ namespace AllIn13DShader
 			}
 		}
 
-		public static void EnableEffectToggle(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references, MaterialInfo targetMatInfo)
+		public static void EnableEffectToggle(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references, AbstractMaterialInfo targetMatInfo)
 		{
 			targetMatInfo.EnableKeyword(effectConfig.keywords[0].keyword);
 			references.matProperties[effectConfig.keywordPropertyIndex].floatValue = 1f;
 		}
 
-		public static void DisableEffectToggle(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references, MaterialInfo targetMatInfo)
+		public static void DisableEffectToggle(AllIn13DEffectConfig effectConfig, AllIn13DShaderInspectorReferences references, AbstractMaterialInfo targetMatInfo)
 		{
 			targetMatInfo.DisableKeyword(effectConfig.keywords[0].keyword);
 			references.matProperties[effectConfig.keywordPropertyIndex].floatValue = 0f;
 		}
 
-		public static void EnableEffectByIndex(AllIn13DEffectConfig effectConfig, int index, AllIn13DShaderInspectorReferences references, MaterialInfo targetMatInfo)
+		public static void EnableEffectByIndex(AllIn13DEffectConfig effectConfig, int index, AllIn13DShaderInspectorReferences references, AbstractMaterialInfo targetMatInfo)
 		{
 			DisableEffect(effectConfig, targetMatInfo);
 			string kwToEnable = effectConfig.keywords[index].keyword;
@@ -286,7 +386,7 @@ namespace AllIn13DShader
 			}
 		}
 
-		public static void DisableEffect(AllIn13DEffectConfig effectConfig, MaterialInfo targetMatInfo)
+		public static void DisableEffect(AllIn13DEffectConfig effectConfig, AbstractMaterialInfo targetMatInfo)
 		{
 			for (int i = 0; i < effectConfig.keywords.Count; i++)
 			{
@@ -311,6 +411,23 @@ namespace AllIn13DShader
 			return res;
 		}
 
+
+
+		public int GetKeywordIndex(string keyword)
+		{
+			int res = -1;
+			for (int i = 0; i < keywords.Count; i++)
+			{
+				if (keywords[i].keyword == keyword)
+				{
+					res = i;
+					break;
+				}
+			}
+
+			return res;
+		}
+
 		public string[] GetPropertyNames()
 		{
 			string[] res = new string[effectProperties.Count];
@@ -319,6 +436,64 @@ namespace AllIn13DShader
 			{
 				res[i] = $"{effectProperties[i].displayName} ({effectProperties[i].propertyName})";
  			}
+
+			return res;
+		}
+
+		public bool ContainsKeywordProperties()
+		{
+			bool res = false;
+
+			for(int i = 0; i < effectProperties.Count; i++)
+			{
+				if (effectProperties[i].IsPropertyWithKeywords())
+				{
+					res = true;
+					break;
+				}
+			}
+
+			return res;
+		}
+
+		public GUIContent CreateGUIContent(int globalEffectIndex, int keywordSelectedIndex)
+		{
+			string label = $"{globalEffectIndex}. {displayName}";
+			string tooltip = keywords[keywordSelectedIndex].keyword + " (C#)";
+			
+			GUIContent res = new GUIContent(label, tooltip);
+
+			return res;
+		}
+
+		public bool ContainsKeyword(string keyword)
+		{
+			bool res = false;
+
+			for(int i = 0; i < keywords.Count; i++)
+			{
+				if (keywords[i].keyword == keyword)
+				{
+					res = true;
+					break;
+				}
+			}
+
+			return res;
+		}
+
+		public bool ContainsSomeKeywordFromList(string[] keywords)
+		{
+			bool res = false;
+
+			for(int i = 0; i < keywords.Length; i++)
+			{
+				if (ContainsKeyword(keywords[i]))
+				{
+					res = true;
+					break;
+				}
+			}
 
 			return res;
 		}

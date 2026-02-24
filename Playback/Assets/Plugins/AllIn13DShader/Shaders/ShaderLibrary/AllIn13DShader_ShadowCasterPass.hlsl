@@ -10,19 +10,26 @@ FragmentDataShadowCaster BasicVertexShadowCaster(VertexData v)
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); 
 
 #ifdef _USE_CUSTOM_TIME
-	float3 shaderTime = allIn13DShader_globalTime.xyz + ACCESS_PROP(_TimingSeed);
+	float3 shaderTime = allIn13DShader_globalTime.xyz + ACCESS_PROP_FLOAT(_TimingSeed);
 #else
-	float3 shaderTime = _Time.xyz + ACCESS_PROP(_TimingSeed);
+	float3 shaderTime = _Time.xyz + ACCESS_PROP_FLOAT(_TimingSeed);
 #endif
 
 	v.vertex = ApplyVertexEffects(v.vertex, v.normal, shaderTime);
 	
-	
 
-	o.mainUV.xy = SIMPLE_CUSTOM_TRANSFORM_TEX(v.uv, _MainTex);
+	float2 uv = v.uv;
+	uv = ApplyUVEffects_VertexStage(uv, o.positionWS, 0, shaderTime);
+	
+	o.mainUV.xy = SIMPLE_CUSTOM_TRANSFORM_TEX(uv, _MainTex);
 	o.positionOS = v.vertex;
 	o.positionWS = GetPositionWS(v.vertex);
+	o.uv2 = v.uvLightmap;
+	o.shaderTime = shaderTime;
+	o.normalOS = v.normal;
+	o.normalWS = GetNormalWS(v.normal);
 
+	
 	o = GetClipPosShadowCaster(v, o);
 
 	return o;
@@ -41,19 +48,26 @@ float4 BasicFragmentShadowCaster(FragmentDataShadowCaster i) : SV_Target
 		discard;
 	#endif
 #endif
+	
+	EffectsData data = CalculateEffectsData_ShadowCaster(i);
+	data = ApplyUVEffects_FragmentStage(data);
 
-	float4 col = float4(0, 0, 0, 1);
+	float4 col = SAMPLE_TEX2D(_MainTex, i.mainUV.xy);
+
 	
 	float camDistance = distance(i.positionWS, _WorldSpaceCameraPos);
 	
 	float4 screenPos = ComputeScreenPos(i.pos);
-	col = ApplyAlphaEffects(col, i.mainUV, 1.0, camDistance, screenPos);
+	
+	col = ApplyAlphaEffects(col,
+		i.mainUV, i.uv2, data.vertexWS,
+		1.0, camDistance, screenPos);
 
-	col.a *= ACCESS_PROP(_GeneralAlpha);
+	col.a *= ACCESS_PROP_FLOAT(_GeneralAlpha);
 
 	float alphaClip = saturate(col.a);
 #ifdef _ALPHA_CUTOFF_ON
-	alphaClip -= ACCESS_PROP(_AlphaCutoffValue);
+	alphaClip -= ACCESS_PROP_FLOAT(_AlphaCutoffValue);
 #endif
 
 	clip(alphaClip - 0.001);

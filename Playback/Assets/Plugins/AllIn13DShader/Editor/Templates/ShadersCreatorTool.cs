@@ -9,6 +9,8 @@ namespace AllIn13DShader
 	{
 		private const string TEMPLATE_EXTENSION = ".allIn13DTemplate";
 
+		private const string STENCIL_BLOCK_TEMPLATE_NAME = "StencilBlock";
+
 		private static string[] TEMPLATES_NAMES = new string[] 
 		{
 			"AllIn13DShaderOutline_NoShadowCaster_Template",
@@ -27,6 +29,7 @@ namespace AllIn13DShader
 			"SHADOW_CASTER_PASS_URP",
 			"DEPTH_ONLY_PASS_URP",
 			"DEPTH_NORMALS_PASS_URP",
+			"META_PASS_URP",
 		};
 
 		private const string REGEX_CORE = @"\/\*<{0}_START>\*\/\s*([\t\r\ ]*(?:.*\n)*)[\t\r\ ]*\s+\/\*<{0}_END>\*\/";
@@ -39,15 +42,25 @@ namespace AllIn13DShader
 
 			string shaderFileText = File.ReadAllText(mainShaderPath);
 
-			for(int i = 0; i < TEMPLATES_NAMES.Length; i++)
+			string stencilBlockPath = Path.Combine(Constants.TEMPLATES_FOLDER, STENCIL_BLOCK_TEMPLATE_NAME) + TEMPLATE_EXTENSION;
+			string stencilBlockContent = File.ReadAllText(stencilBlockPath);
+
+			for (int i = 0; i < TEMPLATES_NAMES.Length; i++)
 			{
 				string templatePath = Path.Combine(Constants.TEMPLATES_FOLDER, TEMPLATES_NAMES[i]) + TEMPLATE_EXTENSION;
 				
 				string templateText = File.ReadAllText(templatePath);
 				string newShaderFileText = SearchAndReplaceTemplateTags(shaderFileText, templateText);
 
+				if (TEMPLATES_NAMES[i] == "AllIn13DShaderOutline_NoShadowCaster_Template" ||
+					TEMPLATES_NAMES[i] == "AllIn13DShaderOutline_Template")
+				{
+					newShaderFileText = newShaderFileText.Replace(@"/*<STENCIL_BLOCK>*/", stencilBlockContent);
+				}
+
 				string newShaderFileName = TEMPLATES_NAMES[i].Replace("_Template", "");
-				string newShaderPath = Path.Combine(Constants.SHADERS_FOLDER_PATH, newShaderFileName + ".shader");
+				string newShaderPath = Path.Combine(Constants.SHADERS_GENERIC_FOLDER_PATH, newShaderFileName + ".shader");
+				newShaderFileText = EditorUtils.UnifyEOL(newShaderFileText);
 				File.WriteAllText(newShaderPath, newShaderFileText);
 			}
 

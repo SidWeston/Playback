@@ -95,14 +95,6 @@ namespace AllIn13DShader
 			expositorNameGo.SetActive(demoExpositors.Length > 1);
         }
         
-        private void Update()
-        {
-			if (showDemoInfoHandler.IsKeyPressed())
-			{
-				demoUI.ShowOrHideDemoInfo();
-			}
-		}
-        
         public void NavigateToNextExpositor()
         {
 	        previousDemoElement = CurrentDemoElement;

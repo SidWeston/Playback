@@ -8,8 +8,7 @@ namespace AllIn13DShader
 		public MaterialProperty[] matProperties;
 		public string[] oldKeyWords;
 
-		//public Material[] targetMats;
-		public MaterialInfo[] targetMatInfos;
+		public AbstractMaterialInfo[] targetMatInfos;
 
 		public Material materialWithDefaultValues;
 
@@ -25,7 +24,8 @@ namespace AllIn13DShader
 		//Cast Shadows Effect
 		public AllIn13DEffectConfig castShadowsEffectConfig;
 
-
+		//Effects Profile Collection
+		public EffectsProfileCollection effectsProfileCollection;
 
 		public AllIn13DShaderInspectorReferences()
 		{
@@ -49,15 +49,17 @@ namespace AllIn13DShader
 
 			if (this.targetMatInfos == null)
 			{
-				this.targetMatInfos = new MaterialInfo[materialEditor.targets.Length];
+				this.targetMatInfos = new AbstractMaterialInfo[materialEditor.targets.Length];
 				for (int i = 0; i < materialEditor.targets.Length; i++)
 				{
 					Material mat = (Material)materialEditor.targets[i];
-					targetMatInfos[i] = new MaterialInfo(mat);
+					targetMatInfos[i] = AbstractMaterialInfo.CreateInstance(mat);
 				}
 
 				materialWithDefaultValues = new Material(targetMatInfos[0].mat.shader);
 			}
+
+			this.effectsProfileCollection = GlobalConfiguration.instance.effectsProfileCollection;
 
 			this.matProperties = properties;
 		}
@@ -103,6 +105,90 @@ namespace AllIn13DShader
 			{
 				this.targetMatInfos[i].RefreshKeywords();
 			}
+		}
+
+		public bool IsShaderVariant()
+		{
+			bool res = true;
+
+			for(int i = 0; i < targetMatInfos.Length; i++)
+			{
+				res = res && targetMatInfos[i].IsShaderVariant();
+			}
+
+			return res;
+		}
+
+		public bool IsEffectEnabled(AllIn13DEffectConfig effectConfig, ref int selectedIndex)
+		{
+			bool res = true;
+
+			for (int i = 0; i < targetMatInfos.Length; i++)
+			{
+				int enumIdx = -1;
+				AbstractMaterialInfo matInfo = targetMatInfos[i];
+
+				bool effectEnabled = AllIn13DEffectConfig.IsEffectEnabled(effectConfig, ref enumIdx, matInfo);
+
+				if (i == 0)
+				{
+					selectedIndex = enumIdx;
+				}
+				else
+				{
+					res = res && (enumIdx == selectedIndex);
+				}
+			}
+
+			return res;
+		}
+
+		public bool IsEffectPropertyEnabled(EffectProperty effectProperty, ref int selectedIndex)
+		{
+			bool res = true;
+
+			for (int i = 0; i < targetMatInfos.Length; i++)
+			{
+				int enumIdx = 0;
+				AbstractMaterialInfo matInfo = targetMatInfos[i];
+
+				res = res && AllIn13DEffectConfig.IsEffectPropertyEnabled(effectProperty, ref enumIdx, matInfo);
+
+				if (i == 0)
+				{
+					selectedIndex = enumIdx;
+				}
+				else
+				{
+					res = res && (enumIdx == selectedIndex);
+				}
+			}
+
+			return res;
+		}
+
+		public bool AreAllMaterialsShaderVariant()
+		{
+			bool res = true;
+
+			for(int i = 0; i < targetMatInfos.Length; i++)
+			{
+				res = res && targetMatInfos[i].IsShaderVariant();
+			}
+
+			return res;
+		}
+
+		public bool AreAllMaterialsShaderGeneric()
+		{
+			bool res = true;
+
+			for (int i = 0; i < targetMatInfos.Length; i++)
+			{
+				res = res && !targetMatInfos[i].IsShaderVariant();
+			}
+
+			return res;
 		}
 	}
 }

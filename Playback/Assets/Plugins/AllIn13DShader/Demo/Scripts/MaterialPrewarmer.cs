@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -12,21 +11,9 @@ namespace AllIn13DShader
 		[SerializeField] private Transform spawnPosT;
 		[SerializeField] private GameObject overlayUI;
 
-		[SerializeField] private ShaderVariantCollection shaderVariantCollection;
-
-
-		private void Awake()
-		{
-#if UNITY_EDITOR
-			PrewarmEditor();
-#endif
-		}
-
 		private void Start()
 		{
-#if !UNITY_EDITOR
 			StartRuntime();
-#endif
 		}
 
 		private IEnumerator PrewarmMaterials()
@@ -76,40 +63,5 @@ namespace AllIn13DShader
 			};
 			return mesh;
 		}
-
-#if UNITY_EDITOR
-		private void PrewarmEditor()
-		{
-			ShaderVariantCollection shaderVariantCollection = new ShaderVariantCollection();
-			for (int i = 0; i < materialsToPrewarm.Length; i++)
-			{
-				Material mat = materialsToPrewarm[i];
-
-				string[] enabledKeywords = new string[mat.enabledKeywords.Length];
-				for(int kwIndex = 0; kwIndex < enabledKeywords.Length; kwIndex++)
-				{
-					enabledKeywords[kwIndex] = mat.enabledKeywords[kwIndex].name;
-				}
-
-				foreach (UnityEngine.Rendering.PassType passType in Enum.GetValues(typeof(UnityEngine.Rendering.PassType)))
-				{
-					try
-					{
-						shaderVariantCollection.Add(new ShaderVariantCollection.ShaderVariant(mat.shader, passType, enabledKeywords));
-					}
-					catch (Exception e)
-					{
-#if ALLIN13DSHADER_DEVELOP && ALLIN13DSHADER_LOG
-						Debug.LogWarning($"Failed to add shader variant for material: {mat.name} || Error Message: {e.Message}");
-#endif
-					}
-				}
-			}
-
-			this.shaderVariantCollection = shaderVariantCollection;
-
-			shaderVariantCollection.WarmUp();
-		}
-#endif
 	}
 }

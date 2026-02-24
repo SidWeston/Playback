@@ -69,7 +69,7 @@ namespace AllIn13DShader
 
 			if(postProcessProfileBIRP == null)
 			{
-				string rootFolder = EditorPrefs.GetString("AllIn13DShader_RootPluginFolder", "Assets/AllIn13DShader");
+				string rootFolder = SessionState.GetString("AllIn13DShader_RootPluginFolder", "Assets/AllIn13DShader");
 				string profilePath = Path.Combine(rootFolder, "Demo/PostProcessingProfile/3DShaderPP.asset");
 				postProcessProfileBIRP = AssetDatabase.LoadAssetAtPath<PostProcessProfile>(profilePath);
 			}
@@ -93,7 +93,7 @@ namespace AllIn13DShader
 
 			if(postProcessProfileURP == null)
 			{
-				string rootFolder = EditorPrefs.GetString("AllIn13DShader_RootPluginFolder", "Assets/AllIn13DShader");
+				string rootFolder = SessionState.GetString("AllIn13DShader_RootPluginFolder", "Assets/AllIn13DShader");
 				string profilePath = Path.Combine(rootFolder, "Demo/PostProcessingProfile/3DShaderPP_URP.asset");
 				postProcessProfileURP = AssetDatabase.LoadAssetAtPath<VolumeProfile>(profilePath);
 			}

@@ -10,8 +10,10 @@
 #define ALLIN13DSHADER_HALF_PI       1.57079632679f
 #define ALLIN13DSHADER_INV_HALF_PI   0.636619772367f
 
-#define CUSTOM_TRANSFORM_TEX(uv, increment, name) ((uv.xy + increment.xy) * ACCESS_PROP(name##_ST).xy + ACCESS_PROP(name##_ST).zw)
-#define SIMPLE_CUSTOM_TRANSFORM_TEX(uv, name) uv.xy * ACCESS_PROP(name##_ST).xy + ACCESS_PROP(name##_ST).zw
+#define CUSTOM_TRANSFORM_TEX(uv, increment, name) ((uv.xy + increment.xy) * ACCESS_PROP_FLOAT4(name##_ST).xy/*ACCESS_PROP_TILING_AND_OFFSET(name##_ST).xy*/ + ACCESS_PROP_FLOAT4(name##_ST).zw/*ACCESS_PROP_TILING_AND_OFFSET(name##_ST).zw*/)
+#define SIMPLE_CUSTOM_TRANSFORM_TEX(uv, name) uv.xy * ACCESS_PROP_FLOAT4(name##_ST).xy/*ACCESS_PROP_TILING_AND_OFFSET(name##_ST).xy*/ + /*ACCESS_PROP_FLOAT4(name##_ST).zw*/ACCESS_PROP_TILING_AND_OFFSET(name##_ST).zw
+
+#define DEFAULT_NORMAL_MAP_VALUE float4(1, 0.5, 0.5, 0.5)
 
 #ifdef _CUSTOM_SHADOW_COLOR_ON
 	#define SHADOW_COLOR global_shadowColor
@@ -52,6 +54,7 @@ float3 RemapFloat3(float3 inValue, float3 inMin, float3 inMax, float3 outMin, fl
 float GetLuminanceRaw(float4 col)
 {
 	float res = 0.3 * col.r + 0.59 * col.g + 0.11 * col.b;
+	res *= col.a;
 	return res;
 }
 
@@ -150,6 +153,14 @@ float3 GetNormalWSFromNormalMap(float3 tnormal, float normalStrength,
 //}
 #endif
 
+float3 BlendingUnpackedNormals(float3 unpackedNormal0, float3 unpackedNormal1)
+{
+	float2 unpackedBlendedNormalXY	= unpackedNormal0.xy + unpackedNormal1.xy;
+	float unpackedBlendedNormalZ	= unpackedNormal0.z * unpackedNormal1.z;
+
+	float3 res	= normalize(float3(unpackedBlendedNormalXY.x, unpackedBlendedNormalXY.y, unpackedBlendedNormalZ));
+	return res;
+}
 
 #ifdef REQUIRE_SCENE_DEPTH
 float ComputeEyeDepth(float3 vertexWS)
@@ -189,11 +200,11 @@ float3 GetAOMapTerm(float2 uv)
 {
 	float aoTex = SAMPLE_TEX2D(_AOMap, uv).r;
 	
-	//float ao = smoothstep(ACCESS_PROP(_AOContrast), 1 - ACCESS_PROP(_AOContrast), aoTex);
-	float3 ao = max(0, (aoTex - float3(0.5, 0.5, 0.5)) * ACCESS_PROP(_AOContrast) + float3(0.5, 0.5, 0.5));
+	//float ao = smoothstep(ACCESS_PROP_FLOAT(_AOContrast), 1 - ACCESS_PROP_FLOAT(_AOContrast), aoTex);
+	float3 ao = max(0, (aoTex - float3(0.5, 0.5, 0.5)) * ACCESS_PROP_FLOAT(_AOContrast) + float3(0.5, 0.5, 0.5));
 
-	ao = saturate(ao + 1 - ACCESS_PROP(_AOMapStrength));
-	float3 res = lerp(ACCESS_PROP(_AOColor).rgb, 1, ao);
+	ao = saturate(ao + 1 - ACCESS_PROP_FLOAT(_AOMapStrength));
+	float3 res = lerp(ACCESS_PROP_FLOAT4(_AOColor).rgb, 1, ao);
 	return res;
 }
 
@@ -213,7 +224,7 @@ float4 Dither_float4(float4 input, float4 screenPos, float normalizedDistance)
 	float2 screenUV = screenPos.xy / screenPos.w;
 	screenUV = screenUV * 0.5 + 0.5;
     
-	float2 pixelPos = screenUV * _ScreenParams.xy * ACCESS_PROP(_DitherScale) * 0.05;
+	float2 pixelPos = screenUV * _ScreenParams.xy * ACCESS_PROP_FLOAT(_DitherScale);
 	uint index = (uint(pixelPos.x) & 3) * 4 + (uint(pixelPos.y) & 3);
     
 	float dither = DITHER_THRESHOLDS[index] * normalizedDistance;
@@ -223,5 +234,19 @@ float4 Dither_float4(float4 input, float4 screenPos, float normalizedDistance)
 	return result;
 }
 #endif
+
+float AntiAliasing(float gradient, float cutOff)
+{
+	cutOff = max(0.01, cutOff);
+	float gradientCutOff = cutOff - gradient;
+
+	float2 ddxVector = float2(ddx(gradientCutOff), ddy(gradientCutOff));
+
+	float res = gradientCutOff / length(ddxVector);
+
+	res = saturate(0.5 - res);
+
+	return res;
+}
 
 #endif

@@ -8,42 +8,41 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: MAT_Outline
-  m_Shader: {fileID: 4800000, guid: 6034452bd7752ab41918b7826b5cfd4f, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
+  m_Shader: {fileID: 4800000, guid: a4c8f68acf7c9844e97a36914026acb1, type: 3}
   m_ValidKeywords:
+  - _ALBEDOVERTEXCOLORMODE_REPLACE
   - _ALPHA_CUTOFF_ON
   - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
+  - _FADEUVSET_UV1
   - _FADE_BURN_ON
   - _FADE_ON
   - _GREYSCALESTAGE_BEFORELIGHTING
+  - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
   - _HUE_SHIFT_ON
-  - _LIGHTMODEL_TOON
+  - _LIGHTMODEL_FAKEGI
   - _MATCAPBLENDMODE_MULTIPLY
   - _MATCAP_ON
   - _OUTLINETYPE_SIMPLE
+  - _RECEIVEDSHADOWSTYPE_CLASSIC
   - _RECEIVE_SHADOWS_ON
-  - _REFLECTIONS_NONE
+  - _REFLECTIONS_CLASSIC
   - _RIMLIGHTINGSTAGE_BEFORELIGHTING
   - _RIM_LIGHTING_ON
-  - _SHADINGMODEL_BASIC
-  - _SPECULARMODEL_TOON
+  - _SHADINGMODEL_PBR
+  - _SPECULARMODEL_CLASSIC
   - _TEXTUREBLENDINGMODE_RGB
-  - _USE_WIND_VERTICAL_MASK
-  m_InvalidKeywords:
-  - _ALBEDOVERTEXCOLORMODE_REPLACE
-  - _GLITCHWORLDSPACE_ON
-  - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
   - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
   - _TRIPLANARNORMALSPACE_WORLD
+  - _USE_WIND_VERTICAL_MASK
+  m_InvalidKeywords:
+  - _GLITCHWORLDSPACE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 2000
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -163,6 +162,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: a26b9f1a12d33184ab5e89d304e441ad, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TriplanarNoiseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TriplanarTopNormalMap:
         m_Texture: {fileID: 2800000, guid: 8175cba73bf87af41aeba7bbd2f3c4cd, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -237,6 +240,9 @@ Material:
     - _FadeOn: 1
     - _FadePower: 1
     - _FadeTransition: 0.215
+    - _FadeUVSet: 0
+    - _FlatNormalsBlend: 1
+    - _FlatNormalsEnabled: 0
     - _FogOn: 0
     - _GeneralAlpha: 1
     - _Glitch: 0
@@ -251,6 +257,7 @@ Material:
     - _GreyScaleStage: 0
     - _Greyscale: 0
     - _GreyscaleBlend: 1
+    - _GreyscaleBlending: 1
     - _GreyscaleLuminosity: 0
     - _HalfLambertWrap: 1
     - _HandDrawn: 0
@@ -290,7 +297,7 @@ Material:
     - _IntersectionFadeFactor: 1
     - _IntersectionFadeOn: 0
     - _IntersectionGlowOn: 0
-    - _LightModel: 2
+    - _LightModel: 5
     - _LightmapColorCorrection: 0
     - _Matcap: 1
     - _MatcapBlend: 0.556
@@ -307,7 +314,7 @@ Material:
     - _MinDistanceToFade: 0
     - _MinGradientHeight: 0
     - _MinInflate: 0
-    - _MinRim: 0.45
+    - _MinRim: 0.118
     - _Mode: 0
     - _NearFade: 0
     - _NormalInfluence: 0.5
@@ -324,8 +331,10 @@ Material:
     - _PosterizeGamma: 0.75
     - _PosterizeNumColors: 8
     - _RecalculateNormals: 0
+    - _ReceiveShadows: 1
     - _ReceiveShadowsOn: 1
-    - _Reflections: 0
+    - _ReceivedShadowsType: 0
+    - _Reflections: 1
     - _ReflectionsAtten: 0.25
     - _RenderPreset: 1
     - _RimAttenuation: 0
@@ -340,7 +349,8 @@ Material:
     - _ScrollTextureOn: 0
     - _ScrollTextureX: 1
     - _ScrollTextureY: 1
-    - _ShadingModel: 0
+    - _ShadingModel: 1
+    - _ShadowCutoff: 0.2
     - _ShakeBlend: 1
     - _ShakeSpeedMult: 1
     - _Shininess: 16
@@ -348,7 +358,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularAtten: 1
     - _SpecularHighlights: 1
-    - _SpecularModel: 2
+    - _SpecularModel: 1
     - _SpecularToonCutoff: 0.35
     - _SpecularToonSmoothness: 0
     - _SpherizeNormals: 0
@@ -367,8 +377,10 @@ Material:
     - _ToonSmoothness: 0.5
     - _TopNormalStrength: 1
     - _TriplanarMappingOn: 0
+    - _TriplanarNoiseTransitionOn: 0
     - _TriplanarNormalSpace: 1
     - _TriplanarSharpness: 15
+    - _TriplanarTransitionPower: 0.75
     - _UVDistortion: 0
     - _UVSec: 0
     - _UseCustomTime: 0
@@ -417,4 +429,3 @@ Material:
     - _ShakeSpeed: {r: 41, g: 49, b: 45, a: 0}
     - _VertexDistortionNoiseSpeed: {r: 4, g: 4, b: 0, a: 0}
   m_BuildTextureStacks: []
-  m_AllowLocking: 1

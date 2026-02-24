@@ -27,5 +27,7 @@ namespace AllIn13DShader
 		{
 		
 		}
+
+		public abstract string GetTabName();
 	}
 }

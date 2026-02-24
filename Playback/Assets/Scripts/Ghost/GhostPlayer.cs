@@ -55,11 +55,17 @@ public class GhostPlayer : MonoBehaviour
     //interaction stuff
     [SerializeField] private LayerMask interactableLayers;
     private const float interactRadius = 0.25f;
-    private const float interactDistance = 5f;
+    private const float interactDistance = 5f;    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if(!playerMovement)
+        {
+            GameObject.FindGameObjectWithTag("Player").TryGetComponent(out PlayerMovement movement);
+            playerMovement = movement;
+        }
+
         headRenderer = head.GetComponent<Renderer>();
         bodyRenderer = body.GetComponent<Renderer>();
         ResetGlitch(); //ensure glitch effect isnt set to high by default

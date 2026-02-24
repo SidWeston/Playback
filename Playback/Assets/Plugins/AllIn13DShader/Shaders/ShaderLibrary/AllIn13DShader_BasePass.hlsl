@@ -18,9 +18,9 @@ FragmentData BasicVertex(VertexData v)
 	o.interpolator_01 = 0; 
 
 #ifdef _USE_CUSTOM_TIME
-	SHADER_TIME(o) = allIn13DShader_globalTime.xyz + ACCESS_PROP(_TimingSeed);
+	SHADER_TIME(o) = allIn13DShader_globalTime.xyz + ACCESS_PROP_FLOAT(_TimingSeed);
 #else
-	SHADER_TIME(o) = _Time.xyz + ACCESS_PROP(_TimingSeed);
+	SHADER_TIME(o) = _Time.xyz + ACCESS_PROP_FLOAT(_TimingSeed);
 #endif
 
 	float3 originalVertex = v.vertex.xyz;
@@ -81,13 +81,13 @@ FragmentData BasicVertex(VertexData v)
 	UV_NORMAL_MAP(o) = CUSTOM_TRANSFORM_TEX(v.uv, UV_DIFF(o), _NormalMap);
 #endif
 
-	ShadowCoordStruct shadowCoordStruct = GetShadowCoords(v, o.pos, POSITION_WS(o));
+	ShadowCoordStruct shadowCoordStruct = GetShadowCoords(v, o.pos, POSITION_WS(o), v.uvLightmap);
 	o._ShadowCoord = shadowCoordStruct._ShadowCoord;
 
 #ifdef LIGHTMAP_ON
 	UV_LIGHTMAP(o) = v.uvLightmap * unity_LightmapST.xy + unity_LightmapST.zw;
 #else
-	UV_LIGHTMAP(o) = 0;
+	UV_LIGHTMAP(o) = v.uvLightmap;
 #endif
 	FOGCOORD(o) = GetFogFactor(o.pos);
 
@@ -105,16 +105,47 @@ FragmentData BasicVertex(VertexData v)
 	return o;
 }
 
-float4 BasicFragment(FragmentData i) : SV_Target
+float4 BasicFragment(
+	FragmentData i
+	#ifdef _WRITE_RENDERING_LAYERS
+		#if UNITY_VERSION >= 60020000
+			, out uint outRenderingLayers : SV_Target1
+		#else
+			, out float4 outRenderingLayers : SV_Target1
+		#endif
+	#endif
+	) : SV_Target
 {
 	UNITY_SETUP_INSTANCE_ID(i);
 	UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-	EffectsData data = CalculateEffectsData(i);
+
+	AllIn1DecalData decalData;
+	INIT_DECAL_DATA(decalData);
+
+#ifdef ALLIN1_DECALS_READY_TO_USE
+	ConfigureDecalData(decalData, i.pos);
+#endif
+
+
+#if defined(_FLAT_NORMALS_ON)
+	i.normalWS = GetFlatNormalWS(i.normalWS, POSITION_WS(i));
+	#if defined(REQUIRE_TANGENT_WS)
+		i.tspace0 = float3(i.tspace0.x, i.tspace0.y, i.normalWS.x);
+		i.tspace1 = float3(i.tspace1.x, i.tspace1.y, i.normalWS.y);
+		i.tspace2 = float3(i.tspace2.x, i.tspace2.y, i.normalWS.z);
+	#endif
+#endif
+
+	EffectsData data = CalculateEffectsData(i, decalData);
 	
 	data = ApplyUVEffects_FragmentStage(data);
 
-	data.normalWS = GetNormalWS(data, i);
+
+	data.normalWS = GetNormalWS(data, i, decalData);
+
+
+
 #ifdef _NORMAL_MAP_ON
 	data.bitangentWS = normalize(cross(data.normalWS, data.tangentWS));
 #endif
@@ -137,21 +168,25 @@ float4 BasicFragment(FragmentData i) : SV_Target
 	camDistance = distance(POSITION_WS(i), _WorldSpaceCameraPos);
 #endif
 	
-	objectColor *= ACCESS_PROP(_Color);
+	objectColor *= ACCESS_PROP_FLOAT4(_Color);
 	objectColor = ApplyColorEffectsBeforeLighting(objectColor, data);
+
+#ifdef ALLIN1_DECALS_READY_TO_USE
+	objectColor.rgb = objectColor.rgb * decalData.baseColor.a + decalData.baseColor.rgb;
+#endif
 
 	float4 col = objectColor;
 	
+
+
+	AllIn1GI gi = CalculateGI(UV_LIGHTMAP(i), data);
 	float3 lightmap = GetLightmap(UV_LIGHTMAP(i), data);
 #if defined(_AFFECTED_BY_LIGHTMAPS_ON) && defined(_LIGHTMAP_COLOR_CORRECTION_ON)
 	lightmap = LightmapColorCorrection(lightmap);
-	//float3 correctedLightmap = LightmapColorCorrection(lightmap);
-
-	//float lightmapMask = 1 - saturate(GetLuminance(lightmap));
-	//lightmap = (correctedLightmap * lightmapMask) + lightmap;
 #endif
 
-	float3 ambientColor = GetAmbientColor(float4(normalWS, 1));
+
+	float3 ambientColor = GetAmbientColor(data);
 
 #ifdef LIGHT_ON
 	float3 mainLightColor = GetMainLightColorRGB();
@@ -160,36 +195,48 @@ float4 BasicFragment(FragmentData i) : SV_Target
 	col.rgb = CalculateLighting(
 		POSITION_WS(i),
 		normalWS, data.tangentWS, data.bitangentWS,
-		objectColor.rgb, 
-		1.0, lightmap, ambientColor, viewDirWS, 
-		SCALED_MAIN_UV(i), mainLightColor, mainLightDir, i, 1.0, data);
+		objectColor.rgb, objectColor.a,
+		1.0, ambientColor, viewDirWS, 
+		SCALED_MAIN_UV(i), mainLightColor, mainLightDir, i, 1.0, data, 
+		gi); 
 #else
-	float2 ssaoFactor = GetSSAO(data.normalizedScreenSpaceUV.xy);
-	col.rgb = IndirectLighting_Basic(objectColor.rgb, lightmap, ssaoFactor, data);
+	float2 ssaoFactor = GetSSAO(data.normalizedScreenSpaceUV.xy, objectColor.a);
+	col.rgb = IndirectLighting_Basic(objectColor.rgb, ssaoFactor, data, gi);
 #endif
 	
 #ifdef _EMISSION_ON
 	float2 emissionUV = SIMPLE_CUSTOM_TRANSFORM_TEX(MAIN_UV(data), _EmissionMap);
 	float4 emissionMapCol = SAMPLE_TEX2D(_EmissionMap, emissionUV);
-	float4 emissionCol = emissionMapCol * ACCESS_PROP(_EmissionColor);
+	float4 emissionCol = emissionMapCol * ACCESS_PROP_FLOAT4(_EmissionColor) * ACCESS_PROP_FLOAT(_EmissionSelfGlow);
 
-	col.rgb *= ACCESS_PROP(_EmissionSelfGlow);
+	emissionCol.rgb += decalData.emissive;
+
 	col.rgb += emissionCol.rgb;
 #endif
 	
-	col = ApplyAlphaEffects(col, SCALED_MAIN_UV(i), sceneDepthDiff, data.camDistance, data.projPos);
+	col = ApplyAlphaEffects(col, 
+		SCALED_MAIN_UV(i), UV_LIGHTMAP(i), data.vertexWS, 
+		sceneDepthDiff, data.camDistance, data.projPos); 
 
 #ifdef _ALPHA_CUTOFF_ON
-	clip((col.a - ACCESS_PROP(_AlphaCutoffValue)) - 0.001);
+	clip((col.a - ACCESS_PROP_FLOAT(_AlphaCutoffValue)) - 0.001);
 #endif	
 
 	col = ApplyColorEffectsAfterLighting(col, data);
-	col.a *= ACCESS_PROP(_GeneralAlpha);
+	col.a *= ACCESS_PROP_FLOAT(_GeneralAlpha);
 	
-#ifdef _FOG_ON
+#if defined(FOG_ENABLED)
 	col = CustomMixFog(FOGCOORD(i), col);
 #endif
 
+#if defined(_WRITE_RENDERING_LAYERS)
+	#if UNITY_VERSION >= 60020000
+		outRenderingLayers = EncodeMeshRenderingLayer();
+	#else
+		uint renderingLayers = AllIn1GetMeshRenderingLayer();
+		outRenderingLayers = float4(EncodeMeshRenderingLayer(renderingLayers), 0, 0, 0);
+	#endif
+#endif
 
 	return col;
 }

@@ -9,6 +9,8 @@ namespace AllIn13DShader
 {
 	public class OverrideMaterialsTabDrawer : AssetWindowTabDrawer
 	{
+		private const string TAB_NAME = "Override Materials";
+
 		private enum State
 		{
 			NONE = 0,
@@ -477,12 +479,11 @@ namespace AllIn13DShader
 			{
 				overrideData.EndOverrideProcess();
 			}
-		} 
+		}
 
-		//[InitializeOnLoadMethod]
-		//private static void InitializeOnLoad()
-		//{ 
-		//	Debug.Log("Initialize On Load");
-		//}
+		public override string GetTabName()
+		{
+			return TAB_NAME;
+		}
 	}
 }

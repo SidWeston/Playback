@@ -8,6 +8,7 @@ namespace AllIn13DShader
 		public const int BUTTON_WIDTH = 600;
 		public const int BIG_FONT_SIZE = 16;
 
+		public GUIStyle shaderPropertiesStyle;
 		public GUIStyle wordWrappedStyle;
 		public GUIStyle style;
 		public GUIStyle bigLabel;
@@ -63,6 +64,12 @@ namespace AllIn13DShader
 			{
 				boxStyle = new GUIStyle(EditorStyles.helpBox);
 				boxStyle.margin = new RectOffset(0, 0, 0, 0);
+			}
+
+			if(shaderPropertiesStyle == null)
+			{
+				shaderPropertiesStyle = new GUIStyle(EditorStyles.helpBox);
+				shaderPropertiesStyle.margin = new RectOffset(25, 0, 0, 0);
 			}
 		}
 	}
