@@ -850,7 +850,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1539390014203715149
 Transform:
   m_ObjectHideFlags: 0
@@ -889,8 +889,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31810d401580865488e513236e1046d8, type: 2}
-  - {fileID: 2100000, guid: f07486364fe01a841a0de36050ed4e6c, type: 2}
+  - {fileID: 2100000, guid: 79a00bdaf8ee1624aac85629ad8ff70b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2426,7 +2425,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6918948436293863720
 Transform:
   m_ObjectHideFlags: 0
@@ -2465,8 +2464,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31810d401580865488e513236e1046d8, type: 2}
-  - {fileID: 2100000, guid: f07486364fe01a841a0de36050ed4e6c, type: 2}
+  - {fileID: 2100000, guid: 79a00bdaf8ee1624aac85629ad8ff70b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2907,7 +2905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0537b5e788d73040b54c630471ea407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  playerMovement: {fileID: 0}
   isRecording: 0
   frameInterval: 0.1
   recordDuration: 12
@@ -2923,6 +2921,10 @@ MonoBehaviour:
   body: {fileID: 8160859224214552357}
   ghostMat: {fileID: 2100000, guid: 31810d401580865488e513236e1046d8, type: 2}
   ghostUI: {fileID: 4165520606073552891}
+  crouchedColSize: {x: 0, y: 0, z: 0}
+  crouchedColOffset: -0.3
+  restartGlitchValue: 5
+  baseGlitchValue: 0.1
   interactableLayers:
     serializedVersion: 2
     m_Bits: 512

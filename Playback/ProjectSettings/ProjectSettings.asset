@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: Sid Weston Games
   productName: Playback
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -142,7 +142,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.1.0
+  bundleVersion: 0.2.0
   preloadedAssets:
   - {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   metroInputSource: 0
@@ -825,7 +825,7 @@ PlayerSettings:
   webWasm2023: 0
   scriptingDefineSymbols:
     Server: PROBUILDER_EXPERIMENTAL_FEATURES
-    Standalone: AMPLIFY_SHADER_EDITOR;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3;PROBUILDER_EXPERIMENTAL_FEATURES;ALLIN13DSHADER_URP
+    Standalone: AMPLIFY_SHADER_EDITOR;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3;PROBUILDER_EXPERIMENTAL_FEATURES;ALLIN13DSHADER_URP;DREAMTECK_SPLINES
     WebGL: ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3;ALLIN13DSHADER_URP;PROBUILDER_EXPERIMENTAL_FEATURES
     Windows Store Apps: PROBUILDER_EXPERIMENTAL_FEATURES
   additionalCompilerArguments: {}
