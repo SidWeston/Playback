@@ -50,7 +50,7 @@ public class MultiDoor : ActivatableObject
     {
         foreach (FloorButton button in buttons)
         {
-            if (!button.active)
+            if (!button.powered)
             {
                 return;
             }

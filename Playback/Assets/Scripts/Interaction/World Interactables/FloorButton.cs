@@ -46,7 +46,7 @@ public class FloorButton : ButtonBase
         if((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
             if (!buttonDown) buttonDown = true;
-            active = true;
+            powered = true;
             overlappedObjects.Add(other.gameObject);
             ActivateObjects(gameObject);            
             if(powerline)   powerline.material = lineOn;
@@ -69,7 +69,7 @@ public class FloorButton : ButtonBase
             {
                 DeactivateObjects();
                 if (buttonDown) buttonDown = false;
-                active = false;
+                powered = false;
                 if(powerline)  powerline.material = lineOff;
                 if(wallLight)   wallLight.material = lightOff;
             }

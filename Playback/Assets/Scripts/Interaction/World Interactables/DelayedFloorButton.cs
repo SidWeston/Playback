@@ -34,7 +34,7 @@ public class DelayedFloorButton : FloorButton
                 if(r <= 0)
                 {
                     DeactivateObjects();
-                    active = false;
+                    powered = false;
                     if(powerline) powerline.material = lineOff;
                     if(wallLight) wallLight.material = lightOff;
                 }

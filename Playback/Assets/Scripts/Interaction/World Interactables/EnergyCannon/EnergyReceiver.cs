@@ -1,10 +1,8 @@
 using UnityEngine;
 
-public class EnergyReceiver : MonoBehaviour
+public class EnergyReceiver : Activator
 {
-    public ActivatableObject poweredObj;
-
-    public bool powered = false;
+    public ActivatableObject poweredObj;    
 
     //line renderers
     [SerializeField] private LineRenderer powerline;

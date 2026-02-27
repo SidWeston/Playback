@@ -20,9 +20,7 @@ public class GameUI : MonoBehaviour
     public List<GhostUI> ghostUIs = new List<GhostUI>();
 
     public Button backButton;
-    public Button backToMenuButton;
-
-    [SerializeField] private AudioSource musicSource;
+    public Button backToMenuButton;    
 
     private PlayerCamera playerCam;
 
@@ -92,8 +90,8 @@ public class GameUI : MonoBehaviour
             instance.canvas.gameObject.SetActive(true);
             settingsMenu.SetActive(false);
             gameUI.SetActive(true);
-            musicSource.gameObject.SetActive(true);
-            musicSource.Play();
+            //musicSource.gameObject.SetActive(true);
+            //musicSource.Play();
         }
 
         //moved disabling the camera for the pause menu in here because for some reason if you play a level,
@@ -261,7 +259,7 @@ public class GameUI : MonoBehaviour
 
     private void SetMusicVolume(float volume)
     {
-        musicSource.volume = volume;
+        //musicSource.volume = volume;
     }
 }
 

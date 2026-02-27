@@ -27,10 +27,10 @@ public class InteractionButton : ButtonBase, Interactable
     {
         if (!toggleable)
         {
-            if (!active && !IsInvoking())
+            if (!powered && !IsInvoking())
             {
                 ActivateObjects(interactor);
-                active = true;
+                powered = true;
                 if (powerline) powerline.material = lineOn;
                 if (wallLight) wallLight.material = lightOn;
             }
@@ -38,28 +38,28 @@ public class InteractionButton : ButtonBase, Interactable
         }
         else if (toggleable)
         {
-            if (!active)
+            if (!powered)
             {
                 ActivateObjects(interactor);
-                active = true;
+                powered = true;
                 if (powerline) powerline.material = lineOn;
                 if (wallLight) wallLight.material = lightOn;
             }
             else
             {
                 DeactivateObjects();
-                active = false;
+                powered = false;
                 if (powerline) powerline.material = lineOff;
                 if (wallLight) wallLight.material = lightOff;
             }
 
         }
 
-        if(timed && active)
+        if(timed && powered)
         {
             Invoke(nameof(DeactivateOnTimer), timer);
         }
-        else if(timed && !active)
+        else if(timed && !powered)
         {
             CancelInvoke(nameof(DeactivateOnTimer));
         }
@@ -68,7 +68,7 @@ public class InteractionButton : ButtonBase, Interactable
     private void DeactivateOnTimer()
     {
         DeactivateObjects();
-        active = false;
+        powered = false;
         if (powerline) powerline.material = lineOff;
         if (wallLight) wallLight.material = lightOff;
     }

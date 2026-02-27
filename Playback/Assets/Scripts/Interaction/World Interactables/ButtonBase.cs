@@ -1,12 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ButtonBase : MonoBehaviour
-{    
-    [SerializeField] protected List<ActivatableObject> activatableObjects;
-
-    public bool active = false;
-
+public class ButtonBase : Activator
+{        
     [SerializeField] protected LineRenderer powerline;
     [SerializeField] protected Material lineOff, lineOn;
     //powerlight

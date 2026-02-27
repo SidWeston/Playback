@@ -50,6 +50,9 @@ MonoBehaviour:
   doors:
   - {fileID: 6260452456148789437}
   - {fileID: 3812568183435820052}
+  wallLights: []
+  lightOff: {fileID: 2100000, guid: d9debb8ca9f0aa9409ec5489aa193649, type: 2}
+  lightOn: {fileID: 2100000, guid: 82fc1ef76d976754a9fb378fbc84d556, type: 2}
 --- !u!1 &3878017892494104219
 GameObject:
   m_ObjectHideFlags: 0

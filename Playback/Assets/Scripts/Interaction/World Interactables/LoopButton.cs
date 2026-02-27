@@ -35,7 +35,7 @@ public class LoopButton : FloorButton
         if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
         {
             if (!buttonDown) buttonDown = true;
-            active = true;
+            powered = true;
             overlappedObjects.Add(other.gameObject);
             InvokeRepeating("Activate", 0, loopTimer);
             if (powerline) powerline.material = lineOn;
@@ -64,7 +64,7 @@ public class LoopButton : FloorButton
                 DeactivateObjects();                
                 CancelInvoke("Activate");
                 if (buttonDown) buttonDown = false;
-                active = false;
+                powered = false;
                 if (powerline) powerline.material = lineOff;
                 if (wallLight) wallLight.material = lightOff;
             }
