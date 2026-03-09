@@ -19,6 +19,7 @@ public class GhostPlayer : MonoBehaviour
     [SerializeField] private BoxCollider ghostCollider;
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private LayerMask obstacleLayers;
+    private bool stateSwapped = false;
 
     [SerializeField] private GameObject head, body;
     private Renderer headRenderer, bodyRenderer;
@@ -58,6 +59,7 @@ public class GhostPlayer : MonoBehaviour
 
     private bool paused = false;
     private bool rewind = false;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -132,11 +134,11 @@ public class GhostPlayer : MonoBehaviour
         }
 
         //if the movement direction changes, update the animation
-        if(a.movementInput != b.movementInput)
+        if(a.movementInput != b.movementInput || stateSwapped)
         {
-            
-        }
-        animationController.PlayMovementAnimation(b.movementInput);
+            stateSwapped = false;
+            animationController.PlayMovementAnimation(b.movementInput);
+        }        
     }
 
     private void ApplyInitialFrameState()
@@ -148,18 +150,21 @@ public class GhostPlayer : MonoBehaviour
             ghostCollider.size = crouchedColSize;
             ghostCollider.center = new Vector3(0, crouchedColOffset, 0);
             animationController.SwitchAnimSet(MoveMode.CROUCH);
+            stateSwapped = true;
         }
         else if(firstFrame.isSprinting)
         {
             ghostCollider.size = standingColSize;
             ghostCollider.center = Vector3.zero;
             animationController.SwitchAnimSet(MoveMode.SPRINT);
+            stateSwapped = true;
         }
         else
         {
             ghostCollider.size = standingColSize;
             ghostCollider.center = Vector3.zero;
             animationController.SwitchAnimSet(MoveMode.WALK);
+            stateSwapped = true;
         }
     }
 
@@ -345,6 +350,7 @@ public class GhostPlayer : MonoBehaviour
                     ghostCollider.size = crouchedColSize;
                     ghostCollider.center = new Vector3(0, crouchedColOffset, 0);
                     animationController.SwitchAnimSet(MoveMode.CROUCH);
+                    stateSwapped = true;
                     break;
                 }
             case GhostEvent.EventType.UnCrouch:
@@ -352,6 +358,7 @@ public class GhostPlayer : MonoBehaviour
                     ghostCollider.size = standingColSize;
                     ghostCollider.center = Vector3.zero;
                     animationController.SwitchAnimSet(MoveMode.WALK);
+                    stateSwapped = true;
                     break;
                 }
             case GhostEvent.EventType.Sprint:
@@ -359,6 +366,7 @@ public class GhostPlayer : MonoBehaviour
                     ghostCollider.size = standingColSize;
                     ghostCollider.center = Vector3.zero;
                     animationController.SwitchAnimSet(MoveMode.SPRINT);
+                    stateSwapped = true;
                     break;
                 }
             case GhostEvent.EventType.UnSprint:
@@ -366,6 +374,7 @@ public class GhostPlayer : MonoBehaviour
                     ghostCollider.size = standingColSize;
                     ghostCollider.center = Vector3.zero;
                     animationController.SwitchAnimSet(MoveMode.WALK);
+                    stateSwapped = true;
                     break;
                 }
         }
