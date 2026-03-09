@@ -10,9 +10,7 @@ public class GhostPlayer : MonoBehaviour
     private List<GhostFrame> recording = new List<GhostFrame>();
     private List<GhostEvent> eventLog = new List<GhostEvent>();
 
-    public bool isRecording = false;
-    private bool isPlaying = false;
-    private bool active = false;
+    public GhostState ghostState;
 
     [SerializeField] private float frameInterval = 0.1f;
     [SerializeField] private float recordDuration = 5f;
@@ -25,6 +23,7 @@ public class GhostPlayer : MonoBehaviour
     [SerializeField] private GameObject head, body;
     private Renderer headRenderer, bodyRenderer;
     [SerializeField] private Material ghostMat;
+    private bool visualsActive;
 
     [SerializeField] private GhostUI ghostUI;
 
@@ -55,7 +54,10 @@ public class GhostPlayer : MonoBehaviour
     //interaction stuff
     [SerializeField] private LayerMask interactableLayers;
     private const float interactRadius = 0.25f;
-    private const float interactDistance = 5f;    
+    private const float interactDistance = 5f;
+
+    private bool paused = false;
+    private bool rewind = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -69,7 +71,7 @@ public class GhostPlayer : MonoBehaviour
         headRenderer = head.GetComponent<Renderer>();
         bodyRenderer = body.GetComponent<Renderer>();
         ResetGlitch(); //ensure glitch effect isnt set to high by default
-        active = false; //assume ghost starts turned off
+        ghostState = GhostState.Inactive; //assume ghost starts turned off
 
         ghostUI = GetComponent<GhostUI>();
 
@@ -85,8 +87,8 @@ public class GhostPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isPlaying || recording.Count < 2) return;
-
+        if (ghostState != GhostState.Playing || recording.Count < 2) return;
+        
         frameTimer += Time.deltaTime;
         duration -= Time.deltaTime;
 
@@ -99,6 +101,7 @@ public class GhostPlayer : MonoBehaviour
             //reached the end of playback, loop back to the start
             if (currentFrameIndex >= recording.Count - 1)
             {
+                ApplyInitialFrameState();
                 currentFrameIndex = 0;
                 currentEventIndex = 0;
                 playbackStartTime = Time.time;
@@ -112,7 +115,7 @@ public class GhostPlayer : MonoBehaviour
 
         //get 2 frames to interpolate between
         GhostFrame a = recording[currentFrameIndex];
-        GhostFrame b = recording[currentFrameIndex + 1];
+        GhostFrame b = recording[currentFrameIndex + 1];       
         float t = frameTimer / frameInterval;
 
         Vector3 position = Vector3.Lerp(a.position, b.position, t);
@@ -128,22 +131,36 @@ public class GhostPlayer : MonoBehaviour
             currentEventIndex++;
         }
 
-        animationController.PlayMovementAnimation(a.movementInput);
-        MoveMode moveMode = MoveMode.WALK;
-        //TODO: move sprinting and crouching to the event system to avoid checking every frame
-        if (a.isSprinting) moveMode = MoveMode.SPRINT;
-        if (a.isCrouching)
+        //if the movement direction changes, update the animation
+        if(a.movementInput != b.movementInput)
         {
-            moveMode = MoveMode.CROUCH;
+            
+        }
+        animationController.PlayMovementAnimation(b.movementInput);
+    }
+
+    private void ApplyInitialFrameState()
+    {
+        GhostFrame firstFrame = recording[0];
+
+        if(firstFrame.isCrouching)
+        {            
             ghostCollider.size = crouchedColSize;
             ghostCollider.center = new Vector3(0, crouchedColOffset, 0);
+            animationController.SwitchAnimSet(MoveMode.CROUCH);
+        }
+        else if(firstFrame.isSprinting)
+        {
+            ghostCollider.size = standingColSize;
+            ghostCollider.center = Vector3.zero;
+            animationController.SwitchAnimSet(MoveMode.SPRINT);
         }
         else
         {
             ghostCollider.size = standingColSize;
             ghostCollider.center = Vector3.zero;
+            animationController.SwitchAnimSet(MoveMode.WALK);
         }
-        animationController.SwitchAnimSet(moveMode);
     }
 
     #endregion
@@ -230,9 +247,9 @@ public class GhostPlayer : MonoBehaviour
     public IEnumerator RecordGhostFrames()
     {
         //setup
-        isRecording = true;
+        ghostState = GhostState.Recording;        
         earlyStop = false;
-        if(active) ToggleGhost(true);
+        if(visualsActive) ToggleGhost(true);
         List<GhostFrame> newFrames = new List<GhostFrame>();
         float timer = 0f;
         recordingStartTime = Time.time;
@@ -253,7 +270,7 @@ public class GhostPlayer : MonoBehaviour
         duration = timer;
 
         //toggle the ghost visuals and effects
-        if (!active) ToggleGhost(true);
+        if (!visualsActive) ToggleGhost(true);
         recording = newFrames;
         currentFrameIndex = 0;
         PerformGlitchEffect();
@@ -266,8 +283,8 @@ public class GhostPlayer : MonoBehaviour
         frameTimer = 0;
         transform.position = recording[0].position;
         transform.rotation = recording[0].rotation;
-        isPlaying = true;
-        isRecording = false;
+        ghostState = GhostState.Playing;
+        ApplyInitialFrameState();
 
         //check if the ghost has spawned in the same space as the player
         CheckForPlayerOverlap();
@@ -290,13 +307,17 @@ public class GhostPlayer : MonoBehaviour
     {
         if (input && canRecord)
         {
-            if (!isRecording) //start recording
+            if (ghostState != GhostState.Recording) //start recording
             {
+                if(ghostState == GhostState.Playing)
+                {
+                    ToggleGhost(true);
+                }
                 canRecord = false;
                 Invoke(nameof(ResetCanRecord), recordDelay); //to stop recordings being spammed there is a short delay between activation and deactivation
                 StartCoroutine(RecordGhostFrames());
             }
-            else if (isRecording) //end recording early
+            else if (ghostState == GhostState.Recording) //end recording early
             {
                 earlyStop = true;
             }
@@ -305,7 +326,7 @@ public class GhostPlayer : MonoBehaviour
 
     public void StopRecording()
     {
-        StopCoroutine(RecordGhostFrames());
+        earlyStop = true;
     }
     #endregion
 
@@ -317,6 +338,34 @@ public class GhostPlayer : MonoBehaviour
             case GhostEvent.EventType.Interact:
                 {
                     TryInteract();
+                    break;
+                }
+            case GhostEvent.EventType.Crouch:
+                {
+                    ghostCollider.size = crouchedColSize;
+                    ghostCollider.center = new Vector3(0, crouchedColOffset, 0);
+                    animationController.SwitchAnimSet(MoveMode.CROUCH);
+                    break;
+                }
+            case GhostEvent.EventType.UnCrouch:
+                {
+                    ghostCollider.size = standingColSize;
+                    ghostCollider.center = Vector3.zero;
+                    animationController.SwitchAnimSet(MoveMode.WALK);
+                    break;
+                }
+            case GhostEvent.EventType.Sprint:
+                {
+                    ghostCollider.size = standingColSize;
+                    ghostCollider.center = Vector3.zero;
+                    animationController.SwitchAnimSet(MoveMode.SPRINT);
+                    break;
+                }
+            case GhostEvent.EventType.UnSprint:
+                {
+                    ghostCollider.size = standingColSize;
+                    ghostCollider.center = Vector3.zero;
+                    animationController.SwitchAnimSet(MoveMode.WALK);
                     break;
                 }
         }
@@ -349,16 +398,15 @@ public class GhostPlayer : MonoBehaviour
         {
             if (recording.Count > 2)
             {
-                isPlaying = !isPlaying;
+                ghostState = GhostState.Inactive;
                 currentFrameIndex = 0;
-            }
-            else isPlaying = false;
+            }            
 
             transform.position = new Vector3(-100, -100, -100); //ensure the ghost is out of sight, as it cant be disabled and still allow for recording
             head.SetActive(!head.activeSelf);
             body.SetActive(!body.activeSelf);
-            active = !active;
-            if (!active)
+            visualsActive = !visualsActive;
+            if (!visualsActive)
             {
                 GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Pause);
                 GameUI.instance.UpdateGhostUITime(ghostUI.index, 0);
@@ -366,7 +414,7 @@ public class GhostPlayer : MonoBehaviour
             //need to wait a frame to wait for physics updates
             StartCoroutine(EnableColliderAfterFrame());
 
-            if (!active && recording.Count > 0) recording.Clear();
+            if (!visualsActive && recording.Count > 0) recording.Clear();
         }
     }
 
@@ -397,6 +445,23 @@ public class GhostPlayer : MonoBehaviour
     {
         glitchSound.volume = volume;
     }
+
+    public void TogglePause()
+    {
+        if(ghostState == GhostState.Playing)
+        {
+            ghostState = GhostState.Paused;
+        }
+        else if(ghostState == GhostState.Paused && recording.Count >= 2)
+        {
+            ghostState = GhostState.Playing;
+        }        
+    }
+
+    public void ToggleRewind()
+    {
+
+    }
 }
 
 public struct GhostFrame
@@ -419,5 +484,18 @@ public struct GhostEvent
     public enum EventType
     {
         Interact,     
+        Crouch,
+        UnCrouch,
+        Sprint,
+        UnSprint,
     }
+}
+
+public enum GhostState
+{
+    Recording,
+    Playing,
+    Inactive,
+    Paused,
+    Rewind
 }

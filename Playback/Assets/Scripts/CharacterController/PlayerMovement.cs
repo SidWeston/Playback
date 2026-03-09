@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     //events for animations
     public event Action<bool> landedEvent;
     public event Action<bool> jumpEvent;
+    public event Action<bool> crouchEvent;
+    public event Action<bool> sprintEvent;
 
     private Vector3 startPosition;
 
@@ -101,35 +103,75 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void OnSprint(bool input)
-    {
+    {        
         if(input)
         {
-            moveSpeed = sprintSpeed;
-            sprinting = true;
+            if (sprinting) return;
+
+            if (crouching)
+            {
+                UnCrouch();
+            }
+
+            Sprint();
         }
         else
         {
-            moveSpeed = walkSpeed;
-            sprinting = false;
+            if (!sprinting) return;
+            UnSprint();
         }
     }
 
+    private void Sprint()
+    {        
+        moveSpeed = sprintSpeed;
+        sprinting = true;
+        sprintEvent?.Invoke(true);
+    }
+
+    private void UnSprint()
+    {        
+        moveSpeed = walkSpeed;
+        sprinting = false;
+        sprintEvent?.Invoke(false);
+    }
+
     private void OnCrouch(bool input)
-    {
+    {        
         if(input)
         {
-            crouching = true;
-            playerCamera.transform.localPosition = crouchedCamPos;
-            characterController.height = 1.25f;
-            characterController.center = new Vector3(0, -0.25f, 0);
+            if (crouching) return;
+
+            if (sprinting)
+            {
+                UnSprint();
+            }
+
+            Crouch();
         }
         else
         {
-            crouching = false;
-            playerCamera.transform.localPosition = stoodCamPos;
-            characterController.height = 2f;
-            characterController.center = Vector3.zero;
+            if (!crouching) return;
+            UnCrouch();
         }
+    }
+
+    private void Crouch()
+    {
+        crouching = true;
+        playerCamera.transform.localPosition = crouchedCamPos;
+        characterController.height = 1.25f;
+        characterController.center = new Vector3(0, -0.25f, 0);
+        crouchEvent?.Invoke(true);
+    }
+
+    private void UnCrouch()
+    {
+        crouching = false;
+        playerCamera.transform.localPosition = stoodCamPos;
+        characterController.height = 2f;
+        characterController.center = Vector3.zero;
+        crouchEvent?.Invoke(false);
     }
 
     private void OnInteract(bool input)
@@ -138,7 +180,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
     //2 seperate frame recording structs, ghosts and rewind need different requirements
-
     //ghost recording
     public GhostFrame RecordFrame()
     {

@@ -14,6 +14,13 @@ public class GhostController : MonoBehaviour
         InputManager.instance.selectOne.keyPress += SelectGhostA;
         InputManager.instance.selectTwo.keyPress += SelectGhostB;
         InputManager.instance.interactKey.keyPress += OnInteract;        
+        InputManager.instance.shootKey.keyPress += OnPause;
+
+        //extra events to control crouching and sprinting anims on ghost
+        //as they cancel each other, but dont change the anims if they are held at the same time
+        TryGetComponent(out PlayerMovement movement);
+        movement.crouchEvent += OnCrouch;
+        movement.sprintEvent += OnSprint;        
 
         if (ghosts.Count == 1)
         {
@@ -64,7 +71,7 @@ public class GhostController : MonoBehaviour
 
     public bool IsRecording() //linked to the player rewind mechanic
     {
-        if (currentGhost.isRecording) return true;
+        if (currentGhost.ghostState == GhostState.Recording) return true;
         return false;
     }
 
@@ -77,10 +84,55 @@ public class GhostController : MonoBehaviour
     { 
         if(input)
         {
-            if(currentGhost && currentGhost.isRecording)
+            if(currentGhost && currentGhost.ghostState == GhostState.Recording)
             {
                 RecordEvent(GhostEvent.EventType.Interact);
             }
         }
+    }
+
+    private void OnCrouch(bool input)
+    {
+        if(currentGhost && currentGhost.ghostState == GhostState.Recording)
+        {
+            if(input)
+            {
+                RecordEvent(GhostEvent.EventType.Crouch);
+            }
+            else
+            {
+                RecordEvent(GhostEvent.EventType.UnCrouch);
+            }
+        }
+    }
+
+    private void OnSprint(bool input)
+    {
+        if(currentGhost && currentGhost.ghostState == GhostState.Recording)
+        {
+            if(input)
+            {
+                RecordEvent(GhostEvent.EventType.Sprint);
+            }
+            else
+            {
+                RecordEvent(GhostEvent.EventType.UnSprint);
+            }
+        }
+    }
+
+    private void OnPause(bool input)
+    {
+        if (currentGhost.ghostState != GhostState.Playing && currentGhost.ghostState != GhostState.Paused) return;
+
+        if(input && currentGhost)
+        {
+            currentGhost.TogglePause();
+        }
+    }
+
+    private void OnRewind(bool input)
+    {
+        if (currentGhost.ghostState != GhostState.Playing) return;
     }
 }
