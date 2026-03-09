@@ -16,7 +16,7 @@ public class FloorButton : ButtonBase
 
     private void Start()
     {
-        if(powerline)   powerline.material = lineOff; 
+        if(powerline)  powerline.material = lineOff; 
         if(wallLight)  wallLight.material = lightOff;
     }
 

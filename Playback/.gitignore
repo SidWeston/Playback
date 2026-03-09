@@ -83,3 +83,16 @@ crashlytics-build.properties
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+
+
+# Baked Lighting
+/[Ll]ibrary/
+*.lightmap
+*.exr
+/Assets/**/LightingData.asset
+/Assets/**/ReflectionProbe-*.exr
+/Assets/**/LightmapSnapshot.asset
+
+# Lighting data folders (adjust path to match yours)
+/Assets/**/Lightmap-*_comp_dir.png
+/Assets/**/Lightmap-*_comp_light.exr
