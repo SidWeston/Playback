@@ -24,12 +24,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public InputKey jumpKey = new InputKey();
     public InputKey recordKey = new InputKey();
     public InputKey ghostKey = new InputKey();
-    public InputKey pauseKey = new InputKey();
-    public InputKey rewindKey = new InputKey();
+    public InputKey pauseKey = new InputKey();    
     public InputKey selectOne = new InputKey();
     public InputKey selectTwo = new InputKey();
     public InputKey dropKey = new InputKey();
     public InputKey shootKey = new InputKey();
+    public InputKey pauseGhostKey = new InputKey();
+    public InputKey rewindGhostKey = new InputKey();
 
     private void Awake()
     {      
@@ -156,20 +157,6 @@ public class InputManager : MonoBehaviour, IPlayerActions
         }
     }
 
-    public void OnToggleGhost(InputAction.CallbackContext context)
-    {
-        if (!inputEnabled) return;
-
-        if (context.ReadValue<float>() > 0)
-        {
-            ghostKey.KeyDown();
-        }
-        else if (context.ReadValue<float>() <= 0)
-        {
-            ghostKey.KeyUp();
-        }
-    }
-
     public void OnRecordGhost(InputAction.CallbackContext context)
     {
         if (!inputEnabled) return;
@@ -193,18 +180,6 @@ public class InputManager : MonoBehaviour, IPlayerActions
         else if (context.ReadValue<float>() <= 0)
         {
             pauseKey.KeyUp();
-        }
-    }
-
-    public void OnRewind(InputAction.CallbackContext context)
-    {
-        if (context.ReadValue<float>() > 0)
-        {
-            rewindKey.KeyDown();
-        }
-        else if (context.ReadValue<float>() <= 0)
-        {
-            rewindKey.KeyUp();
         }
     }
 
@@ -253,6 +228,48 @@ public class InputManager : MonoBehaviour, IPlayerActions
         else if(context.ReadValue<float>() <= 0)
         {
             shootKey.KeyUp();
+        }
+    }
+
+    public void OnDestroyGhost(InputAction.CallbackContext context)
+    {
+        if (!inputEnabled) return;
+
+        if (context.ReadValue<float>() > 0)
+        {
+            ghostKey.KeyDown();
+        }
+        else if (context.ReadValue<float>() <= 0)
+        {
+            ghostKey.KeyUp();
+        }
+    }
+
+    public void OnPauseGhost(InputAction.CallbackContext context)
+    {
+        if (!inputEnabled) return;
+
+        if (context.ReadValue<float>() > 0)
+        {
+            pauseGhostKey.KeyDown();
+        }
+        else if (context.ReadValue<float>() <= 0)
+        {
+            pauseGhostKey.KeyUp();
+        }
+    }
+
+    public void OnRewindGhost(InputAction.CallbackContext context)
+    {
+        if (!inputEnabled) return;
+
+        if (context.ReadValue<float>() > 0)
+        {
+            rewindGhostKey.KeyDown();
+        }
+        else if (context.ReadValue<float>() <= 0)
+        {
+            rewindGhostKey.KeyUp();
         }
     }
 }

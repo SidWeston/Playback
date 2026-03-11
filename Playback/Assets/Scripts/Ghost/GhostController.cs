@@ -14,7 +14,8 @@ public class GhostController : MonoBehaviour
         InputManager.instance.selectOne.keyPress += SelectGhostA;
         InputManager.instance.selectTwo.keyPress += SelectGhostB;
         InputManager.instance.interactKey.keyPress += OnInteract;        
-        InputManager.instance.shootKey.keyPress += OnPause;
+        InputManager.instance.pauseGhostKey.keyPress += OnPause;
+        InputManager.instance.rewindGhostKey.keyPress += OnRewind;
 
         //extra events to control crouching and sprinting anims on ghost
         //as they cancel each other, but dont change the anims if they are held at the same time
@@ -51,7 +52,7 @@ public class GhostController : MonoBehaviour
     {
         if(input && currentGhost != null)
         {
-            currentGhost.ToggleGhost(true);
+            currentGhost.DeactivateGhost();            
         }
     }
 
@@ -61,12 +62,6 @@ public class GhostController : MonoBehaviour
         {
             currentGhost.StartRecording(true);
         }
-    }
-
-    public void StopRecording()
-    {
-        currentGhost.StartRecording(true);
-        currentGhost.ToggleGhost(true);
     }
 
     public bool IsRecording() //linked to the player rewind mechanic
@@ -123,7 +118,7 @@ public class GhostController : MonoBehaviour
 
     private void OnPause(bool input)
     {
-        if (currentGhost.ghostState != GhostState.Playing && currentGhost.ghostState != GhostState.Paused) return;
+        if (currentGhost.ghostState != GhostState.Playing && currentGhost.ghostState != GhostState.Paused && currentGhost.ghostState != GhostState.Rewinding) return;
 
         if(input && currentGhost)
         {
@@ -133,6 +128,11 @@ public class GhostController : MonoBehaviour
 
     private void OnRewind(bool input)
     {
-        if (currentGhost.ghostState != GhostState.Playing) return;
+        if (currentGhost.ghostState != GhostState.Playing && currentGhost.ghostState != GhostState.Rewinding) return;
+
+        if(input && currentGhost)
+        {
+            currentGhost.ToggleRewind();
+        }
     }
 }

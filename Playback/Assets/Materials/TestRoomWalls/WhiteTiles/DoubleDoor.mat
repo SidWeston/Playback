@@ -18,8 +18,6 @@ Material:
   - _AOMAP_ON
   - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
-  - _CONTRAST_BRIGHTNESS_ON
-  - _CUSTOM_AMBIENT_LIGHT_ON
   - _CUSTOM_SHADOW_COLOR_ON
   - _FADEUVSET_UV1
   - _GREYSCALESTAGE_BEFORELIGHTING
@@ -239,11 +237,11 @@ Material:
     - _ColorRampScrollSpeed: 0
     - _ColorRampTiling: 1
     - _Contrast: 1.2
-    - _ContrastBrightnessOn: 1
+    - _ContrastBrightnessOn: 0
     - _ContrastLM: 1
     - _Cull: 2
     - _CullingMode: 2
-    - _CustomAmbientLightOn: 1
+    - _CustomAmbientLightOn: 0
     - _CustomShadowColorOn: 1
     - _Cutoff: 0.5
     - _DepthColoringOn: 0
@@ -337,8 +335,8 @@ Material:
     - _MaxFadeDistance: 250
     - _MaxGradientHeight: 0.75
     - _MaxInflate: 0.2
-    - _MaxRim: 0.6
-    - _Metallic: 0.5
+    - _MaxRim: 0.2
+    - _Metallic: 0
     - _MetallicMapOn: 1
     - _MinDistanceToFade: 0
     - _MinGradientHeight: 0
@@ -366,7 +364,7 @@ Material:
     - _Reflections: 2
     - _ReflectionsAtten: 0
     - _RenderPreset: 1
-    - _RimAttenuation: 0.15
+    - _RimAttenuation: 0.05
     - _RimLighting: 1
     - _RimLightingStage: 2
     - _SSSAtten: 1
@@ -383,7 +381,7 @@ Material:
     - _ShakeBlend: 1
     - _ShakeSpeedMult: 1
     - _Shininess: 5.5
-    - _Smoothness: 0.5
+    - _Smoothness: 0.989
     - _SmoothnessTextureChannel: 0
     - _SpecularAtten: 0.5
     - _SpecularHighlights: 1

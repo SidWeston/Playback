@@ -70,9 +70,27 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleGhost",
+                    "name": "DestroyGhost",
                     "type": "Button",
                     "id": "b8004e30-28c0-471c-81ee-e1d73c9d5024",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PauseGhost",
+                    "type": "Button",
+                    "id": "4d9d47bb-45f1-4099-994a-dd3830592f70",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RewindGhost",
+                    "type": "Button",
+                    "id": "46a18c4c-cd23-44ee-b2c5-00d3e52020fe",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -82,15 +100,6 @@
                     "name": "Pause",
                     "type": "Button",
                     "id": "bad4ea3b-4c60-4456-b9d2-087b99ac60e2",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Rewind",
-                    "type": "Button",
-                    "id": "4d9d47bb-45f1-4099-994a-dd3830592f70",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -284,7 +293,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ToggleGhost",
+                    "action": "DestroyGhost",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -306,7 +315,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Rewind",
+                    "action": "PauseGhost",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -351,6 +360,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "753778c8-1a4b-446e-9da7-72d9e46ce5f9",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RewindGhost",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

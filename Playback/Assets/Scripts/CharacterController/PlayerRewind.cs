@@ -22,7 +22,7 @@ public class PlayerRewind : MonoBehaviour
 
         StartCoroutine(RecordFrames());
 
-        InputManager.instance.rewindKey.keyPress += OnRewind;
+        //InputManager.instance.rewindKey.keyPress += OnRewind;
     }
 
     IEnumerator RewindSmoothLerp()
@@ -98,7 +98,7 @@ public class PlayerRewind : MonoBehaviour
 
             if(ghostController.IsRecording())
             {
-                ghostController.StopRecording();
+                //ghostController.StopRecording();
             }
 
             StartCoroutine(RewindSmoothLerp());

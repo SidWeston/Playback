@@ -156,9 +156,27 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ToggleGhost"",
+                    ""name"": ""DestroyGhost"",
                     ""type"": ""Button"",
                     ""id"": ""b8004e30-28c0-471c-81ee-e1d73c9d5024"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PauseGhost"",
+                    ""type"": ""Button"",
+                    ""id"": ""4d9d47bb-45f1-4099-994a-dd3830592f70"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RewindGhost"",
+                    ""type"": ""Button"",
+                    ""id"": ""46a18c4c-cd23-44ee-b2c5-00d3e52020fe"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -168,15 +186,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""name"": ""Pause"",
                     ""type"": ""Button"",
                     ""id"": ""bad4ea3b-4c60-4456-b9d2-087b99ac60e2"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Rewind"",
-                    ""type"": ""Button"",
-                    ""id"": ""4d9d47bb-45f1-4099-994a-dd3830592f70"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -370,7 +379,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ToggleGhost"",
+                    ""action"": ""DestroyGhost"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -392,7 +401,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Rewind"",
+                    ""action"": ""PauseGhost"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -439,6 +448,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Shoot"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""753778c8-1a4b-446e-9da7-72d9e46ce5f9"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RewindGhost"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -454,9 +474,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_RecordGhost = m_Player.FindAction("RecordGhost", throwIfNotFound: true);
-        m_Player_ToggleGhost = m_Player.FindAction("ToggleGhost", throwIfNotFound: true);
+        m_Player_DestroyGhost = m_Player.FindAction("DestroyGhost", throwIfNotFound: true);
+        m_Player_PauseGhost = m_Player.FindAction("PauseGhost", throwIfNotFound: true);
+        m_Player_RewindGhost = m_Player.FindAction("RewindGhost", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
-        m_Player_Rewind = m_Player.FindAction("Rewind", throwIfNotFound: true);
         m_Player_SelectOne = m_Player.FindAction("SelectOne", throwIfNotFound: true);
         m_Player_SelectTwo = m_Player.FindAction("SelectTwo", throwIfNotFound: true);
         m_Player_Drop = m_Player.FindAction("Drop", throwIfNotFound: true);
@@ -548,9 +569,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_RecordGhost;
-    private readonly InputAction m_Player_ToggleGhost;
+    private readonly InputAction m_Player_DestroyGhost;
+    private readonly InputAction m_Player_PauseGhost;
+    private readonly InputAction m_Player_RewindGhost;
     private readonly InputAction m_Player_Pause;
-    private readonly InputAction m_Player_Rewind;
     private readonly InputAction m_Player_SelectOne;
     private readonly InputAction m_Player_SelectTwo;
     private readonly InputAction m_Player_Drop;
@@ -595,17 +617,21 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @RecordGhost => m_Wrapper.m_Player_RecordGhost;
         /// <summary>
-        /// Provides access to the underlying input action "Player/ToggleGhost".
+        /// Provides access to the underlying input action "Player/DestroyGhost".
         /// </summary>
-        public InputAction @ToggleGhost => m_Wrapper.m_Player_ToggleGhost;
+        public InputAction @DestroyGhost => m_Wrapper.m_Player_DestroyGhost;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/PauseGhost".
+        /// </summary>
+        public InputAction @PauseGhost => m_Wrapper.m_Player_PauseGhost;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/RewindGhost".
+        /// </summary>
+        public InputAction @RewindGhost => m_Wrapper.m_Player_RewindGhost;
         /// <summary>
         /// Provides access to the underlying input action "Player/Pause".
         /// </summary>
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/Rewind".
-        /// </summary>
-        public InputAction @Rewind => m_Wrapper.m_Player_Rewind;
         /// <summary>
         /// Provides access to the underlying input action "Player/SelectOne".
         /// </summary>
@@ -669,15 +695,18 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @RecordGhost.started += instance.OnRecordGhost;
             @RecordGhost.performed += instance.OnRecordGhost;
             @RecordGhost.canceled += instance.OnRecordGhost;
-            @ToggleGhost.started += instance.OnToggleGhost;
-            @ToggleGhost.performed += instance.OnToggleGhost;
-            @ToggleGhost.canceled += instance.OnToggleGhost;
+            @DestroyGhost.started += instance.OnDestroyGhost;
+            @DestroyGhost.performed += instance.OnDestroyGhost;
+            @DestroyGhost.canceled += instance.OnDestroyGhost;
+            @PauseGhost.started += instance.OnPauseGhost;
+            @PauseGhost.performed += instance.OnPauseGhost;
+            @PauseGhost.canceled += instance.OnPauseGhost;
+            @RewindGhost.started += instance.OnRewindGhost;
+            @RewindGhost.performed += instance.OnRewindGhost;
+            @RewindGhost.canceled += instance.OnRewindGhost;
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
-            @Rewind.started += instance.OnRewind;
-            @Rewind.performed += instance.OnRewind;
-            @Rewind.canceled += instance.OnRewind;
             @SelectOne.started += instance.OnSelectOne;
             @SelectOne.performed += instance.OnSelectOne;
             @SelectOne.canceled += instance.OnSelectOne;
@@ -722,15 +751,18 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @RecordGhost.started -= instance.OnRecordGhost;
             @RecordGhost.performed -= instance.OnRecordGhost;
             @RecordGhost.canceled -= instance.OnRecordGhost;
-            @ToggleGhost.started -= instance.OnToggleGhost;
-            @ToggleGhost.performed -= instance.OnToggleGhost;
-            @ToggleGhost.canceled -= instance.OnToggleGhost;
+            @DestroyGhost.started -= instance.OnDestroyGhost;
+            @DestroyGhost.performed -= instance.OnDestroyGhost;
+            @DestroyGhost.canceled -= instance.OnDestroyGhost;
+            @PauseGhost.started -= instance.OnPauseGhost;
+            @PauseGhost.performed -= instance.OnPauseGhost;
+            @PauseGhost.canceled -= instance.OnPauseGhost;
+            @RewindGhost.started -= instance.OnRewindGhost;
+            @RewindGhost.performed -= instance.OnRewindGhost;
+            @RewindGhost.canceled -= instance.OnRewindGhost;
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
-            @Rewind.started -= instance.OnRewind;
-            @Rewind.performed -= instance.OnRewind;
-            @Rewind.canceled -= instance.OnRewind;
             @SelectOne.started -= instance.OnSelectOne;
             @SelectOne.performed -= instance.OnSelectOne;
             @SelectOne.canceled -= instance.OnSelectOne;
@@ -833,12 +865,26 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRecordGhost(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "ToggleGhost" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "DestroyGhost" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnToggleGhost(InputAction.CallbackContext context);
+        void OnDestroyGhost(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PauseGhost" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPauseGhost(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RewindGhost" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRewindGhost(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Pause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -846,13 +892,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPause(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Rewind" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRewind(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "SelectOne" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

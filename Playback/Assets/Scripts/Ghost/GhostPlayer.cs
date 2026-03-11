@@ -11,6 +11,7 @@ public class GhostPlayer : MonoBehaviour
     private List<GhostEvent> eventLog = new List<GhostEvent>();
 
     public GhostState ghostState;
+    private GhostState unpausedState;
 
     [SerializeField] private float frameInterval = 0.1f;
     [SerializeField] private float recordDuration = 5f;
@@ -60,6 +61,7 @@ public class GhostPlayer : MonoBehaviour
     private bool paused = false;
     private bool rewind = false;
 
+    private float currentPlaybackTime = 0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -89,56 +91,102 @@ public class GhostPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (ghostState != GhostState.Playing || recording.Count < 2) return;
-        
+        if ((ghostState != GhostState.Playing && ghostState != GhostState.Rewinding) || recording.Count < 2) return;
+
+        UpdateTimers();
+        AdvanceFrames();
+        UpdateTransform();
+        ProcessEvents();        
+    }
+
+    private void UpdateTimers()
+    {
         frameTimer += Time.deltaTime;
-        duration -= Time.deltaTime;
+        if (ghostState == GhostState.Playing)
+        {
+            duration -= Time.deltaTime;
+            currentPlaybackTime += Time.deltaTime;
+        }
+        else if (ghostState == GhostState.Rewinding)
+        {
+            duration += Time.deltaTime;
+            currentPlaybackTime -= Time.deltaTime;
+        }
 
         GameUI.instance.UpdateGhostUITime(ghostUI.index, duration);
+    }
 
+    private void AdvanceFrames()
+    {
+        //after every frame interval, e.g 0.1 seconds, the recording must have reached a new frame, so increment
         while (frameTimer > frameInterval)
         {
-            frameTimer -= frameInterval;
-            currentFrameIndex++;
+            frameTimer = 0;
+
+            if (ghostState == GhostState.Playing) currentFrameIndex++;
+            else if (ghostState == GhostState.Rewinding) currentFrameIndex--;
+
             //reached the end of playback, loop back to the start
-            if (currentFrameIndex >= recording.Count - 1)
+            if (currentFrameIndex >= recording.Count - 1 || currentFrameIndex < 0)
             {
                 ApplyInitialFrameState();
-                currentFrameIndex = 0;
-                currentEventIndex = 0;
-                playbackStartTime = Time.time;
+                currentFrameIndex = ghostState == GhostState.Playing ? 0 : recording.Count - 2;
+                currentEventIndex = ghostState == GhostState.Playing ? 0 : eventLog.Count - 1;
+                currentPlaybackTime = ghostState == GhostState.Playing ? 0 : fullDuration;
+                duration = ghostState == GhostState.Playing ? fullDuration : 0;
+
                 PerformGlitchEffect();
                 glitchSound.Play();
-                duration = fullDuration;
-
                 CheckForPlayerOverlap();
             }
         }
+    }
 
+    private void UpdateTransform()
+    {
         //get 2 frames to interpolate between
         GhostFrame a = recording[currentFrameIndex];
-        GhostFrame b = recording[currentFrameIndex + 1];       
+        GhostFrame b = recording[currentFrameIndex + 1];
+
         float t = frameTimer / frameInterval;
 
-        Vector3 position = Vector3.Lerp(a.position, b.position, t);
-        Quaternion rotation = Quaternion.Slerp(a.rotation, b.rotation, t);
-        transform.position = position;
-        transform.rotation = rotation;
-
-        float playbackTime = Time.time - playbackStartTime;
-
-        while (currentEventIndex < eventLog.Count && eventLog[currentEventIndex].time <= playbackTime)
+        if (ghostState == GhostState.Playing)
         {
-            TriggerEvent(eventLog[currentEventIndex]);
-            currentEventIndex++;
+            transform.position = Vector3.Lerp(a.position, b.position, t);
+            transform.rotation = Quaternion.Slerp(a.rotation, b.rotation, t);
+        }
+        else if (ghostState == GhostState.Rewinding)
+        {
+            transform.position = Vector3.Lerp(b.position, a.position, t);
+            transform.rotation = Quaternion.Slerp(b.rotation, a.rotation, t);
         }
 
         //if the movement direction changes, update the animation
-        if(a.movementInput != b.movementInput || stateSwapped)
+        if (a.movementInput != b.movementInput || stateSwapped)
         {
             stateSwapped = false;
             animationController.PlayMovementAnimation(b.movementInput);
-        }        
+        }
+    }
+
+    private void ProcessEvents()
+    {
+        if(ghostState == GhostState.Playing)
+        {
+            while (currentEventIndex < eventLog.Count && eventLog[currentEventIndex].time <= currentPlaybackTime)
+            {
+                TriggerEvent(eventLog[currentEventIndex]);
+                currentEventIndex++;
+            }
+        }
+        else if(ghostState == GhostState.Rewinding)
+        {
+            while (currentEventIndex >= 0 && eventLog[currentEventIndex].time >= currentPlaybackTime)
+            {
+                TriggerReverseEvent(eventLog[currentEventIndex]);
+                currentEventIndex--;
+            }
+        }
     }
 
     private void ApplyInitialFrameState()
@@ -228,14 +276,14 @@ public class GhostPlayer : MonoBehaviour
                 if (Physics.Raycast(rayThroughPlayer, out RaycastHit wallHit, 1.5f, obstacleLayers))
                 {
                     collisionsDisabled = true;
-                    Physics.IgnoreCollision(ghostCollider, playerMovement.gameObject.GetComponent<CharacterController>(), true);
+                    Physics.IgnoreCollision(ghostCollider, playerCharacterController, true);
                 }
             }
         }
         else if(collisionsDisabled && Vector3.Distance(transform.position, playerMovement.transform.position) > 1.25f)
         {
             collisionsDisabled = false;
-            Physics.IgnoreCollision(ghostCollider, playerMovement.gameObject.GetComponent<CharacterController>(), false);
+            Physics.IgnoreCollision(ghostCollider, playerCharacterController, false);
         }
         
     }
@@ -252,15 +300,11 @@ public class GhostPlayer : MonoBehaviour
     public IEnumerator RecordGhostFrames()
     {
         //setup
-        ghostState = GhostState.Recording;        
-        earlyStop = false;
-        if(visualsActive) ToggleGhost(true);
+        SetupRecording();
+        
         List<GhostFrame> newFrames = new List<GhostFrame>();
         float timer = 0f;
-        recordingStartTime = Time.time;
-
-        GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Recording);
-
+      
         //loop through
         while (timer < recordDuration && !earlyStop)
         {
@@ -271,32 +315,42 @@ public class GhostPlayer : MonoBehaviour
         }
 
         //finish
+        FinishRecording(newFrames, timer);
+    }
+
+    private void SetupRecording()
+    {
+        ghostState = GhostState.Recording;
+        earlyStop = false;
+        recordingStartTime = Time.time;
+        eventLog.Clear();
+        GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Recording);
+    }
+
+    private void FinishRecording(List<GhostFrame> newFrames, float timer)
+    {
+        recording = newFrames;
         fullDuration = timer;
         duration = timer;
-
-        //toggle the ghost visuals and effects
-        if (!visualsActive) ToggleGhost(true);
-        recording = newFrames;
         currentFrameIndex = 0;
-        PerformGlitchEffect();
-        glitchSound.Play();
-
-        //pass data to the UI handler
-        GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Play);
-
-        //setup to play the first frame of the recording
         frameTimer = 0;
-        transform.position = recording[0].position;
-        transform.rotation = recording[0].rotation;
-        ghostState = GhostState.Playing;
-        ApplyInitialFrameState();
-
-        //check if the ghost has spawned in the same space as the player
-        CheckForPlayerOverlap();
-
-        //event stuff
+        currentPlaybackTime = 0f;
         playbackStartTime = Time.time;
         currentEventIndex = 0;
+
+        transform.position = recording[0].position;
+        transform.rotation = recording[0].rotation;
+
+        ActivateGhost(GhostState.Playing);
+        PerformGlitchEffect();
+        glitchSound.Play();        
+        StartCoroutine(EnableColliderAfterFrame());
+
+        ApplyInitialFrameState();
+        ghostState = GhostState.Playing;
+
+        GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Play);
+        CheckForPlayerOverlap();
     }
 
     public void RecordEvent(GhostEvent.EventType type)
@@ -314,15 +368,17 @@ public class GhostPlayer : MonoBehaviour
         {
             if (ghostState != GhostState.Recording) //start recording
             {
-                if(ghostState == GhostState.Playing)
+                //check if there is an active ghost
+                if(ghostState == GhostState.Playing || ghostState == GhostState.Rewinding || ghostState == GhostState.Paused)
                 {
-                    ToggleGhost(true);
+                    DeactivateGhost();                    
                 }
                 canRecord = false;
+                
                 Invoke(nameof(ResetCanRecord), recordDelay); //to stop recordings being spammed there is a short delay between activation and deactivation
                 StartCoroutine(RecordGhostFrames());
             }
-            else if (ghostState == GhostState.Recording) //end recording early
+            else if (ghostState == GhostState.Recording || ghostState == GhostState.Rewinding) //end recording early
             {
                 earlyStop = true;
             }
@@ -380,6 +436,57 @@ public class GhostPlayer : MonoBehaviour
         }
     }
 
+    private void TriggerReverseEvent(GhostEvent ghostEvent)
+    {
+        switch (ghostEvent.type)
+        {
+            case GhostEvent.EventType.Interact:
+                {
+                    //should interactions fire in reverse?
+                    //something to test perchance
+                    //TryInteract();
+                    break;
+                }
+            case GhostEvent.EventType.Crouch:
+                {
+                    //crouch means uncrouching
+                    ghostCollider.size = standingColSize;
+                    ghostCollider.center = Vector3.zero;
+                    animationController.SwitchAnimSet(MoveMode.WALK);
+                    stateSwapped = true;
+                    break;
+                }
+            case GhostEvent.EventType.UnCrouch:
+                {
+                    //uncrouching means crouching
+                    ghostCollider.size = crouchedColSize;
+                    ghostCollider.center = new Vector3(0, crouchedColOffset, 0);
+                    animationController.SwitchAnimSet(MoveMode.CROUCH);
+                    stateSwapped = true;
+                    break;
+                }
+            case GhostEvent.EventType.Sprint:
+                {
+                    //sprinting means unsprinting
+                    ghostCollider.size = standingColSize;
+                    ghostCollider.center = Vector3.zero;
+                    animationController.SwitchAnimSet(MoveMode.WALK);
+                    stateSwapped = true;
+                    break;
+                }
+            case GhostEvent.EventType.UnSprint:
+                {
+                    //unsprinting means sprinting
+                    ghostCollider.size = standingColSize;
+                    ghostCollider.center = Vector3.zero;
+                    animationController.SwitchAnimSet(MoveMode.SPRINT);
+                    stateSwapped = true;
+                    break;
+                }
+        }
+
+    }
+
     private void TryInteract()
     {
         RaycastHit hit;
@@ -394,12 +501,7 @@ public class GhostPlayer : MonoBehaviour
                 interactable.Interact(gameObject);
             }
         }
-    }
-    
-    public void ClearEventLog()
-    {
-        eventLog.Clear();
-    }
+    }   
 
     public void ToggleGhost(bool input)
     {
@@ -425,6 +527,40 @@ public class GhostPlayer : MonoBehaviour
 
             if (!visualsActive && recording.Count > 0) recording.Clear();
         }
+    }
+
+    public void ActivateGhost(GhostState newState)
+    {
+        ghostState = newState;
+        SetVisualsActive(true);
+        SetCollidersActive(true);
+        StartCoroutine(EnableColliderAfterFrame());
+    }
+
+    public void DeactivateGhost()
+    {
+        ghostState = GhostState.Inactive;
+        SetVisualsActive(false);
+        SetCollidersActive(false);
+        recording.Clear();
+        eventLog.Clear();
+        currentFrameIndex = 0;
+    }
+
+    private void SetVisualsActive(bool active)
+    {
+        head.SetActive(active);
+        body.SetActive(active);
+        visualsActive = active;
+        transform.position = active ? transform.position : new Vector3(-100, -100, -100);
+
+        GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Pause);
+        GameUI.instance.UpdateGhostUITime(ghostUI.index, 0);
+    }
+
+    private void SetCollidersActive(bool active)
+    {
+        ghostCollider.enabled = active;
     }
 
     private void PerformGlitchEffect()
@@ -457,19 +593,53 @@ public class GhostPlayer : MonoBehaviour
 
     public void TogglePause()
     {
-        if(ghostState == GhostState.Playing)
+        if(ghostState == GhostState.Playing || ghostState == GhostState.Rewinding)
         {
+            unpausedState = ghostState;
             ghostState = GhostState.Paused;
+            animationController.PauseAnimation();
         }
         else if(ghostState == GhostState.Paused && recording.Count >= 2)
         {
-            ghostState = GhostState.Playing;
+            ghostState = unpausedState;            
+            animationController.UnPauseAnimation();
         }        
     }
 
     public void ToggleRewind()
     {
+        if(ghostState == GhostState.Playing)
+        {
+            ghostState = GhostState.Rewinding;
+            currentPlaybackTime = fullDuration - duration;
+            currentEventIndex = FindLastEventBefore(currentPlaybackTime);
+            animationController.ReverseAnimations();
+        }
+        else if(ghostState == GhostState.Rewinding)
+        {
+            ghostState = GhostState.Playing;
+            currentPlaybackTime = fullDuration - duration;
+            currentEventIndex = FindFirstEventAfter(currentPlaybackTime);
+            animationController.ForwardAnimations();
+        }
+    }
 
+    private int FindLastEventBefore(float time)
+    { 
+        for(int i = eventLog.Count - 1; i >= 0; i--)
+        {
+            if (eventLog[i].time <= time) return i;
+        }
+        return -1;
+    }
+
+    private int FindFirstEventAfter(float time)
+    {
+        for(int i = 0; i < eventLog.Count; i++)
+        {
+            if (eventLog[i].time >= time) return i;
+        }
+        return eventLog.Count;
     }
 }
 
@@ -488,8 +658,7 @@ public struct GhostEvent
 {
     public float time;
     public EventType type;
-
-    //TODO: Add more events for crouching, sprinting etc.
+    
     public enum EventType
     {
         Interact,     
@@ -506,5 +675,5 @@ public enum GhostState
     Playing,
     Inactive,
     Paused,
-    Rewind
+    Rewinding
 }

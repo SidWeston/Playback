@@ -10,24 +10,46 @@ public class GhostAnimationController : MonoBehaviour
 
     public AnimSwitcher animSwitcher;
 
+    private AnimancerState state;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         currentIdle = animSwitcher.idle;
         currentMoveSet = animSwitcher.walkSet;
-        animancer.Play(currentIdle); //assume it starts idle
+        state = animancer.Play(currentIdle); //assume it starts idle        
     }
 
     public void PlayMovementAnimation(Vector2 moveVector)
     {
         if (moveVector == Vector2.zero)
         {
-            animancer.Play(currentIdle, 0.15f);
+            state = animancer.Play(currentIdle, 0.15f);
         }
         else
         {
-            animancer.Play(currentMoveSet.Get(moveVector), 0.15f);
+            state = animancer.Play(currentMoveSet.Get(moveVector), 0.15f);
         }
+    }
+
+    public void PauseAnimation()
+    {        
+        state.IsPlaying = false;
+    }
+
+    public void UnPauseAnimation()
+    {
+        state.IsPlaying = true;        
+    }
+
+    public void ReverseAnimations()
+    {
+        state.Speed = -1;
+    }
+
+    public void ForwardAnimations()
+    {
+        state.Speed = 1;
     }
 
     public void SwitchAnimSet(MoveMode moveMode)

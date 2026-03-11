@@ -2993,7 +2993,6 @@ GameObject:
   - component: {fileID: 5974653435150049071}
   - component: {fileID: 4653575705279436589}
   - component: {fileID: 4874481943290677820}
-  - component: {fileID: 5906679367376822722}
   - component: {fileID: 3712309354710438930}
   - component: {fileID: 6092844924510624725}
   m_Layer: 7
@@ -3064,7 +3063,7 @@ MonoBehaviour:
   walkSpeed: 4
   sprintSpeed: 6
   crouchSpeed: 2
-  jumpHeight: 1
+  jumpHeight: 1.5
   stoodCamPos: {x: 0, y: 0.7, z: 0}
   crouchedCamPos: {x: 0, y: 0.1, z: 0}
   grounded: 0
@@ -3124,25 +3123,6 @@ MonoBehaviour:
   forceMultiplier: 100
   maxHoldDistance: 3
   dampingMulti: 0.95
---- !u!114 &5906679367376822722
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8662953265429487248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9168ec601cc074f47a533aa3a39f0f8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movement: {fileID: 5971502459326427157}
-  playerCamera: {fileID: 6238128522052719806}
-  ghostController: {fileID: 6092844924510624725}
-  shouldRecord: 1
-  isRewinding: 0
-  rewindTime: 10
-  rewindDuration: 1
 --- !u!54 &3712309354710438930
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3182,7 +3162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b401129628e59ea449502086728c7d4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ghosts: []
+  ghosts:
+  - {fileID: 0}
 --- !u!1 &8678372641530580153
 GameObject:
   m_ObjectHideFlags: 0
