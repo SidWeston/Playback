@@ -191,7 +191,7 @@ public class GhostPlayer : MonoBehaviour
 
     private void ApplyInitialFrameState()
     {
-        GhostFrame firstFrame = recording[0];
+        GhostFrame firstFrame = ghostState == GhostState.Playing ? recording[0] : recording[recording.Count - 1];
 
         if(firstFrame.isCrouching)
         {            
@@ -502,32 +502,6 @@ public class GhostPlayer : MonoBehaviour
             }
         }
     }   
-
-    public void ToggleGhost(bool input)
-    {
-        if (input)
-        {
-            if (recording.Count > 2)
-            {
-                ghostState = GhostState.Inactive;
-                currentFrameIndex = 0;
-            }            
-
-            transform.position = new Vector3(-100, -100, -100); //ensure the ghost is out of sight, as it cant be disabled and still allow for recording
-            head.SetActive(!head.activeSelf);
-            body.SetActive(!body.activeSelf);
-            visualsActive = !visualsActive;
-            if (!visualsActive)
-            {
-                GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Pause);
-                GameUI.instance.UpdateGhostUITime(ghostUI.index, 0);
-            }
-            //need to wait a frame to wait for physics updates
-            StartCoroutine(EnableColliderAfterFrame());
-
-            if (!visualsActive && recording.Count > 0) recording.Clear();
-        }
-    }
 
     public void ActivateGhost(GhostState newState)
     {

@@ -28,7 +28,7 @@ public class EnergyWall : MonoBehaviour
             {
                 GameObject vfx = Instantiate(explodeVFXPrefab, ghost.transform.position, ghost.transform.rotation);
                 Destroy(vfx, vfxDuration);
-                ghost.ToggleGhost(true);
+                ghost.DeactivateGhost();
                 if(gameObject.TryGetComponent(out Renderer renderer))
                 {
                     renderer.material.SetFloat("_GlitchAmount", 0.5f);

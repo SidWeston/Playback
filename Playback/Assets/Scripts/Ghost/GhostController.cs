@@ -52,7 +52,7 @@ public class GhostController : MonoBehaviour
     {
         if(input && currentGhost != null)
         {
-            currentGhost.DeactivateGhost();            
+            if(currentGhost.ghostState == GhostState.Playing || currentGhost.ghostState == GhostState.Rewinding) currentGhost.DeactivateGhost();
         }
     }
 
