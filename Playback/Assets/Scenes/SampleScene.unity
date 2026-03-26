@@ -93,8 +93,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: cf683c50d80569d42913eaf1b41cc8c2, type: 2}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 760b6a364895ecd49b056e45e26c5a9a, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1313,7 +1313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activatableObjects: []
-  active: 0
+  powered: 0
   powerline: {fileID: 0}
   lineOff: {fileID: 0}
   lineOn: {fileID: 0}
@@ -1547,6 +1547,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2509,6 +2510,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2697,7 +2699,6 @@ MonoBehaviour:
   ghostUIs: []
   backButton: {fileID: 1386103471}
   backToMenuButton: {fileID: 258771570}
-  musicSource: {fileID: 0}
   testScene: 1
   emptySymbolPrefab: {fileID: 4101759683434359485, guid: 638c21c7f3debc8439121c7e6eff9ba6, type: 3}
   emptyTextPrefab: {fileID: 6514261014643860827, guid: dfac111803c137745aa92d82e9e8a066, type: 3}
@@ -3204,6 +3205,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3346,7 +3348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activatableObjects: []
-  active: 0
+  powered: 0
   powerline: {fileID: 0}
   lineOff: {fileID: 0}
   lineOn: {fileID: 0}
@@ -3547,6 +3549,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3779,6 +3782,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -4511,7 +4515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activatableObjects: []
-  active: 0
+  powered: 0
   powerline: {fileID: 0}
   lineOff: {fileID: 0}
   lineOn: {fileID: 0}
@@ -5494,6 +5498,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -6203,6 +6208,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -6358,6 +6364,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -7662,6 +7669,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -8370,8 +8378,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15f1cbeff2663b9488afcd729c472982, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poweredObj: {fileID: 1037074551}
+  activatableObjects: []
   powered: 0
+  poweredObj: {fileID: 1037074551}
   powerline: {fileID: 0}
   lineOff: {fileID: 0}
   lineOn: {fileID: 0}
@@ -8430,7 +8439,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activatableObjects: []
-  active: 0
+  powered: 0
   powerline: {fileID: 0}
   lineOff: {fileID: 0}
   lineOn: {fileID: 0}
@@ -8910,6 +8919,9 @@ MonoBehaviour:
   doors:
   - {fileID: 9035280754024086462}
   - {fileID: 6168096164946128618}
+  wallLights: []
+  lightOff: {fileID: 0}
+  lightOn: {fileID: 0}
 --- !u!4 &5820593061811713872
 Transform:
   m_ObjectHideFlags: 0

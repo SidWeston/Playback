@@ -130,11 +130,22 @@ public class GhostPlayer : MonoBehaviour
             if (currentFrameIndex >= recording.Count - 1 || currentFrameIndex < 0)
             {
                 ApplyInitialFrameState();
-                currentFrameIndex = ghostState == GhostState.Playing ? 0 : recording.Count - 2;
-                currentEventIndex = ghostState == GhostState.Playing ? 0 : eventLog.Count - 1;
-                currentPlaybackTime = ghostState == GhostState.Playing ? 0 : fullDuration;
-                duration = ghostState == GhostState.Playing ? fullDuration : 0;
-
+                //forward - so put it to the start
+                if(ghostState == GhostState.Playing)
+                {
+                    currentFrameIndex = 0;
+                    currentEventIndex = 0;
+                    currentPlaybackTime = 0;
+                    duration = fullDuration;
+                }
+                //backwards - so go to the end
+                else if(ghostState == GhostState.Rewinding)
+                {
+                    currentFrameIndex = recording.Count - 2;
+                    currentEventIndex = eventLog.Count - 1;
+                    currentPlaybackTime = fullDuration;
+                    duration = 0;
+                }               
                 PerformGlitchEffect();
                 glitchSound.Play();
                 CheckForPlayerOverlap();
@@ -442,9 +453,8 @@ public class GhostPlayer : MonoBehaviour
         {
             case GhostEvent.EventType.Interact:
                 {
-                    //should interactions fire in reverse?
-                    //something to test perchance
-                    //TryInteract();
+                    //interactions still happen in reverse as normal
+                    TryInteract();
                     break;
                 }
             case GhostEvent.EventType.Crouch:
