@@ -30,8 +30,16 @@ public class WeaponSway : MonoBehaviour
 
         InputManager.instance.lookEvent += OnMouseMove;
         InputManager.instance.moveEvent += OnMove;
-        InputManager.instance.sprintKey.keyPress += OnSprint;
-        InputManager.instance.shootKey.keyPress += OnShoot;
+        InputManager.instance.sprintKey += OnSprint;
+        InputManager.instance.shootKey += OnShoot;
+    }
+
+    private void OnDestroy()
+    {
+        InputManager.instance.lookEvent -= OnMouseMove;
+        InputManager.instance.moveEvent -= OnMove;
+        InputManager.instance.sprintKey -= OnSprint;
+        InputManager.instance.shootKey -= OnShoot;
     }
 
     // Update is called once per frame

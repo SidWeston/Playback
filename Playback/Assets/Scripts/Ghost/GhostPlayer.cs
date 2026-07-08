@@ -40,10 +40,11 @@ public class GhostPlayer : MonoBehaviour
     private Vector3 standingColSize;
     [SerializeField] private float crouchedColOffset = -0.3f;
 
-    private bool playerOverlapping = false;
+    private bool overlapWantsIgnore = false;
+    private bool wallWantsIgnore = false;
+    private bool currentlyIgnoring = false;
     private Collider[] overlapBuffer = new Collider[4];
 
-    private bool collisionsDisabled = false;
     private bool earlyStop = false;
 
     private float recordDelay = 0.2f;
@@ -87,6 +88,7 @@ public class GhostPlayer : MonoBehaviour
 
         playerCharacterController = playerMovement.gameObject.GetComponent<CharacterController>();
     }
+
     #region Playback
     // Update is called once per frame
     void Update()
@@ -96,7 +98,7 @@ public class GhostPlayer : MonoBehaviour
         UpdateTimers();
         AdvanceFrames();
         UpdateTransform();
-        ProcessEvents();        
+        ProcessEvents();
     }
 
     private void UpdateTimers()
@@ -202,9 +204,9 @@ public class GhostPlayer : MonoBehaviour
 
     private void ApplyInitialFrameState()
     {
-        GhostFrame firstFrame = ghostState == GhostState.Playing ? recording[0] : recording[recording.Count - 1];
+        GhostFrame firstFrame = ghostState == GhostState.Playing ? recording[0] : recording[recording.Count - 1];        
 
-        if(firstFrame.isCrouching)
+        if (firstFrame.isCrouching)
         {            
             ghostCollider.size = crouchedColSize;
             ghostCollider.center = new Vector3(0, crouchedColOffset, 0);
@@ -237,9 +239,19 @@ public class GhostPlayer : MonoBehaviour
 
         //once the player is overlapping, it only needs to be checked for when they stop overlapping. 
         //this gets assigned at the start of each playback loop, as this is the primary time when overlaps and collision errors occur
-        if (playerOverlapping)
+        if (overlapWantsIgnore)
         {
             CheckForPlayerOverlap();
+        }
+    }
+
+    private void UpdateCollisionIgnoreState()
+    {
+        bool shouldIgnore = overlapWantsIgnore || wallWantsIgnore;
+        if(shouldIgnore != currentlyIgnoring)
+        {
+            Physics.IgnoreCollision(ghostCollider, playerCharacterController, shouldIgnore);
+            currentlyIgnoring = shouldIgnore;
         }
     }
 
@@ -253,18 +265,10 @@ public class GhostPlayer : MonoBehaviour
             ghostCollider.transform.rotation,
             playerLayer
         );
-        
+
         //overlapping
-        if(count > 0)
-        {
-            playerOverlapping = true;
-            Physics.IgnoreCollision(ghostCollider, playerCharacterController, true);
-        }
-        else if(playerOverlapping) //not  
-        {
-            playerOverlapping = false;  
-            Physics.IgnoreCollision(ghostCollider, playerCharacterController, false);
-        }
+        overlapWantsIgnore = count > 0;
+        UpdateCollisionIgnoreState();
     }
 
     private void OnDrawGizmos()
@@ -279,22 +283,22 @@ public class GhostPlayer : MonoBehaviour
         //i.e is the player currently between the ghost and a wall and within a distance threshold
         Vector3 toPlayer = playerMovement.transform.position - transform.position;
         Ray rayToPlayer = new Ray(transform.position, toPlayer);
-        if(!collisionsDisabled)
+        if(!wallWantsIgnore)
         {
             if (Physics.Raycast(rayToPlayer, out RaycastHit playerHit, 1.5f, playerLayer))
-            {
+            {                
                 Ray rayThroughPlayer = new Ray(playerMovement.transform.position, toPlayer);
                 if (Physics.Raycast(rayThroughPlayer, out RaycastHit wallHit, 1.5f, obstacleLayers))
-                {
-                    collisionsDisabled = true;
-                    Physics.IgnoreCollision(ghostCollider, playerCharacterController, true);
+                {                    
+                    wallWantsIgnore = true;
+                    UpdateCollisionIgnoreState();
                 }
             }
         }
-        else if(collisionsDisabled && Vector3.Distance(transform.position, playerMovement.transform.position) > 1.25f)
+        else if(wallWantsIgnore && Vector3.Distance(transform.position, playerMovement.transform.position) > 1.25f)
         {
-            collisionsDisabled = false;
-            Physics.IgnoreCollision(ghostCollider, playerCharacterController, false);
+            wallWantsIgnore = false;
+            UpdateCollisionIgnoreState();
         }
         
     }
@@ -302,7 +306,8 @@ public class GhostPlayer : MonoBehaviour
     private IEnumerator EnableColliderAfterFrame()
     {
         yield return new WaitForFixedUpdate();
-        ghostCollider.enabled = !ghostCollider.enabled;
+        ghostCollider.enabled = true;
+        CheckForPlayerOverlap();
     }
 
     #endregion
@@ -354,14 +359,13 @@ public class GhostPlayer : MonoBehaviour
 
         ActivateGhost(GhostState.Playing);
         PerformGlitchEffect();
-        glitchSound.Play();        
-        StartCoroutine(EnableColliderAfterFrame());
+        glitchSound.Play();                
 
         ApplyInitialFrameState();
         ghostState = GhostState.Playing;
 
         GameUI.instance.UpdateGhostUIState(ghostUI.index, RecordState.Play);
-        CheckForPlayerOverlap();
+        //CheckForPlayerOverlap();
     }
 
     public void RecordEvent(GhostEvent.EventType type)

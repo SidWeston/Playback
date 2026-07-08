@@ -21,11 +21,18 @@ public class PlayerAnimationController : MonoBehaviour
     void Start()
     {
         InputManager.instance.moveEvent += OnMove;
-        InputManager.instance.sprintKey.keyPress += OnSprint;
-        InputManager.instance.crouchKey.keyPress += OnCrouch;
+        InputManager.instance.sprintKey += OnSprint;
+        InputManager.instance.crouchKey += OnCrouch;
 
         playerMovement.jumpEvent += OnJump;
         playerMovement.landedEvent += OnLanded;
+    }
+
+    private void OnDestroy()
+    {
+        InputManager.instance.moveEvent -= OnMove;
+        InputManager.instance.sprintKey -= OnSprint;
+        InputManager.instance.crouchKey -= OnCrouch;
     }
 
     // Update is called once per frame

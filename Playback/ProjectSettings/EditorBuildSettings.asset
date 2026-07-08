@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 58b2ca2e9b6ef144793fad85314d6465
   - enabled: 1
-    path: Assets/Scenes/Game Levels/Chapter 1/L101.unity
+    path: Assets/Scenes/BigFacilityLevels/Chapter 1/L101.unity
     guid: 95010a6ff93db784cba21b58e30200c7
   - enabled: 1
     path: Assets/Scenes/Levels/L01 Boost Up.unity
@@ -53,6 +53,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/L13 Ghost Interaction.unity
     guid: a93c69ce26a781046b22474412da4cf0
+  - enabled: 1
+    path: Assets/Scenes/GameLevels/L101.unity
+    guid: 166b3a52b7014c2469979b5aa7715b60
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

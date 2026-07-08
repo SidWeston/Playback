@@ -2906,7 +2906,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerMovement: {fileID: 0}
-  isRecording: 0
+  ghostState: 0
   frameInterval: 0.1
   recordDuration: 12
   animationController: {fileID: 5808585837080059873}
@@ -2916,7 +2916,7 @@ MonoBehaviour:
     m_Bits: 128
   obstacleLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   head: {fileID: 3192516904129123997}
   body: {fileID: 8160859224214552357}
   ghostMat: {fileID: 2100000, guid: 31810d401580865488e513236e1046d8, type: 2}

@@ -58,7 +58,7 @@ public class GameUI : MonoBehaviour
         }
 
         SceneManager.sceneLoaded += OnSceneLoaded;
-        InputManager.instance.pauseKey.keyPress += OnPause;
+        InputManager.instance.pauseKey += OnPause;
         Settings.instance.musicVolumeChange += SetMusicVolume;
 
         //currentActionSymbol = actionSymbolA;

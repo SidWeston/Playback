@@ -169,7 +169,7 @@ Material:
     - _AOContrast: 1
     - _AOMapEnabled: 0
     - _AOMapStrength: 1
-    - _AdvancedConfigurationEnabled: 1
+    - _AdvancedConfigurationEnabled: 0
     - _AffectedByLightmaps: 1
     - _AlbedoVertexColorMode: 1
     - _AlbedoVertexColorOn: 0

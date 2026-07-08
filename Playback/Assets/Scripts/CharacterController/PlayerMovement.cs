@@ -41,14 +41,23 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         InputManager.instance.moveEvent += OnMove;
-        InputManager.instance.jumpKey.keyPress += OnJump;
-        InputManager.instance.crouchKey.keyPress += OnCrouch;
-        InputManager.instance.sprintKey.keyPress += OnSprint;
-        InputManager.instance.interactKey.keyPress += OnInteract;
+        InputManager.instance.jumpKey += OnJump;
+        InputManager.instance.crouchKey += OnCrouch;
+        InputManager.instance.sprintKey += OnSprint;
+        InputManager.instance.interactKey += OnInteract;
 
         moveSpeed = walkSpeed; //assume player always starts off walking
 
         startPosition = transform.position;
+    }
+
+    private void OnDestroy()
+    {
+        InputManager.instance.moveEvent -= OnMove;
+        InputManager.instance.jumpKey -= OnJump;
+        InputManager.instance.crouchKey -= OnCrouch;
+        InputManager.instance.sprintKey -= OnSprint;
+        InputManager.instance.interactKey -= OnInteract;
     }
 
     // Update is called once per frame

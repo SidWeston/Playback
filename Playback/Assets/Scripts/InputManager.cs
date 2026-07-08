@@ -17,20 +17,20 @@ public class InputManager : MonoBehaviour, IPlayerActions
     //events and keys
     public event Action<Vector2> moveEvent;
     public event Action<Vector2> lookEvent;
-
-    public InputKey interactKey = new InputKey();
-    public InputKey crouchKey = new InputKey();
-    public InputKey sprintKey = new InputKey();
-    public InputKey jumpKey = new InputKey();
-    public InputKey recordKey = new InputKey();
-    public InputKey ghostKey = new InputKey();
-    public InputKey pauseKey = new InputKey();    
-    public InputKey selectOne = new InputKey();
-    public InputKey selectTwo = new InputKey();
-    public InputKey dropKey = new InputKey();
-    public InputKey shootKey = new InputKey();
-    public InputKey pauseGhostKey = new InputKey();
-    public InputKey rewindGhostKey = new InputKey();
+    
+    public event Action<bool> interactKey;    
+    public event Action<bool> crouchKey;    
+    public event Action<bool> sprintKey;    
+    public event Action<bool> jumpKey;    
+    public event Action<bool> recordKey;    
+    public event Action<bool> ghostKey;    
+    public event Action<bool> pauseKey;    
+    public event Action<bool> selectOne;    
+    public event Action<bool> selectTwo;    
+    public event Action<bool> dropKey;    
+    public event Action<bool> shootKey;   
+    public event Action<bool> pauseGhostKey;
+    public event Action<bool> rewindGhostKey;
 
     private void Awake()
     {      
@@ -105,13 +105,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            interactKey.KeyDown();           
+            interactKey?.Invoke(true);       
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            interactKey.KeyUp();
+            interactKey?.Invoke(false);
         }
     }
 
@@ -119,13 +119,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            jumpKey.KeyDown();
+            jumpKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            jumpKey.KeyUp();
+            jumpKey?.Invoke(false);
         }
     }
 
@@ -133,13 +133,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            crouchKey.KeyDown();
+            crouchKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            crouchKey.KeyUp();
+            crouchKey?.Invoke(false);
         }
     }
 
@@ -147,13 +147,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            sprintKey.KeyDown();
+            sprintKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            sprintKey.KeyUp();
+            sprintKey?.Invoke(false);
         }
     }
 
@@ -161,73 +161,73 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            recordKey.KeyDown();
+            recordKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            recordKey.KeyUp();
+            recordKey?.Invoke(false);
         }
     }
 
     public void OnPause(InputAction.CallbackContext context)
     {
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            pauseKey.KeyDown();
+            pauseKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            pauseKey.KeyUp();
+            pauseKey?.Invoke(false);
         }
     }
 
     public void OnSelectOne(InputAction.CallbackContext context)
     {
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            selectOne.KeyDown();
+            selectOne?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            selectOne.KeyUp();
+            selectOne?.Invoke(false);
         }
     }
 
     public void OnSelectTwo(InputAction.CallbackContext context)
     {
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            selectTwo.KeyDown();
+            selectTwo?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            selectTwo.KeyUp();
+            selectTwo?.Invoke(false);
         }
     }
 
     public void OnDrop(InputAction.CallbackContext context)
     {
-        if(context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            dropKey.KeyDown();
+            dropKey?.Invoke(true);
         }
-        else if(context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            dropKey.KeyUp();
+            dropKey?.Invoke(false);
         }
     }
 
     public void OnShoot(InputAction.CallbackContext context)
     {
-        if(context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            shootKey.KeyDown();
+            shootKey?.Invoke(true);
         }
-        else if(context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            shootKey.KeyUp();
+            shootKey?.Invoke(false);
         }
     }
 
@@ -235,13 +235,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            ghostKey.KeyDown();
+            ghostKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            ghostKey.KeyUp();
+            ghostKey?.Invoke(false);
         }
     }
 
@@ -249,13 +249,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            pauseGhostKey.KeyDown();
+            pauseGhostKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            pauseGhostKey.KeyUp();
+            pauseGhostKey?.Invoke(false);
         }
     }
 
@@ -263,44 +263,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
     {
         if (!inputEnabled) return;
 
-        if (context.ReadValue<float>() > 0)
+        if (context.performed)
         {
-            rewindGhostKey.KeyDown();
+            rewindGhostKey?.Invoke(true);
         }
-        else if (context.ReadValue<float>() <= 0)
+        else if (context.canceled)
         {
-            rewindGhostKey.KeyUp();
+            rewindGhostKey?.Invoke(false);
         }
-    }
-}
-
-//basic custom class for handling inputs + getting around unity's weird bullshit with the new input system
-public class InputKey
-{
-    public event Action<bool> keyPress;
-
-    public bool isDown = false;    
-    
-    public void InvokeKeyPress(bool input)
-    {
-        //true for key down, false for key up
-        keyPress?.Invoke(input);
-    }
-
-    public void KeyDown()
-    {
-        //check for isDown here, because otherwise the input system will register the key press twice
-        //due to there being both a Started() and Performed() event for inputs.
-        if (!isDown)
-        {
-            isDown = true;
-            InvokeKeyPress(true);
-        }
-    }
-
-    public void KeyUp()
-    {
-        isDown = false;
-        InvokeKeyPress(false);
     }
 }

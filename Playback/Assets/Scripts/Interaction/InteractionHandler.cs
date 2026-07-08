@@ -12,7 +12,12 @@ public class InteractionHandler : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        InputManager.instance.interactKey.keyPress += OnInteract;
+        InputManager.instance.interactKey += OnInteract;
+    }
+
+    private void OnDestroy()
+    {
+        InputManager.instance.interactKey -= OnInteract;
     }
 
     private void OnInteract(bool input)

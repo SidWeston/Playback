@@ -9,13 +9,13 @@ public class GhostController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        InputManager.instance.ghostKey.keyPress += ToggleGhost;
-        InputManager.instance.recordKey.keyPress += StartRecording;
-        InputManager.instance.selectOne.keyPress += SelectGhostA;
-        InputManager.instance.selectTwo.keyPress += SelectGhostB;
-        InputManager.instance.interactKey.keyPress += OnInteract;        
-        InputManager.instance.pauseGhostKey.keyPress += OnPause;
-        InputManager.instance.rewindGhostKey.keyPress += OnRewind;
+        InputManager.instance.ghostKey += ToggleGhost;
+        InputManager.instance.recordKey += StartRecording;
+        InputManager.instance.selectOne += SelectGhostA;
+        InputManager.instance.selectTwo += SelectGhostB;
+        InputManager.instance.interactKey += OnInteract;        
+        InputManager.instance.pauseGhostKey += OnPause;
+        InputManager.instance.rewindGhostKey += OnRewind;
 
         //extra events to control crouching and sprinting anims on ghost
         //as they cancel each other, but dont change the anims if they are held at the same time
@@ -28,6 +28,21 @@ public class GhostController : MonoBehaviour
             currentGhost = ghosts[0];
             GameUI.instance.SetGhostUIActive(0);
         }
+    }
+
+    private void OnDestroy()
+    {
+        InputManager.instance.ghostKey -= ToggleGhost;
+        InputManager.instance.recordKey -= StartRecording;
+        InputManager.instance.selectOne -= SelectGhostA;
+        InputManager.instance.selectTwo -= SelectGhostB;
+        InputManager.instance.interactKey -= OnInteract;
+        InputManager.instance.pauseGhostKey -= OnPause;
+        InputManager.instance.rewindGhostKey -= OnRewind;
+
+        TryGetComponent(out PlayerMovement movement);
+        movement.crouchEvent -= OnCrouch;
+        movement.sprintEvent -= OnSprint;
     }
 
     private void SelectGhostA(bool input)

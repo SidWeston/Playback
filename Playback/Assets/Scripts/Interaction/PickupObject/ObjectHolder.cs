@@ -22,6 +22,12 @@ public class ObjectHolder : MonoBehaviour
 
     }
 
+    private void OnDestroy()
+    {
+        InputManager.instance.interactKey -= OnDropLarge;
+        InputManager.instance.dropKey -= OnDropSmall;
+    }
+
     private void FixedUpdate()
     {
         if(largeObject != null)
@@ -52,7 +58,7 @@ public class ObjectHolder : MonoBehaviour
         largeObject.transform.parent = null;
         largeObject = null;
 
-        InputManager.instance.interactKey.keyPress -= OnDropLarge;
+        InputManager.instance.interactKey -= OnDropLarge;
     }
 
     public void PickupObject(PickupObject obj)
@@ -62,7 +68,7 @@ public class ObjectHolder : MonoBehaviour
         previousDrag = largeObject.rb.linearDamping;
         largeObject.rb.linearDamping = 5f;
 
-        InputManager.instance.interactKey.keyPress += OnDropLarge;
+        InputManager.instance.interactKey += OnDropLarge;
     }
 
     public void PickupSmallObject(SmallPickupObject obj)
@@ -74,7 +80,7 @@ public class ObjectHolder : MonoBehaviour
 
         smallObject.rb.isKinematic = true;
 
-        InputManager.instance.dropKey.keyPress += OnDropSmall;
+        InputManager.instance.dropKey += OnDropSmall;
     }
 
     public void DropSmallObject()
@@ -86,7 +92,7 @@ public class ObjectHolder : MonoBehaviour
 
         smallObject = null;
 
-        InputManager.instance.dropKey.keyPress -= OnDropSmall;
+        InputManager.instance.dropKey -= OnDropSmall;
     }
 
     private void OnDropLarge(bool input)
