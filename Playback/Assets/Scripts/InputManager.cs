@@ -185,6 +185,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnSelectOne(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.performed)
         {
             selectOne?.Invoke(true);
@@ -197,6 +199,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnSelectTwo(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.performed)
         {
             selectTwo?.Invoke(true);
@@ -209,6 +213,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnDrop(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.performed)
         {
             dropKey?.Invoke(true);
@@ -221,6 +227,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
     public void OnShoot(InputAction.CallbackContext context)
     {
+        if (!inputEnabled) return;
+
         if (context.performed)
         {
             shootKey?.Invoke(true);
