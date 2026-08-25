@@ -1,49 +1,59 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ProximityTrigger : MonoBehaviour
 {
-    public ActivatableObject obj;
+    [SerializeField] private bool triggerOnce = false;
 
-    public bool deactivateWhenLeft = false;
+    [Header("Events")]
+    public UnityEvent onTriggerEnter;
+    public UnityEvent onTriggerStay;
+    public UnityEvent onTriggerExit;
 
-    [SerializeField] private LayerMask activatableLayers;
-
-    //powerlight
-    [SerializeField] private Renderer wallLight;
-    [SerializeField] private Material lightOff, lightOn;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        if (!wallLight) return;
-        wallLight.material = lightOff;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    //independent trackers for each activation method - enter, stay, exit.
+    private bool enterTriggered = false;
+    private bool stayTriggered = false;
+    private bool exitTriggered = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
+        if (!other.gameObject.CompareTag("Player")) return;
+
+        if(triggerOnce && enterTriggered)
         {
-            obj.Activate(other.gameObject);
-            if (!wallLight) return;
-            wallLight.material = lightOn;
+            return;
         }
+
+        enterTriggered = true;
+
+        onTriggerEnter?.Invoke();
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (!other.gameObject.CompareTag("Player")) return;
+
+        if (triggerOnce && stayTriggered)
+        {
+            return;
+        }
+
+        stayTriggered = true;
+
+        onTriggerStay?.Invoke();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (!deactivateWhenLeft) return;
+        if (!other.gameObject.CompareTag("Player")) return;
 
-        if ((activatableLayers.value & (1 << other.gameObject.layer)) != 0)
+        if (triggerOnce && exitTriggered)
         {
-            obj.Deactivate();
-            if (!wallLight) return;
-            wallLight.material = lightOff;
+            return;
         }
+
+        exitTriggered = true;
+
+        onTriggerExit?.Invoke();
     }
 }

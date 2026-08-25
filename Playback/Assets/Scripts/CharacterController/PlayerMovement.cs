@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform groundCheckLocation;
 
     private Vector3 velocity;
-    private float gravity = -9.81f;
+    [SerializeField] private float gravity = -9.81f;
 
     //input variables
     private Vector2 moveVector;
